@@ -2,6 +2,7 @@ import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BarChart2, Users, Lightbulb, Search } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 // Define agents first
 const agents = [
@@ -10,32 +11,44 @@ const agents = [
     title: 'Research Manager',
     description: 'Strategy & Coordination',
     icon: BarChart2,
-    color: 'bg-blue-50',
-    iconColor: 'text-blue-600'
+    color: 'bg-blue-50/70',
+    iconColor: 'text-blue-600',
+    selectedColor: 'bg-gradient-to-b from-blue-50 to-blue-100',
+    borderColor: 'border-blue-200',
+    shadowColor: 'shadow-blue-100'
   },
   {
     id: 'market',
     title: 'Market Analyst',
     description: 'Trends & Competition',
     icon: Search,
-    color: 'bg-emerald-50',
-    iconColor: 'text-emerald-600'
+    color: 'bg-emerald-50/70',
+    iconColor: 'text-emerald-600',
+    selectedColor: 'bg-gradient-to-b from-emerald-50 to-emerald-100',
+    borderColor: 'border-emerald-200',
+    shadowColor: 'shadow-emerald-100'
   },
   {
     id: 'consumer',
     title: 'Consumer Expert',
     description: 'Behavior & Segments',
     icon: Users,
-    color: 'bg-violet-50',
-    iconColor: 'text-violet-600'
+    color: 'bg-violet-50/70',
+    iconColor: 'text-violet-600',
+    selectedColor: 'bg-gradient-to-b from-violet-50 to-violet-100',
+    borderColor: 'border-violet-200',
+    shadowColor: 'shadow-violet-100'
   },
   {
     id: 'industry',
     title: 'Industry Specialist',
     description: 'Technical Analysis',
     icon: Lightbulb,
-    color: 'bg-amber-50',
-    iconColor: 'text-amber-600'
+    color: 'bg-amber-50/70',
+    iconColor: 'text-amber-600',
+    selectedColor: 'bg-gradient-to-b from-amber-50 to-amber-100',
+    borderColor: 'border-amber-200',
+    shadowColor: 'shadow-amber-100'
   }
 ]
 
@@ -51,45 +64,42 @@ export function ResearchResults({ content }: { content: string }) {
       .filter(p => p.length > 0)
 
     const formattedParagraphs = paragraphs.map(p => {
-      // Handle section headers (e.g., "### Industry Analysis Report on AI Agents")
+      // Handle section headers
       if (p.startsWith('###')) {
         return `\n## ${p.replace(/^###\s*/, '')}`
       }
 
-      // Handle subsection headers (e.g., "#### I. Technical Trends")
+      // Handle subsection headers
       if (p.startsWith('####')) {
         return `\n### ${p.replace(/^####\s*/, '')}`
       }
 
-      // Handle numbered points with bold text
-      if (p.match(/^\d+\.\s+\*\*/)) {
-        return `- ${p.replace(/^\d+\.\s+/, '')}`
+      // Handle numbered lists
+      if (p.match(/^\d+\.\s+/)) {
+        return `\n- ${p.replace(/^\d+\.\s+/, '')}`
       }
 
       // Handle bullet points
       if (p.startsWith('•') || p.startsWith('-')) {
-        return `- ${p.replace(/^[•-]\s*/, '')}`
+        return `\n- ${p.replace(/^[•-]\s*/, '')}`
       }
 
       // Handle bold sections
       if (p.startsWith('**') && p.endsWith('**')) {
-        return `### ${p.replace(/^\*\*|\*\*$/g, '')}`
+        return `\n### ${p.replace(/^\*\*|\*\*$/g, '')}`
       }
 
       // Regular paragraphs
-      return p
+      return `\n${p}`
     })
 
     return formattedParagraphs
       .join('\n')
-      .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
+      .replace(/\n{3,}/g, '\n\n')
       .trim()
   }
 
   const parseContent = React.useCallback((content: string) => {
-    console.log('Raw content received:', content);
-    
-    // Initialize with empty strings
     const parsedSections: Record<string, string> = {
       manager: '',
       market: '',
@@ -97,52 +107,43 @@ export function ResearchResults({ content }: { content: string }) {
       industry: ''
     }
     
-    if (!content) {
-      console.log('No content to parse');
-      return parsedSections;
-    }
+    if (!content) return parsedSections
 
     try {
-      // Split content into sections using markdown h2 headers
       const sections = content.split(/(?=## (?:Research Manager|Market Analyst|Consumer Expert|Industry Specialist))/g)
         .filter(Boolean)
-        .map(section => section.trim());
+        .map(section => section.trim())
       
       sections.forEach(section => {
-        const titleMatch = section.match(/^## ([^\n]+)/);
+        const titleMatch = section.match(/^## ([^\n]+)/)
         if (titleMatch) {
-          const title = titleMatch[1].trim();
-          const content = section.replace(/^## [^\n]+\n/, '').trim();
+          const title = titleMatch[1].trim()
+          const content = section.replace(/^## [^\n]+\n/, '').trim()
           
           if (title.includes('Research Manager')) {
-            parsedSections.manager = formatContent(content);
+            parsedSections.manager = formatContent(content)
           } else if (title.includes('Market Analyst')) {
-            parsedSections.market = formatContent(content);
+            parsedSections.market = formatContent(content)
           } else if (title.includes('Consumer Expert')) {
-            parsedSections.consumer = formatContent(content);
+            parsedSections.consumer = formatContent(content)
           } else if (title.includes('Industry Specialist')) {
-            parsedSections.industry = formatContent(content);
+            parsedSections.industry = formatContent(content)
           }
         }
-      });
-
-      // Log parsed sections
-      Object.entries(parsedSections).forEach(([key, value]) => {
-        console.log(`${key} section length:`, value?.length || 0);
-      });
+      })
     } catch (error) {
-      console.error('Error parsing content:', error);
+      console.error('Error parsing content:', error)
     }
     
-    return parsedSections;
-  }, []);
+    return parsedSections
+  }, [])
 
   const sections = React.useMemo(() => parseContent(content), [content, parseContent])
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <Tabs defaultValue="manager" className="w-full" onValueChange={setSelectedTab}>
-        <TabsList className="grid grid-cols-2 lg:grid-cols-4 gap-2 bg-transparent p-0 rounded-lg mb-4">
+        <TabsList className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 bg-transparent p-0 mb-6">
           {agents.map(agent => {
             const Icon = agent.icon
             const hasContent = Boolean(sections[agent.id]?.trim())
@@ -151,22 +152,74 @@ export function ResearchResults({ content }: { content: string }) {
               <TabsTrigger 
                 key={agent.id} 
                 value={agent.id}
-                className={`
-                  flex items-center gap-2 p-2 sm:p-3
-                  data-[state=active]:bg-white data-[state=active]:shadow-md
-                  rounded-lg border border-gray-100
-                  transition-all duration-200 
-                  ${!hasContent ? 'opacity-50' : ''}
-                  ${isActive ? 'scale-[1.01]' : 'hover:scale-[1.005]'}
-                `}
+                className={cn(
+                  "relative flex items-center gap-3 p-3 sm:p-4",
+                  "rounded-xl border transition-all duration-300 ease-out",
+                  "hover:shadow-lg group data-[state=active]:shadow-lg",
+                  isActive ? [
+                    agent.selectedColor,
+                    agent.borderColor,
+                    'shadow-md scale-[1.02]',
+                    'ring-2',
+                    `ring-${agent.iconColor.split('-')[1]}-300`,
+                    'ring-opacity-50',
+                    'after:absolute after:bottom-[-2px] after:left-[calc(50%-1.5rem)] after:w-12 after:h-1',
+                    'after:rounded-full after:transition-all after:duration-300',
+                    `after:bg-${agent.iconColor.split('-')[1]}-500`,
+                    'after:shadow-sm'
+                  ] : [
+                    'bg-white/95 hover:bg-white',
+                    'border-gray-100 hover:border-gray-200',
+                    'hover:scale-[1.01]',
+                    'hover:ring-1',
+                    `hover:ring-${agent.iconColor.split('-')[1]}-200`,
+                    'hover:ring-opacity-50'
+                  ],
+                  !hasContent && 'opacity-50 cursor-not-allowed hover:scale-100'
+                )}
                 disabled={!hasContent}
               >
-                <div className={`p-1.5 sm:p-2 rounded-md ${agent.color} transition-colors duration-200`}>
-                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${agent.iconColor}`} />
+                <div className={cn(
+                  "p-2 sm:p-2.5 rounded-lg transition-all duration-300",
+                  isActive ? [
+                    'bg-white shadow-sm',
+                    'scale-110',
+                    'ring-1',
+                    `ring-${agent.iconColor.split('-')[1]}-200`,
+                    'ring-opacity-50'
+                  ] : [
+                    agent.color,
+                    'group-hover:bg-white/80',
+                    'group-hover:shadow-sm'
+                  ],
+                  "group-hover:shadow-sm"
+                )}>
+                  <Icon className={cn(
+                    "w-5 h-5 sm:w-6 sm:h-6",
+                    agent.iconColor,
+                    "transition-all duration-300",
+                    "group-hover:scale-110",
+                    "group-hover:rotate-3",
+                    isActive && "rotate-6 scale-110"
+                  )} />
                 </div>
-                <div className="text-left min-w-0">
-                  <div className="font-medium text-sm truncate">{agent.title}</div>
-                  <div className="text-xs text-gray-500 truncate">{agent.description}</div>
+                <div className="text-left min-w-0 flex-1">
+                  <div className={cn(
+                    "font-semibold text-sm sm:text-base truncate",
+                    isActive ? "text-gray-900" : "text-gray-700",
+                    "transition-colors duration-300",
+                    "group-hover:text-gray-900"
+                  )}>
+                    {agent.title}
+                  </div>
+                  <div className={cn(
+                    "text-xs sm:text-sm truncate",
+                    isActive ? "text-gray-600" : "text-gray-500",
+                    "transition-colors duration-300",
+                    "group-hover:text-gray-600"
+                  )}>
+                    {agent.description}
+                  </div>
                 </div>
               </TabsTrigger>
             )
@@ -181,36 +234,46 @@ export function ResearchResults({ content }: { content: string }) {
             <TabsContent 
               key={agent.id} 
               value={agent.id}
-              className="transition-all duration-500 animate-fadeIn mt-0"
+              className="mt-0 transition-all duration-500 animate-fadeIn"
             >
-              <div className={`rounded-lg ${agent.color} p-4 sm:p-6 border border-gray-100`}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`p-2 rounded-lg bg-white/90 shadow-sm ${agent.iconColor}`}>
-                    <Icon className="w-5 h-5" />
+              <div className={cn(
+                "rounded-xl p-6 sm:p-8 lg:p-10",
+                "border shadow-lg backdrop-blur-sm",
+                agent.color,
+                agent.borderColor
+              )}>
+                <div className="flex items-center gap-4 mb-8">
+                  <div className={cn(
+                    "p-3 sm:p-4 rounded-xl bg-white/90",
+                    "shadow-md transition-transform duration-300 hover:scale-105",
+                    agent.shadowColor,
+                    agent.iconColor
+                  )}>
+                    <Icon className="w-6 h-6 sm:w-7 sm:h-7" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-base font-semibold text-gray-900 truncate">{agent.title}</h3>
-                    <p className="text-sm text-gray-600 truncate">{agent.description}</p>
+                    <h3 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
+                      {agent.title}
+                    </h3>
+                    <p className="text-base sm:text-lg text-gray-600 truncate">
+                      {agent.description}
+                    </p>
                   </div>
                 </div>
 
-                <div className="prose prose-sm max-w-none 
-                  prose-headings:font-semibold prose-headings:text-gray-900 
-                  prose-h1:text-2xl prose-h1:font-bold prose-h1:mb-6
-                  prose-h2:text-xl prose-h2:font-bold prose-h2:mt-8 prose-h2:mb-4
-                  prose-h3:text-lg prose-h3:font-semibold prose-h3:mt-6 prose-h3:mb-3
-                  prose-h4:text-base prose-h4:font-medium prose-h4:mt-4 prose-h4:mb-2
-                  prose-p:text-gray-600 prose-p:leading-relaxed prose-p:my-3
-                  prose-ul:my-4 prose-ul:list-none prose-ul:pl-0 prose-ul:space-y-3
-                  prose-ol:my-4 prose-ol:list-decimal prose-ol:pl-4 prose-ol:space-y-3
-                  prose-li:my-0 prose-li:text-gray-600
-                  prose-strong:text-gray-900 prose-strong:font-semibold
-                  [&>*:first-child]:mt-0 [&>*:last-child]:mb-0
-                  [&_ul>li]:pl-0 [&_ul>li]:relative [&_ul>li]:leading-relaxed
-                  [&_ol>li]:pl-0 [&_ol>li]:relative [&_ol>li]:leading-relaxed
-                  [&_ul>li:before]:hidden
-                  divide-y divide-gray-100"
-                >
+                <div className={cn(
+                  "prose prose-sm sm:prose lg:prose-lg max-w-none",
+                  "prose-headings:font-bold prose-headings:text-gray-900",
+                  "prose-h2:text-2xl sm:prose-h2:text-3xl prose-h2:mt-10 prose-h2:mb-6",
+                  "prose-h3:text-xl sm:prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-4",
+                  "prose-p:text-gray-600 prose-p:leading-relaxed prose-p:my-4",
+                  "prose-ul:my-6 prose-ul:list-none prose-ul:pl-0",
+                  "prose-li:my-3 prose-li:text-gray-600",
+                  "[&>*:first-child]:mt-0 [&>*:last-child]:mb-0",
+                  "[&_ul>li]:relative [&_ul>li]:pl-8 [&_ul>li]:leading-relaxed",
+                  `[&_ul>li:before]:absolute [&_ul>li:before]:left-0 [&_ul>li:before]:text-${agent.iconColor.split('-')[1]}-400`,
+                  "[&_ul>li:before]:content-['•'] [&_ul>li:before]:text-2xl [&_ul>li:before]:leading-tight"
+                )}>
                   {sectionContent ? (
                     <div className="relative space-y-6">
                       <ReactMarkdown>
@@ -218,8 +281,16 @@ export function ResearchResults({ content }: { content: string }) {
                       </ReactMarkdown>
                     </div>
                   ) : (
-                    <div className="text-gray-500 italic">
-                      No analysis available yet. Please click "Generate Market Analysis" to analyze your input.
+                    <div className="text-center py-12">
+                      <div className="text-gray-400 mb-2">
+                        <Icon className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                      </div>
+                      <p className="text-lg text-gray-500">
+                        No analysis available yet.
+                      </p>
+                      <p className="text-sm text-gray-400">
+                        Click "Generate Market Analysis" to analyze your input.
+                      </p>
                     </div>
                   )}
                 </div>

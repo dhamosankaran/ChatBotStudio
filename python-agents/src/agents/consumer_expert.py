@@ -21,7 +21,7 @@ class ConsumerExpert:
             memory=True,
             llm_config={
                 "api_key": os.getenv("OPENAI_API_KEY"),
-                "model": "gpt-4-turbo-preview",
+                "model": "gpt-4o",
                 "temperature": 0.7,
                 "max_tokens": 1200,
                 "top_p": 1,
