@@ -1,0 +1,14 @@
+setup.py
+market_research_agents.egg-info/PKG-INFO
+market_research_agents.egg-info/SOURCES.txt
+market_research_agents.egg-info/dependency_links.txt
+market_research_agents.egg-info/requires.txt
+market_research_agents.egg-info/top_level.txt
+src/__init__.py
+src/agents/__init__.py
+src/agents/consumer_expert.py
+src/agents/industry_specialist.py
+src/agents/market_analyst.py
+src/agents/research_manager.py
+src/api/__init__.py
+src/api/main.py
