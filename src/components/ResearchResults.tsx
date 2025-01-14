@@ -51,63 +51,39 @@ export function ResearchResults({ content }: { content: string }) {
       .filter(p => p.length > 0)
 
     const formattedParagraphs = paragraphs.map(p => {
-      // Handle main title (usually the first line)
-      if (p.match(/^#\s+/)) {
-        // Keep existing header as is
-        return p
+      // Handle section headers (e.g., "### Industry Analysis Report on AI Agents")
+      if (p.startsWith('###')) {
+        return `\n## ${p.replace(/^###\s*/, '')}`
       }
 
-      // Handle numbered sections (e.g., "1. Introduction")
-      if (p.match(/^\d+\.\s*[A-Z]/)) {
-        return `\n## ${p.trim()}`
+      // Handle subsection headers (e.g., "#### I. Technical Trends")
+      if (p.startsWith('####')) {
+        return `\n### ${p.replace(/^####\s*/, '')}`
       }
 
-      // Handle subsections (e.g., "2.1 Key Preferences")
-      if (p.match(/^\d+\.\d+\s*[A-Z]/)) {
-        return `\n### ${p.trim()}`
+      // Handle numbered points with bold text
+      if (p.match(/^\d+\.\s+\*\*/)) {
+        return `- ${p.replace(/^\d+\.\s+/, '')}`
       }
 
-      // Handle bold points with asterisks
-      if (p.startsWith('**') && p.includes(':**')) {
-        const [title, ...rest] = p.split(':**')
-        return `\n#### ${title.replace(/^\*\*/, '')}:\n${rest.join(':').trim()}`
-      }
-
-      // Handle bullet points and lists
+      // Handle bullet points
       if (p.startsWith('•') || p.startsWith('-')) {
-        const listContent = p.replace(/^[•-]/, '').trim()
-        // If it contains a colon, format the title part
-        if (listContent.includes(':')) {
-          const [title, ...desc] = listContent.split(':')
-          return `- **${title.trim()}:** ${desc.join(':').trim()}`
-        }
-        return `- ${listContent}`
+        return `- ${p.replace(/^[•-]\s*/, '')}`
       }
 
-      // Handle indented sub-items
-      if (p.startsWith('  ') || p.startsWith('\t')) {
-        return `  - ${p.trim()}`
+      // Handle bold sections
+      if (p.startsWith('**') && p.endsWith('**')) {
+        return `### ${p.replace(/^\*\*|\*\*$/g, '')}`
       }
 
-      // Regular paragraphs with proper spacing
-      return `\n${p}\n`
+      // Regular paragraphs
+      return p
     })
 
-    // Join paragraphs with proper spacing and structure
-    let formattedContent = formattedParagraphs
+    return formattedParagraphs
       .join('\n')
-      // Remove excessive newlines
-      .replace(/\n{4,}/g, '\n\n\n')
-      // Ensure proper spacing around headers
-      .replace(/\n(#{1,4})/g, '\n\n$1')
-      // Ensure proper list spacing
-      .replace(/(\n- .*?)(\n- )/g, '$1\n$2')
-      // Add space after paragraphs
-      .replace(/([^>\n])\n([^#\n-])/g, '$1\n\n$2')
-      // Clean up any remaining excessive spacing
+      .replace(/\n{3,}/g, '\n\n') // Remove excessive newlines
       .trim()
-
-    return formattedContent
   }
 
   const parseContent = React.useCallback((content: string) => {
@@ -127,43 +103,32 @@ export function ResearchResults({ content }: { content: string }) {
     }
 
     try {
-      // First try to parse as JSON in case it's stringified
-      let processedContent = content;
-      try {
-        const jsonContent = JSON.parse(content);
-        if (typeof jsonContent === 'string') {
-          processedContent = jsonContent;
-        }
-      } catch (e) {
-        // Not JSON, use as is
-      }
-
       // Split content into sections using markdown h2 headers
-      const sections = processedContent.split(/(?=##\s+[^#])/g).filter(Boolean)
+      const sections = content.split(/(?=## (?:Research Manager|Market Analyst|Consumer Expert|Industry Specialist))/g)
+        .filter(Boolean)
+        .map(section => section.trim());
       
-      sections.forEach((section, index) => {
-        const lines = section.trim().split('\n')
-        const title = lines[0].replace(/^#+\s*/, '').trim()
-        const sectionContent = lines.slice(1).join('\n').trim()
-        
-        console.log(`Processing section ${index}:`, { title });
-
-        // Simple title matching
-        const titleLower = title.toLowerCase()
-        if (titleLower.includes('research manager') || titleLower.includes('manager') || titleLower.includes('final answer')) {
-          parsedSections['manager'] = formatContent(sectionContent)
-        } else if (titleLower.includes('market analyst') || titleLower.includes('market')) {
-          parsedSections['market'] = formatContent(sectionContent)
-        } else if (titleLower.includes('consumer expert') || titleLower.includes('consumer')) {
-          parsedSections['consumer'] = formatContent(sectionContent)
-        } else if (titleLower.includes('industry specialist') || titleLower.includes('industry')) {
-          parsedSections['industry'] = formatContent(sectionContent)
+      sections.forEach(section => {
+        const titleMatch = section.match(/^## ([^\n]+)/);
+        if (titleMatch) {
+          const title = titleMatch[1].trim();
+          const content = section.replace(/^## [^\n]+\n/, '').trim();
+          
+          if (title.includes('Research Manager')) {
+            parsedSections.manager = formatContent(content);
+          } else if (title.includes('Market Analyst')) {
+            parsedSections.market = formatContent(content);
+          } else if (title.includes('Consumer Expert')) {
+            parsedSections.consumer = formatContent(content);
+          } else if (title.includes('Industry Specialist')) {
+            parsedSections.industry = formatContent(content);
+          }
         }
-      })
+      });
 
       // Log parsed sections
       Object.entries(parsedSections).forEach(([key, value]) => {
-        console.log(`${key} section:`, Boolean(value));
+        console.log(`${key} section length:`, value?.length || 0);
       });
     } catch (error) {
       console.error('Error parsing content:', error);

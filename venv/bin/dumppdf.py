@@ -1,4 +1,4 @@
-#!/Users/kalaidhamu/Downloads/MarketResearch/venv/bin/python3.11
+#!/Users/kalaidhamu/Downloads/MarketResearch/venv/bin/python
 """Extract pdf structure in XML format"""
 import logging
 import os.path

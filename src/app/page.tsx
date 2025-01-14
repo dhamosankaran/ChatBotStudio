@@ -43,13 +43,13 @@ export default function MarketResearchPage() {
                 const jsonData = JSON.parse(line.slice(6).trim())
                 if (jsonData.text) {
                   const text = jsonData.text
-                  if (text.includes('Research Manager Analysis')) {
+                  if (text.includes('Research Manager')) {
                     setAnalysisResults(prev => ({ ...prev, manager: text }))
-                  } else if (text.includes('Market Analyst Insights')) {
+                  } else if (text.includes('Market Analyst')) {
                     setAnalysisResults(prev => ({ ...prev, market: text }))
-                  } else if (text.includes('Consumer Expert Review')) {
+                  } else if (text.includes('Consumer Expert')) {
                     setAnalysisResults(prev => ({ ...prev, consumer: text }))
-                  } else if (text.includes('Industry Specialist Assessment')) {
+                  } else if (text.includes('Industry Specialist')) {
                     setAnalysisResults(prev => ({ ...prev, industry: text }))
                   }
                 }
@@ -116,11 +116,14 @@ export default function MarketResearchPage() {
   const combinedResults = Object.entries(analysisResults)
     .filter(([_, content]) => content)
     .map(([type, content]) => {
-      const title = type === 'manager' ? 'Research Manager Analysis' :
-                   type === 'market' ? 'Market Analyst Insights' :
-                   type === 'consumer' ? 'Consumer Expert Review' :
-                   'Industry Specialist Assessment'
-      return `## ${title}\n${content}`
+      // Extract the agent name and content from the response
+      const agentMatch = content.match(/# Agent: ([^\n]+)/);
+      const finalAnswerMatch = content.match(/## Final Answer:\s*([\s\S]+)$/);
+      
+      const agentName = agentMatch ? agentMatch[1].trim() : '';
+      const analysisContent = finalAnswerMatch ? finalAnswerMatch[1].trim() : content;
+
+      return `## ${agentName}\n${analysisContent}`
     })
     .join('\n\n')
 

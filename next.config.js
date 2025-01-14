@@ -21,7 +21,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' blob: data:",
               "font-src 'self'",
-              "connect-src 'self' http://localhost:8000",
+              "connect-src 'self' http://localhost:8000 ws://localhost:3000/_next/webpack-hmr",
               "frame-src 'self'",
               "base-uri 'self'",
               "form-action 'self'"
