@@ -1,119 +1,109 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import StreamingResponse
-from crewai import Agent, Task, Crew
-from textwrap import dedent
-import os
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
+from python_agents.src.agents.research_manager import ResearchManager
 import logging
 import json
+from datetime import datetime
 
-from agents.market_analyst import MarketAnalyst
-from agents.consumer_expert import ConsumerExpert
-from agents.industry_specialist import IndustrySpecialist
-from agents.research_manager import ResearchManager
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-async def process_market_research(request_data: dict) -> StreamingResponse:
-    try:
-        product_name = request_data.get("product_name", "")
-        context = request_data.get("context", "")
+def extract_analysis_request(body: dict) -> dict:
+    """
+    Extracts product_name and context from a request body. Handles cases where the body 
+    might be a direct object or an object with a prompt key containing a JSON string.
+    """
+    if 'prompt' in body:
+        try:
+           
+            prompt_data = json.loads(body['prompt'])
+            return {
+                 'product_name': prompt_data.get('product_name', ""),
+                 'context': prompt_data.get('context', "")
+            }
+        except (json.JSONDecodeError, TypeError):
+             logger.error(f"Could not parse prompt {body.get('prompt', '')}")
+             raise HTTPException(status_code=400, detail="Invalid prompt format")
+    
+    return {
+         'product_name': body.get('product_name', ""),
+         'context': body.get('context', "")
+    }
 
-        # Initialize research manager for search capabilities
-        research_manager = ResearchManager()
-        search_tool = research_manager.create_agent().tools[0]
-
-        # Initialize agents
-        market_agent = MarketAnalyst().create_agent()
-        consumer_agent = ConsumerExpert().create_agent()
-        industry_agent = IndustrySpecialist().create_agent()
-
-        # Add search tool to each agent
-        for agent in [market_agent, consumer_agent, industry_agent]:
-            agent.tools = [search_tool]
-
-        # Create tasks
-        market_task = Task(
-            description=dedent(f"""
-                Analyze {product_name} from a market perspective, focusing on:
-                - Market Size & Growth: Current valuation, growth rates, segmentation
-                - Competition: Key players, market share, competitive dynamics
-                - Market Trends: Current and emerging trends, consumer shifts
-                - Entry Barriers: Regulatory landscape, market access challenges
-                - Market Opportunities: Untapped segments, growth areas
-                
-                Additional Context: {context}
-                
-                Use the search tool to gather current market data and statistics.
-            """).strip(),
-            agent=market_agent
-        )
-
-        consumer_task = Task(
-            description=dedent(f"""
-                Analyze consumer aspects of {product_name}, focusing on:
-                - Target Demographics: Customer segments, characteristics, profiles
-                - Consumer Behavior: Purchase patterns, decision factors
-                - User Experience: Pain points, satisfaction drivers
-                - Brand Perception: Positioning, sentiment, loyalty
-                - Future Trends: Evolving needs, preferences, adoption barriers
-                
-                Additional Context: {context}
-                
-                Use the search tool to gather current consumer insights and trends.
-            """).strip(),
-            agent=consumer_agent
-        )
-
-        industry_task = Task(
-            description=dedent(f"""
-                Analyze industry aspects of {product_name}, focusing on:
-                - Industry Structure: Key players, value chain, business models
-                - Regulatory Environment: Current and upcoming regulations
-                - Technology Landscape: Current stack, emerging technologies
-                - Industry Challenges: Bottlenecks, constraints, opportunities
-                - Future Outlook: Evolution, disruption potential, growth drivers
-                
-                Additional Context: {context}
-                
-                Use the search tool to gather current industry data and regulatory information.
-            """).strip(),
-            agent=industry_agent
-        )
-
-        # Create and run crew
-        crew = Crew(
-            agents=[market_agent, consumer_agent, industry_agent],
-            tasks=[market_task, consumer_task, industry_task],
-            verbose=True
-        )
-
-        async def stream_results():
-            result = crew.kickoff()
-            yield json.dumps({"result": result})
-
-        return StreamingResponse(
-            stream_results(),
-            media_type="text/event-stream"
-        )
-
-    except Exception as e:
-        logging.error(f"Error in market research processing: {str(e)}")
-        raise
 
 @app.post("/analyze")
 async def analyze(request: Request):
+    """
+    Receives a request to analyze a market and returns a structured response with the analysis.
+    """
     try:
-        data = await request.json()
-        return await process_market_research(data)
-    except Exception as e:
-        logging.error(f"Error in analyze endpoint: {str(e)}")
-        return {"error": str(e)}
+        body = await request.json()
+        logger.info(f"Received analysis request for: {body}")
 
-@app.post("/api/chat")
-async def chat(request: Request):
-    try:
-        data = await request.json()
-        return await process_market_research(data)
+        analysis_request = extract_analysis_request(body)
+        product_name = analysis_request.get('product_name')
+        context = analysis_request.get('context')
+
+        if not product_name:
+              raise HTTPException(status_code=400, detail="Product name is required")
+      
+        research_manager = ResearchManager()
+        analysis_results = research_manager.analyze_task(product_name, context)
+        
+        # Ensure we have a properly structured response
+        if isinstance(analysis_results, dict) and 'results' in analysis_results:
+            return JSONResponse(content=analysis_results)
+        else:
+            # If we get an unstructured response, wrap it in our standard format
+            return JSONResponse(content={
+                'metadata': {
+                    'timestamp': datetime.now().isoformat(),
+                    'version': '2.0',
+                    'status': 'success'
+                },
+                'results': {
+                    'manager': str(analysis_results),
+                    'market': '',
+                    'consumer': '',
+                    'industry': ''
+                },
+                'errors': {}
+            })
+    
+    except HTTPException as http_ex:
+      logger.error(f"HTTP error: {str(http_ex)}")
+      return JSONResponse(content={
+        'metadata': {
+          'timestamp': datetime.now().isoformat(),
+          'version': '2.0',
+          'status': 'error'
+        },
+        'results': {
+          'manager': '',
+          'market': '',
+          'consumer': '',
+          'industry': ''
+        },
+        'errors': {
+              "system_error": str(http_ex.detail)
+        }
+      }, status_code=http_ex.status_code)
     except Exception as e:
-        logging.error(f"Error in chat endpoint: {str(e)}")
-        return {"error": str(e)} 
+         logger.error(f"Unexpected error: {str(e)}")
+         return JSONResponse(content={
+          'metadata': {
+            'timestamp': datetime.now().isoformat(),
+            'version': '2.0',
+            'status': 'error'
+          },
+          'results': {
+            'manager': '',
+            'market': '',
+            'consumer': '',
+            'industry': ''
+          },
+          'errors': {
+              "system_error": str(e)
+          }
+        }, status_code=500)

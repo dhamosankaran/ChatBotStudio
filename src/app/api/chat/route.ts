@@ -1,53 +1,124 @@
 import { NextResponse } from 'next/server'
+import { analyzeMarket } from '@/lib/api-client'
+import { ResearchRequest, ResearchResponse } from '@/types/research'
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json()
-    const prompt = typeof body === 'string' ? body : body.prompt
+    let body;
 
-    if (!prompt) {
-      return new NextResponse('Missing prompt', { status: 400 })
+    try {
+      body = await req.json()
+      console.log('API Route - Received request body:', body)
+    } catch (jsonError) {
+      console.error('API Route - JSON Parsing Error:', jsonError)
+      return new NextResponse('Invalid request body', { status: 400 })
     }
 
-    // Extract product name and context from the prompt
-    const productMatch = prompt.match(/Product\/Service:\s*([^\n]+)/)
-    const contextMatch = prompt.match(/Context:\s*([^\n]+)/)
-
-    if (!productMatch || !contextMatch) {
-      throw new Error('Invalid prompt format. Expected format: "Product/Service: <name>\nContext: <context>"')
+    // Handle the prompt-wrapped format
+    let request: ResearchRequest;
+    try {
+      if (typeof body.prompt === 'string') {
+        const promptData = JSON.parse(body.prompt)
+        request = {
+          product_name: promptData.product_name || "",
+          context: promptData.context || ''
+        }
+      } else {
+        request = {
+          product_name: body.product_name || "",
+          context: body.context || ''
+        }
+      }
+      console.log('API Route - Processed request:', request)
+    } catch (parseError) {
+      console.error('API Route - Prompt Parsing Error:', parseError)
+      return new NextResponse('Invalid prompt format', { status: 400 })
     }
 
-    const productName = productMatch[1].trim()
-    const context = contextMatch[1].trim()
+    // Validate required fields
+    if (!request.product_name) {
+      console.error('API Route - Missing product name')
+      return new NextResponse('Product name is required', { status: 400 })
+    }
 
-    // Make the request to the backend
-    const backendResponse = await fetch('http://localhost:8000/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        product_name: productName,
-        context: context,
-        temperature: 0.7
-      })
+    // Create a transform stream to handle the response
+    const stream = new TransformStream()
+    const writer = stream.writable.getWriter()
+    const encoder = new TextEncoder()
+
+    // Start the analysis in the background
+    analyzeMarket(request).then(async (response) => {
+      try {
+        // Send the response as a stream
+        const data = `data: ${JSON.stringify(response)}\n\n`
+        await writer.write(encoder.encode(data))
+      } catch (error) {
+        console.error('Error writing response:', error)
+      } finally {
+        writer.close()
+      }
+    }).catch(async (error) => {
+      console.error('API Route - Analysis Error:', error)
+      const errorResponse: ResearchResponse = {
+        metadata: {
+          timestamp: new Date().toISOString(),
+          version: '2.0',
+          status: 'error'
+        },
+        results: {
+          manager: '',
+          market: '',
+          consumer: '',
+          industry: ''
+        },
+        errors: { 
+          system_error: error.message || 'Unknown error'
+        }
+      }
+      try {
+        const data = `data: ${JSON.stringify(errorResponse)}\n\n`
+        await writer.write(encoder.encode(data))
+      } catch (writeError) {
+        console.error('Error writing error response:', writeError)
+      } finally {
+        writer.close()
+      }
     })
 
-    if (!backendResponse.ok) {
-      throw new Error(`Backend error: ${await backendResponse.text()}`)
-    }
-
-    // Create a new stream for the frontend
-    return new NextResponse(backendResponse.body, {
+    return new NextResponse(stream.readable, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
-      },
+        'Connection': 'keep-alive'
+      }
     })
   } catch (error: any) {
-    console.error('API Error:', error)
+    console.error('API Route - Unhandled Error:', error)
+    const errorResponse: ResearchResponse = {
+      metadata: {
+        timestamp: new Date().toISOString(),
+        version: '2.0',
+        status: 'error'
+      },
+      results: {
+        manager: '',
+        market: '',
+        consumer: '',
+        industry: ''
+      },
+      errors: { 
+        system_error: error.message || 'Unknown error'
+      }
+    }
+
     return new NextResponse(
-      JSON.stringify({ error: error.message }), 
-      { status: 500 }
+      JSON.stringify(errorResponse),
+      { 
+        status: error.status || 500,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
     )
   }
-} 
+}
