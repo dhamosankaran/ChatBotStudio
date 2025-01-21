@@ -63,10 +63,10 @@ async def analyze(request: Request):
                     'status': 'success'
                 },
                 'results': {
-                    'manager': str(analysis_results),
-                    'market': '',
-                    'consumer': '',
-                    'industry': ''
+                    'manager': analysis_results,
+                    'market': analysis_results,
+                    'consumer': analysis_results,
+                    'industry': analysis_results
                 },
                 'errors': {}
             })
@@ -80,10 +80,10 @@ async def analyze(request: Request):
           'status': 'error'
         },
         'results': {
-          'manager': '',
-          'market': '',
-          'consumer': '',
-          'industry': ''
+          'manager': {},
+          'market': {},
+          'consumer': {},
+          'industry': {}
         },
         'errors': {
               "system_error": str(http_ex.detail)
@@ -98,10 +98,10 @@ async def analyze(request: Request):
             'status': 'error'
           },
           'results': {
-            'manager': '',
-            'market': '',
-            'consumer': '',
-            'industry': ''
+             'manager': {},
+              'market': {},
+              'consumer': {},
+              'industry': {}
           },
           'errors': {
               "system_error": str(e)

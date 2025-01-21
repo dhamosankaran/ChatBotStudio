@@ -1,5 +1,5 @@
 'use client'
-
+//filename: page.tsx
 import { useState, useEffect } from 'react'
 import { useCompletion } from 'ai/react'
 import { Button } from '@/components/ui/button'
@@ -11,6 +11,31 @@ import { toast } from 'sonner'
 
 type AnalysisStatus = 'success' | 'error' | 'partial_success'
 type AgentType = 'manager' | 'market' | 'consumer' | 'industry'
+interface ChartData {
+    type: 'bar' | 'line' | 'pie';
+    title: string;
+    data: {
+        labels: string[];
+        datasets: {
+            label: string;
+            data: number[];
+        }[];
+    };
+}
+interface TableData {
+    title: string;
+    headers: string[];
+    rows: Record<string, string>[];
+}
+
+interface AgentResult {
+    content?: string;
+    charts?: ChartData[];
+    tables?: TableData[];
+    error?: string;
+    status: 'success' | 'error';
+    timestamp: string;
+}
 
 interface AnalysisState {
     metadata: {
@@ -19,10 +44,10 @@ interface AnalysisState {
         status: AnalysisStatus;
     };
     results: {
-        manager: string;
-        market: string;
-        consumer: string;
-        industry: string;
+        manager: AgentResult;
+        market: AgentResult;
+        consumer: AgentResult;
+        industry: AgentResult;
     };
     errors: Record<string, string>;
 }
@@ -30,6 +55,10 @@ interface AnalysisState {
 export default function MarketResearchPage() {
     const [productName, setProductName] = useState('')
     const [context, setContext] = useState('')
+      const initialAgentResult: AgentResult = {
+          status: 'success',
+          timestamp: new Date().toISOString(),
+       };
     const [analysisResults, setAnalysisResults] = useState<AnalysisState>({
         metadata: {
             timestamp: new Date().toISOString(),
@@ -37,22 +66,34 @@ export default function MarketResearchPage() {
             status: 'success'
         },
         results: {
-            manager: '',
-            market: '',
-            consumer: '',
-            industry: ''
+            manager: {
+                status: 'success',
+                timestamp: new Date().toISOString()
+            },
+            market: {
+                status: 'success',
+                timestamp: new Date().toISOString()
+            },
+            consumer: {
+                status: 'success',
+                timestamp: new Date().toISOString()
+            },
+            industry: {
+                status: 'success',
+                timestamp: new Date().toISOString()
+            }
         },
         errors: {}
     })
 
     const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
 
-    
+
     // Add debug logging for state changes
     useEffect(() => {
         console.log('Analysis results updated:', analysisResults)
     }, [analysisResults])
-    
+
       const { complete, isLoading } = useCompletion({
         api: '/api/chat',
         onResponse: async (response) => {
@@ -60,13 +101,13 @@ export default function MarketResearchPage() {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
-            
+
             setIsAnalysisLoading(true);
 
             const reader = response.body?.getReader()
             const decoder = new TextDecoder()
             let buffer = ''
-            
+
             try {
                 while (true) {
                     const { done, value } = await reader!.read()
@@ -74,78 +115,68 @@ export default function MarketResearchPage() {
 
                     const chunk = decoder.decode(value)
                     buffer += chunk
-                    
+
                     // Process complete messages
                     const lines = buffer.split('\n')
                     buffer = lines.pop() || '' // Keep incomplete line
-                    
+
                     for (const line of lines) {
                         if (line.startsWith('data: ')) {
                             try {
                                 const jsonData = JSON.parse(line.slice(6))
                                 console.log('Parsed streaming data:', jsonData)
-                                
+
                                 // Handle the complete response object with results
                                 if (jsonData.metadata && jsonData.results) {
-                                    console.log('Received complete results:', {
-                                        metadata: jsonData.metadata,
-                                        resultLengths: {
-                                            manager: jsonData.results.manager?.length || 0,
-                                            market: jsonData.results.market?.length || 0,
-                                            consumer: jsonData.results.consumer?.length || 0,
-                                            industry: jsonData.results.industry?.length || 0
+                                    const newResults: Record<string, AgentResult> = {};
+                                    Object.entries(jsonData.results).forEach(([key, value]) => {
+                                        if (key === 'manager' || key === 'market' || key === 'consumer' || key === 'industry') {
+                                            newResults[key] = {
+                                                content: typeof value === 'string' ? value : (value as any)?.content,
+                                                charts: (value as any)?.charts || [],
+                                                tables: (value as any)?.tables || [],
+                                                status: 'success',
+                                                timestamp: new Date().toISOString()
+                                            };
                                         }
-                                    })
-                                    
-                                    setAnalysisResults(prev => {
-                                        const newResults = {
-                                            metadata: {
-                                                timestamp: jsonData.metadata.timestamp || new Date().toISOString(),
-                                                version: jsonData.metadata.version || '2.0',
-                                                status: jsonData.metadata.status || 'error'
-                                            },
-                                            results: {
-                                                ...prev.results,
-                                                ...Object.fromEntries(
-                                                    Object.entries(jsonData.results)
-                                                        .filter(([_, value]) => value && typeof value === 'string' && value.trim().length > 0)
-                                                )
-                                            },
-                                            errors: jsonData.errors || {}
-                                        }
-                                        console.log('Updated analysis results:', newResults)
-                                        return newResults
-                                    })
-                                    continue
+                                    });
+
+                                    setAnalysisResults(prev => ({
+                                        metadata: {
+                                            timestamp: jsonData.metadata.timestamp || new Date().toISOString(),
+                                            version: jsonData.metadata.version || '2.0',
+                                            status: jsonData.metadata.status || 'error'
+                                        },
+                                        results: {
+                                            ...prev.results,
+                                            ...newResults
+                                        },
+                                        errors: jsonData.errors || {}
+                                    }));
                                 }
-                                
+
                                 // Handle streaming updates
-                                if (jsonData && jsonData.results) {
-                                   
-                                    console.log('Processing streaming results:', {
-                                        resultLengths: Object.fromEntries(
-                                            Object.entries(jsonData.results)
-                                                .map(([key, value]) => [key, typeof value === 'string' ? value.length : 0])
-                                        )
-                                    })
-                                     if(Object.keys(analysisResults.results).length === 0) {
-                                         setIsAnalysisLoading(true);
-                                     }
-                                    setAnalysisResults(prev => {
-                                        const newResults = {
-                                            ...prev,
-                                            results: {
-                                                ...prev.results,
-                                                ...Object.fromEntries(
-                                                    Object.entries(jsonData.results)
-                                                        .filter(([_, value]) => value && typeof value === 'string' && value.trim().length > 0)
-                                                )
-                                            }
+                                if (jsonData.results) {
+                                    const newResults: Record<string, AgentResult> = {};
+                                    Object.entries(jsonData.results).forEach(([key, value]) => {
+                                        if (key === 'manager' || key === 'market' || key === 'consumer' || key === 'industry') {
+                                            newResults[key] = {
+                                                content: typeof value === 'string' ? value : (value as any)?.content,
+                                                charts: (value as any)?.charts || [],
+                                                tables: (value as any)?.tables || [],
+                                                status: 'success',
+                                                timestamp: new Date().toISOString()
+                                            };
                                         }
-                                        
-                                        console.log('Updated streaming results:', newResults)
-                                        return newResults
-                                    })
+                                    });
+
+                                    setAnalysisResults(prev => ({
+                                        ...prev,
+                                        results: {
+                                            ...prev.results,
+                                            ...newResults
+                                        }
+                                    }));
                                 }
                             } catch (err) {
                                 console.error('Error parsing JSON:', err)
@@ -212,27 +243,27 @@ export default function MarketResearchPage() {
          try {
             console.log('Starting new analysis')
             // Reset results before starting new analysis
-            setAnalysisResults({
+              setAnalysisResults({
                 metadata: {
                     timestamp: new Date().toISOString(),
                     version: '2.0',
                     status: 'success'
                 },
                 results: {
-                    manager: '',
-                    market: '',
-                    consumer: '',
-                    industry: ''
+                    manager: initialAgentResult,
+                    market: initialAgentResult,
+                    consumer: initialAgentResult,
+                    industry: initialAgentResult
                 },
                 errors: {}
             })
             setIsAnalysisLoading(true)
-            
+
            const payload = JSON.stringify({
                 product_name: productName,
                 context: context || ''
            });
-           
+
            console.log('Submitting analysis with payload:', payload)
             await complete(payload)
 
@@ -321,7 +352,9 @@ export default function MarketResearchPage() {
                     </div>
 
                     {/* Results Section */}
-                    {(isAnalysisLoading || Object.values(analysisResults.results).some(r => r.trim().length > 0)) && (
+                    {(isAnalysisLoading || Object.values(analysisResults.results).some((r: AgentResult) => 
+                        Boolean(r?.content) || (r?.charts && r.charts.length > 0) || (r?.tables && r.tables.length > 0)
+                    )) && (
                         <div className="mt-8">
                             <ResearchResults
                                 content={analysisResults}

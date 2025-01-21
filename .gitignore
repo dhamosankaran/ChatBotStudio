@@ -50,3 +50,5 @@ __pycache__/
 .coverage
 htmlcov/
 
+.README.md
+
