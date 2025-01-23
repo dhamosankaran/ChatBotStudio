@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { ResearchResults } from '@/components/ResearchResults'
 import { Loader2, Search, ArrowRight } from 'lucide-react'
 import { toast } from 'sonner'
+import { VoiceSearch } from '@/components/VoiceSearch'
 
 type AnalysisStatus = 'success' | 'error' | 'partial_success'
 type AgentType = 'manager' | 'market' | 'consumer' | 'industry'
@@ -52,13 +53,45 @@ interface AnalysisState {
     errors: Record<string, string>;
 }
 
+interface SavedSearch {
+  id: string;
+  query: string;
+  context: string;
+  timestamp: string;
+}
+
+interface Template {
+  id: string;
+  name: string;
+  context: string;
+}
+
+const DEFAULT_TEMPLATES: Template[] = [
+  {
+    id: 'market-analysis',
+    name: 'Market Analysis',
+    context: 'Focus on market size, growth trends, key players, and competitive landscape'
+  },
+  {
+    id: 'consumer-behavior',
+    name: 'Consumer Behavior',
+    context: 'Analyze target demographics, buying patterns, preferences, and pain points'
+  },
+  {
+    id: 'competitive-analysis',
+    name: 'Competitive Analysis',
+    context: 'Deep dive into main competitors, their strategies, strengths, and weaknesses'
+  }
+]
+
 export default function MarketResearchPage() {
     const [productName, setProductName] = useState('')
     const [context, setContext] = useState('')
-      const initialAgentResult: AgentResult = {
-          status: 'success',
-          timestamp: new Date().toISOString(),
-       };
+    const [isListening, setIsListening] = useState(false)
+    const initialAgentResult: AgentResult = {
+        status: 'success',
+        timestamp: new Date().toISOString(),
+    };
     const [analysisResults, setAnalysisResults] = useState<AnalysisState>({
         metadata: {
             timestamp: new Date().toISOString(),
@@ -88,13 +121,12 @@ export default function MarketResearchPage() {
 
     const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
 
-
     // Add debug logging for state changes
     useEffect(() => {
         console.log('Analysis results updated:', analysisResults)
     }, [analysisResults])
 
-      const { complete, isLoading } = useCompletion({
+    const { complete, isLoading } = useCompletion({
         api: '/api/chat',
         onResponse: async (response) => {
              console.log('Response received:', response.status)
@@ -233,17 +265,16 @@ export default function MarketResearchPage() {
         }
     })
 
-
     const handleSubmit = async () => {
         if (!productName) {
             toast.error('Please enter a product or service name')
             return
         }
 
-         try {
+        try {
             console.log('Starting new analysis')
             // Reset results before starting new analysis
-              setAnalysisResults({
+            setAnalysisResults({
                 metadata: {
                     timestamp: new Date().toISOString(),
                     version: '2.0',
@@ -259,14 +290,13 @@ export default function MarketResearchPage() {
             })
             setIsAnalysisLoading(true)
 
-           const payload = JSON.stringify({
+            const payload = JSON.stringify({
                 product_name: productName,
                 context: context || ''
-           });
+            });
 
-           console.log('Submitting analysis with payload:', payload)
+            console.log('Submitting analysis with payload:', payload)
             await complete(payload)
-
 
         } catch (err: any) {
             console.error('Error during analysis:', {
@@ -289,85 +319,87 @@ export default function MarketResearchPage() {
         }
     }
 
-    return (
-        <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-indigo-50">
-            {/* Enhanced Header Section */}
-            <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50 shadow-sm">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center justify-between h-16 sm:h-20">
-                        <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-xl shadow-sm">
-                                <Search className="w-6 h-6 text-blue-600" />
-                            </div>
-                            <div className="flex flex-col">
-                                <h1 className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">
-                                    AI Market Research System
-                                </h1>
-                                <p className="text-sm text-gray-600">
-                                    Powered by Advanced AI
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </header>
+    const handleVoiceResult = (transcript: string) => {
+        setProductName(transcript)
+    }
 
-            {/* Enhanced Main Content */}
-            <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-                <div className="space-y-8">
-                    {/* Enhanced Input Section */}
-                    <div className="space-y-4 max-w-2xl mx-auto">
-                        <div className="bg-white rounded-xl shadow-sm border p-6 space-y-4">
+    return (
+        <div className="min-h-screen bg-slate-50">
+            <div className="max-w-4xl mx-auto px-4 py-6 sm:px-6 sm:py-12">
+                {/* Header Section */}
+                <div className="flex flex-col items-center space-y-3 sm:space-y-4 text-center mb-6 sm:mb-8">
+                    <Search className="h-8 w-8 sm:h-12 sm:w-12 text-blue-500" />
+                    <h1 className="text-xl sm:text-4xl font-bold text-blue-500 leading-tight">
+                        AI Market Research System
+                    </h1>
+                    <p className="text-sm sm:text-base text-slate-600">Powered by Advanced AI</p>
+                </div>
+
+                {/* Main Input Section */}
+                <div className="space-y-4 bg-white p-4 sm:p-6 rounded-lg shadow-sm">
+                    {/* Search Input Group */}
+                    <div className="flex flex-col space-y-4">
+                        <div className="flex gap-2">
                             <Input
-                                placeholder="Enter Product or Service Name"
+                                placeholder="Enter product or market name"
                                 value={productName}
                                 onChange={(e) => setProductName(e.target.value)}
-                                className="text-lg"
+                                className="flex-1 h-10 sm:h-12 text-base sm:text-lg"
                             />
-                            <Textarea
-                                placeholder="Additional Context (optional) - Add any specific aspects you'd like to analyze"
-                                value={context}
-                                onChange={(e) => setContext(e.target.value)}
-                                className="h-32 text-base"
+                            <VoiceSearch
+                                onResult={handleVoiceResult}
+                                isListening={isListening}
+                                setIsListening={setIsListening}
                             />
-                            <Button
-                                onClick={handleSubmit}
-                                disabled={isLoading || !productName}
-                                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md"
-                                size="lg"
-                            >
-                                {isLoading ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                        Analyzing Market...
-                                    </>
-                                ) : (
-                                    <>
-                                        Analyze Market
-                                        <ArrowRight className="ml-2 h-5 w-5" />
-                                    </>
-                                )}
-                            </Button>
                         </div>
                     </div>
 
-                    {/* Results Section */}
-                    {(isAnalysisLoading || Object.values(analysisResults.results).some((r: AgentResult) => 
-                        Boolean(r?.content) || (r?.charts && r.charts.length > 0) || (r?.tables && r.tables.length > 0)
-                    )) && (
-                        <div className="mt-8">
-                            <ResearchResults
-                                content={analysisResults}
-                                isLoading={isAnalysisLoading}
-                                onRetry={(agentId) => {
-                                    console.log('Retry requested for:', agentId)
-                                    // Implement retry logic here
-                                }}
-                            />
-                        </div>
-                    )}
+                    {/* Context Textarea */}
+                    <Textarea
+                        placeholder="Add additional context or requirements (optional)"
+                        value={context}
+                        onChange={(e) => setContext(e.target.value)}
+                        className="min-h-[80px] sm:min-h-[100px] text-sm sm:text-base"
+                    />
+
+                    {/* Action Button */}
+                    <div className="flex justify-center">
+                        <Button 
+                            onClick={handleSubmit} 
+                            className="w-full sm:w-auto h-12 text-base px-8"
+                            disabled={isLoading || !productName}
+                        >
+                            {isLoading ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    <span className="text-sm sm:text-base">Analyzing Market</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span className="text-sm sm:text-base">Analyze Market</span>
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </>
+                            )}
+                        </Button>
+                    </div>
                 </div>
-            </main>
+
+                {/* Results Section */}
+                {(isAnalysisLoading || Object.values(analysisResults.results).some((r: AgentResult) => 
+                    Boolean(r?.content) || (r?.charts && r.charts.length > 0) || (r?.tables && r.tables.length > 0)
+                )) && (
+                    <div className="mt-6 sm:mt-8">
+                        <ResearchResults
+                            content={analysisResults}
+                            isLoading={isAnalysisLoading}
+                            onRetry={(agentId) => {
+                                console.log('Retry requested for:', agentId)
+                                // Implement retry logic here
+                            }}
+                        />
+                    </div>
+                )}
+            </div>
         </div>
     )
 }
