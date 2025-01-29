@@ -31,12 +31,10 @@ export async function analyzeMarket(request: ResearchRequest): Promise<ResearchR
       headers: { 
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'x-vercel-skip-toolbar': '1'
+        'x-api-key': process.env.NEXT_PUBLIC_INTERNAL_API_KEY || ''
       },
       body: JSON.stringify(request),
-      cache: 'no-store',
-      // Add credentials for same-origin requests
-      credentials: 'same-origin'
+      cache: 'no-store'
     })
 
     if (!response.ok) {

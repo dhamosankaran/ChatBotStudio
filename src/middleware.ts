@@ -4,41 +4,33 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   // Only apply to /api routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
-    // Clone the request headers
-    const requestHeaders = new Headers(request.headers)
-    
-    // Add the bypass header
-    requestHeaders.set('x-vercel-skip-toolbar', '1')
-
-    // Get the origin
-    const origin = request.headers.get('origin') || ''
-    const isVercelDeployment = request.headers.get('host')?.includes('vercel.app')
-    
-    // Handle CORS
-    if (isVercelDeployment || origin.includes('vercel.app')) {
-      requestHeaders.set('Access-Control-Allow-Origin', origin)
-      requestHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-      requestHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-      requestHeaders.set('Access-Control-Allow-Credentials', 'true')
-    }
-
     // Handle preflight requests
     if (request.method === 'OPTIONS') {
-      return new NextResponse(null, {
-        status: 200,
-        headers: requestHeaders,
-      })
+      return new NextResponse(null, { status: 200 });
     }
 
-    // Return response with the modified headers
-    return NextResponse.next({
-      request: {
-        headers: requestHeaders,
-      },
-    })
+    // Get API key from header
+    const apiKey = request.headers.get('x-api-key');
+    const expectedKey = process.env.INTERNAL_API_KEY;
+
+    // Verify API key
+    if (!apiKey || apiKey !== expectedKey) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Unauthorized - Invalid API Key' }),
+        { 
+          status: 401,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+    }
+
+    // Continue with valid API key
+    return NextResponse.next();
   }
 
-  return NextResponse.next()
+  return NextResponse.next();
 }
 
 export const config = {
