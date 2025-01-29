@@ -9,7 +9,15 @@ class ApiError extends Error {
 }
 
 const getAbsoluteUrl = (path: string) => {
-  // Always use relative paths for API requests
+  // Check if we're running on the server side
+  if (typeof window === 'undefined') {
+    // Server-side: use complete URL
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    return `${baseUrl}${path}`;
+  }
+  // Client-side: use relative path
   return path;
 }
 
@@ -26,7 +34,9 @@ export async function analyzeMarket(request: ResearchRequest): Promise<ResearchR
         'x-vercel-skip-toolbar': '1'
       },
       body: JSON.stringify(request),
-      cache: 'no-store'
+      cache: 'no-store',
+      // Add credentials for same-origin requests
+      credentials: 'same-origin'
     })
 
     if (!response.ok) {
