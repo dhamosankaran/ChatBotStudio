@@ -10,7 +10,16 @@ const genAI = process.env.GEMINI_API_KEY
   : null;
 
 export async function POST(req: Request) {
+  // Debug logging for environment variables
+  console.log("Environment Variables Check:", {
+    hasGeminiKey: !!process.env.GEMINI_API_KEY,
+    hasSerperKey: !!process.env.SERPER_API_KEY,
+    geminiKeyLength: process.env.GEMINI_API_KEY?.length,
+    serperKeyLength: process.env.SERPER_API_KEY?.length
+  });
+
   if (!genAI) {
+    console.error("Gemini API initialization failed - API key missing or invalid");
     return NextResponse.json(
       { error: "Gemini API key not configured" },
       { status: 503 }
