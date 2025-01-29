@@ -16,9 +16,10 @@ export function middleware(request: NextRequest) {
       });
     }
 
-    // Get API key from header
+    // Get API keys
     const apiKey = request.headers.get('x-api-key');
     const expectedKey = process.env.INTERNAL_API_KEY;
+    const publicKey = process.env.NEXT_PUBLIC_INTERNAL_API_KEY;
     
     // Debug logging (be careful not to log the full keys in production)
     console.log('Middleware - Auth Debug:', {
@@ -26,21 +27,31 @@ export function middleware(request: NextRequest) {
       apiKeyLength: apiKey?.length,
       hasExpectedKey: !!expectedKey,
       expectedKeyLength: expectedKey?.length,
+      hasPublicKey: !!publicKey,
+      publicKeyLength: publicKey?.length,
       url: request.url,
-      method: request.method
+      method: request.method,
+      isDevelopment: process.env.NODE_ENV === 'development'
     });
 
     // Verify API key
-    if (!apiKey || !expectedKey || apiKey !== expectedKey) {
+    if (!apiKey || !expectedKey || (apiKey !== expectedKey && apiKey !== publicKey)) {
       console.error('Middleware - Auth Failed:', {
         reason: !apiKey ? 'Missing API key' : !expectedKey ? 'Missing env var' : 'Invalid key',
-        url: request.url
+        url: request.url,
+        method: request.method
       });
       
       return new NextResponse(
         JSON.stringify({ 
           error: 'Unauthorized - Invalid API Key',
-          details: !apiKey ? 'Missing API key' : !expectedKey ? 'Configuration error' : 'Invalid key'
+          details: !apiKey ? 'Missing API key' : !expectedKey ? 'Configuration error' : 'Invalid key',
+          debug: {
+            hasApiKey: !!apiKey,
+            hasExpectedKey: !!expectedKey,
+            hasPublicKey: !!publicKey,
+            isDevelopment: process.env.NODE_ENV === 'development'
+          }
         }),
         { 
           status: 401,

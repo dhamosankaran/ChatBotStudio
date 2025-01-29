@@ -125,7 +125,8 @@ export default function MarketResearchPage() {
     useEffect(() => {
         console.log('API Configuration Debug:', {
             hasApiKey: !!process.env.NEXT_PUBLIC_INTERNAL_API_KEY,
-            apiKeyLength: process.env.NEXT_PUBLIC_INTERNAL_API_KEY?.length
+            apiKeyLength: process.env.NEXT_PUBLIC_INTERNAL_API_KEY?.length,
+            isDevelopment: process.env.NODE_ENV === 'development'
         });
     }, []);
 
@@ -137,10 +138,17 @@ export default function MarketResearchPage() {
     const { complete, isLoading } = useCompletion({
         api: '/api/chat',
         headers: {
+            'Content-Type': 'application/json',
             'x-api-key': process.env.NEXT_PUBLIC_INTERNAL_API_KEY || ''
         },
         onResponse: async (response) => {
-             console.log('Response received:', response.status)
+            // Add request header debug logging
+            console.log('Request Headers Debug:', {
+                apiKeyPresent: !!process.env.NEXT_PUBLIC_INTERNAL_API_KEY,
+                apiKeyLength: process.env.NEXT_PUBLIC_INTERNAL_API_KEY?.length,
+                url: response.url
+            });
+            console.log('Response received:', response.status)
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`)
             }
