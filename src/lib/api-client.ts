@@ -24,14 +24,26 @@ const getAbsoluteUrl = (path: string) => {
 export async function analyzeMarket(request: ResearchRequest): Promise<ResearchResponse> {
   try {
     const url = getAbsoluteUrl(API_ENDPOINTS.analyze);
-    console.log('Making request to:', url);
+    const apiKey = process.env.NEXT_PUBLIC_INTERNAL_API_KEY;
+    
+    // Debug logging
+    console.log('API Client - Request Debug:', {
+      url,
+      hasApiKey: !!apiKey,
+      apiKeyLength: apiKey?.length,
+      method: 'POST'
+    });
+    
+    if (!apiKey) {
+      throw new ApiError(401, 'API key not configured');
+    }
     
     const response = await fetch(url, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'x-api-key': process.env.NEXT_PUBLIC_INTERNAL_API_KEY || ''
+        'x-api-key': apiKey
       },
       body: JSON.stringify(request),
       cache: 'no-store'
@@ -42,7 +54,8 @@ export async function analyzeMarket(request: ResearchRequest): Promise<ResearchR
       console.error('API Error Response:', {
         status: response.status,
         statusText: response.statusText,
-        error: errorText
+        error: errorText,
+        url
       });
       throw new ApiError(response.status, errorText)
     }
