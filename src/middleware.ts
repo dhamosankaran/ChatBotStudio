@@ -26,6 +26,11 @@ export function middleware(request: NextRequest) {
       apiKeyLength: apiKey?.length,
       hasExpectedKey: !!expectedKey,
       expectedKeyLength: expectedKey?.length,
+      keysMatch: apiKey === expectedKey,
+      keyFirstChar: apiKey?.charAt(0),
+      expectedFirstChar: expectedKey?.charAt(0),
+      keyLastChar: apiKey?.charAt(apiKey.length - 1),
+      expectedLastChar: expectedKey?.charAt(expectedKey.length - 1),
       url: request.url,
       method: request.method,
       headers: Object.fromEntries(request.headers.entries()),
@@ -35,7 +40,11 @@ export function middleware(request: NextRequest) {
     // Verify API key
     if (!apiKey || !expectedKey || apiKey !== expectedKey) {
       console.error('Middleware - Auth Failed:', {
-        reason: !apiKey ? 'Missing API key' : !expectedKey ? 'Missing env var' : 'Invalid key',
+        reason: !apiKey ? 'Missing API key' : !expectedKey ? 'Missing env var' : 'Keys do not match',
+        keyFirstChar: apiKey?.charAt(0),
+        expectedFirstChar: expectedKey?.charAt(0),
+        keyLastChar: apiKey?.charAt(apiKey.length - 1),
+        expectedLastChar: expectedKey?.charAt(expectedKey.length - 1),
         url: request.url,
         headers: Array.from(request.headers.keys())
       });
