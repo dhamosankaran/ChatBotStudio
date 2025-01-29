@@ -9,15 +9,8 @@ class ApiError extends Error {
 }
 
 const getAbsoluteUrl = (path: string) => {
-  // In production, use relative paths
-  if (process.env.NODE_ENV === 'production') {
-    return path;
-  }
-  // For development, use absolute URL
-  const baseUrl = process.env.VERCEL_URL 
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000';
-  return `${baseUrl}${path}`;
+  // Always use relative paths for API requests
+  return path;
 }
 
 export async function analyzeMarket(request: ResearchRequest): Promise<ResearchResponse> {
@@ -28,7 +21,8 @@ export async function analyzeMarket(request: ResearchRequest): Promise<ResearchR
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'x-vercel-protection-bypass': 'true'
       },
       body: JSON.stringify(request),
       cache: 'no-store'
