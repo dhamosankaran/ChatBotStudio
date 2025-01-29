@@ -27,26 +27,17 @@ export function middleware(request: NextRequest) {
       hasExpectedKey: !!expectedKey,
       expectedKeyLength: expectedKey?.length,
       keysMatch: apiKey === expectedKey,
-      keyFirstChar: apiKey?.charAt(0),
-      expectedFirstChar: expectedKey?.charAt(0),
-      keyLastChar: apiKey?.charAt(apiKey.length - 1),
-      expectedLastChar: expectedKey?.charAt(expectedKey.length - 1),
-      url: request.url,
       method: request.method,
-      headers: Object.fromEntries(request.headers.entries()),
-      envVars: Object.keys(process.env).filter(key => key.includes('API_KEY'))
+      contentType: request.headers.get('content-type'),
+      url: request.url
     });
 
     // Verify API key
     if (!apiKey || !expectedKey || apiKey !== expectedKey) {
       console.error('Middleware - Auth Failed:', {
         reason: !apiKey ? 'Missing API key' : !expectedKey ? 'Missing env var' : 'Keys do not match',
-        keyFirstChar: apiKey?.charAt(0),
-        expectedFirstChar: expectedKey?.charAt(0),
-        keyLastChar: apiKey?.charAt(apiKey.length - 1),
-        expectedLastChar: expectedKey?.charAt(expectedKey.length - 1),
-        url: request.url,
-        headers: Array.from(request.headers.keys())
+        method: request.method,
+        contentType: request.headers.get('content-type')
       });
       
       return new NextResponse(
@@ -58,7 +49,9 @@ export function middleware(request: NextRequest) {
           status: 401,
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key'
           }
         }
       );

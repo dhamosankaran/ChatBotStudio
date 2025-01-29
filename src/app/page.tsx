@@ -147,8 +147,7 @@ export default function MarketResearchPage() {
             // Log headers being sent
             console.log('Request Headers:', {
                 hasApiKey: !!process.env.NEXT_PUBLIC_INTERNAL_API_KEY,
-                apiKeyLength: process.env.NEXT_PUBLIC_INTERNAL_API_KEY?.length,
-                headers: ['Content-Type', 'x-api-key']
+                apiKeyLength: process.env.NEXT_PUBLIC_INTERNAL_API_KEY?.length
             });
             // Add response debug logging
             console.log('Response Debug:', {
@@ -317,13 +316,13 @@ export default function MarketResearchPage() {
             })
             setIsAnalysisLoading(true)
 
-            const payload = JSON.stringify({
+            const requestBody = {
                 product_name: productName,
                 context: context || ''
-            });
+            };
 
-            console.log('Submitting analysis with payload:', payload)
-            await complete(payload)
+            console.log('Submitting analysis with payload:', requestBody)
+            await complete(JSON.stringify(requestBody))
 
         } catch (err: any) {
             console.error('Error during analysis:', {
