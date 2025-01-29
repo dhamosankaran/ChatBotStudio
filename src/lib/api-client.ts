@@ -9,15 +9,7 @@ class ApiError extends Error {
 }
 
 const getAbsoluteUrl = (path: string) => {
-  // In production, use the VERCEL_URL environment variable
-  if (typeof window === 'undefined') {
-    // Server-side
-    const baseUrl = process.env.VERCEL_URL 
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000';
-    return `${baseUrl}${path}`;
-  }
-  // Client-side - use relative path
+  // Always use relative paths for API requests
   return path;
 }
 
@@ -31,7 +23,7 @@ export async function analyzeMarket(request: ResearchRequest): Promise<ResearchR
       headers: { 
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'x-vercel-protection-bypass': 'true'
+        'x-vercel-skip-toolbar': '1'
       },
       body: JSON.stringify(request),
       cache: 'no-store'
