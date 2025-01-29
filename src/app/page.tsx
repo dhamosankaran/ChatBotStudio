@@ -123,10 +123,12 @@ export default function MarketResearchPage() {
 
     // Debug logging for API configuration
     useEffect(() => {
+        const apiKey = process.env.NEXT_PUBLIC_INTERNAL_API_KEY;
         console.log('API Configuration Debug:', {
-            hasApiKey: !!process.env.NEXT_PUBLIC_INTERNAL_API_KEY,
-            apiKeyLength: process.env.NEXT_PUBLIC_INTERNAL_API_KEY?.length,
-            isDevelopment: process.env.NODE_ENV === 'development'
+            hasApiKey: !!apiKey,
+            apiKeyLength: apiKey?.length,
+            isDevelopment: process.env.NODE_ENV === 'development',
+            envVars: Object.keys(process.env).filter(key => key.includes('INTERNAL_API_KEY'))
         });
     }, []);
 
@@ -142,12 +144,17 @@ export default function MarketResearchPage() {
             'x-api-key': process.env.NEXT_PUBLIC_INTERNAL_API_KEY || ''
         },
         onResponse: async (response) => {
-            // Add request header debug logging
-            console.log('Request Headers Debug:', {
-                apiKeyPresent: !!process.env.NEXT_PUBLIC_INTERNAL_API_KEY,
+            // Log headers being sent
+            console.log('Request Headers:', {
+                hasApiKey: !!process.env.NEXT_PUBLIC_INTERNAL_API_KEY,
                 apiKeyLength: process.env.NEXT_PUBLIC_INTERNAL_API_KEY?.length,
+                headers: ['Content-Type', 'x-api-key']
+            });
+            // Add response debug logging
+            console.log('Response Debug:', {
+                status: response.status,
                 url: response.url,
-                status: response.status
+                headers: Object.fromEntries(response.headers.entries())
             });
             console.log('Response received:', response.status)
             if (!response.ok) {
