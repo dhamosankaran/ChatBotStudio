@@ -66,10 +66,26 @@ export async function POST(req: Request) {
           status: 'error'
         },
         results: {
-          manager: '',
-          market: '',
-          consumer: '',
-          industry: ''
+          manager: {
+            content: '',
+            status: 'error',
+            timestamp: new Date().toISOString()
+          },
+          market: {
+            content: '',
+            status: 'error',
+            timestamp: new Date().toISOString()
+          },
+          consumer: {
+            content: '',
+            status: 'error',
+            timestamp: new Date().toISOString()
+          },
+          industry: {
+            content: '',
+            status: 'error',
+            timestamp: new Date().toISOString()
+          }
         },
         errors: { 
           system_error: error.message || 'Unknown error'
@@ -101,10 +117,26 @@ export async function POST(req: Request) {
         status: 'error'
       },
       results: {
-        manager: '',
-        market: '',
-        consumer: '',
-        industry: ''
+        manager: {
+          content: '',
+          status: 'error',
+          timestamp: new Date().toISOString()
+        },
+        market: {
+          content: '',
+          status: 'error',
+          timestamp: new Date().toISOString()
+        },
+        consumer: {
+          content: '',
+          status: 'error',
+          timestamp: new Date().toISOString()
+        },
+        industry: {
+          content: '',
+          status: 'error',
+          timestamp: new Date().toISOString()
+        }
       },
       errors: { 
         system_error: error.message || 'Unknown error'

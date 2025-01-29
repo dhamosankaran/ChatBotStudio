@@ -41,8 +41,8 @@ export const agents: AgentConfig[] = [
 ]
 
 export const API_ENDPOINTS = {
-  analyze: 'http://localhost:8000/analyze',
-  health: 'http://localhost:8000/health',
-  cacheStats: 'http://localhost:8000/cache/stats',
-  cacheClear: 'http://localhost:8000/cache/clear'
+  analyze: '/api/analyze',
+  health: '/api/health',
+  cacheStats: '/api/cache/stats',
+  cacheClear: '/api/cache/clear'
 } as const 

@@ -20,9 +20,31 @@ export interface ResearchResults {
   industry: string;
 }
 
+export interface ResearchResult {
+  content: string;
+  status: string;
+  timestamp: string;
+}
+
+export interface SearchResult {
+  title: string;
+  link: string;
+  snippet: string;
+  position: number;
+}
+
 export interface ResearchResponse {
-  metadata: AgentMetadata;
-  results: ResearchResults;
+  metadata: {
+    timestamp: string;
+    version: string;
+    status: string;
+  };
+  results: {
+    manager?: ResearchResult;
+    market?: ResearchResult;
+    consumer?: ResearchResult;
+    industry?: ResearchResult;
+  };
   errors: Record<string, string>;
 }
 
