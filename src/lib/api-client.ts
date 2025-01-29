@@ -9,15 +9,24 @@ class ApiError extends Error {
 }
 
 const getAbsoluteUrl = (path: string) => {
-  // Always use relative paths for API requests
+  // In production, use the VERCEL_URL environment variable
+  if (typeof window === 'undefined') {
+    // Server-side
+    const baseUrl = process.env.VERCEL_URL 
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000';
+    return `${baseUrl}${path}`;
+  }
+  // Client-side - use relative path
   return path;
 }
 
 export async function analyzeMarket(request: ResearchRequest): Promise<ResearchResponse> {
   try {
-    console.log('Making request to:', getAbsoluteUrl(API_ENDPOINTS.analyze));
+    const url = getAbsoluteUrl(API_ENDPOINTS.analyze);
+    console.log('Making request to:', url);
     
-    const response = await fetch(getAbsoluteUrl(API_ENDPOINTS.analyze), {
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
