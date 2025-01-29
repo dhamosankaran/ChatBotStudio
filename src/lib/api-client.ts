@@ -9,7 +9,11 @@ class ApiError extends Error {
 }
 
 const getAbsoluteUrl = (path: string) => {
-  // Always use absolute URL for server-side requests
+  // In production, use relative paths
+  if (process.env.NODE_ENV === 'production') {
+    return path;
+  }
+  // For development, use absolute URL
   const baseUrl = process.env.VERCEL_URL 
     ? `https://${process.env.VERCEL_URL}`
     : 'http://localhost:3000';
