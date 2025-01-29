@@ -121,6 +121,14 @@ export default function MarketResearchPage() {
 
     const [isAnalysisLoading, setIsAnalysisLoading] = useState(false);
 
+    // Debug logging for API configuration
+    useEffect(() => {
+        console.log('API Configuration Debug:', {
+            hasApiKey: !!process.env.NEXT_PUBLIC_INTERNAL_API_KEY,
+            apiKeyLength: process.env.NEXT_PUBLIC_INTERNAL_API_KEY?.length
+        });
+    }, []);
+
     // Add debug logging for state changes
     useEffect(() => {
         console.log('Analysis results updated:', analysisResults)
@@ -128,6 +136,9 @@ export default function MarketResearchPage() {
 
     const { complete, isLoading } = useCompletion({
         api: '/api/chat',
+        headers: {
+            'x-api-key': process.env.NEXT_PUBLIC_INTERNAL_API_KEY || ''
+        },
         onResponse: async (response) => {
              console.log('Response received:', response.status)
             if (!response.ok) {
