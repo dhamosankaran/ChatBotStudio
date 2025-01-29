@@ -146,7 +146,8 @@ export default function MarketResearchPage() {
             console.log('Request Headers Debug:', {
                 apiKeyPresent: !!process.env.NEXT_PUBLIC_INTERNAL_API_KEY,
                 apiKeyLength: process.env.NEXT_PUBLIC_INTERNAL_API_KEY?.length,
-                url: response.url
+                url: response.url,
+                status: response.status
             });
             console.log('Response received:', response.status)
             if (!response.ok) {
