@@ -27,9 +27,7 @@ export async function analyzeMarket(request: ResearchRequest): Promise<ResearchR
         'Accept': 'application/json'
       },
       body: JSON.stringify(request),
-      // Add next.js specific options
-      cache: 'no-store',
-      next: { revalidate: 0 }
+      cache: 'no-store'
     })
 
     if (!response.ok) {
@@ -59,8 +57,7 @@ export async function analyzeMarket(request: ResearchRequest): Promise<ResearchR
 export async function checkHealth(): Promise<{ status: string; timestamp: string }> {
   try {
     const response = await fetch(getAbsoluteUrl(API_ENDPOINTS.health), {
-      cache: 'no-store',
-      next: { revalidate: 0 }
+      cache: 'no-store'
     })
     if (!response.ok) {
       throw new ApiError(response.status, 'Health check failed')
@@ -78,8 +75,7 @@ export async function getCacheStats(): Promise<{
 }> {
   try {
     const response = await fetch(getAbsoluteUrl(API_ENDPOINTS.cacheStats), {
-      cache: 'no-store',
-      next: { revalidate: 0 }
+      cache: 'no-store'
     })
     if (!response.ok) {
       throw new ApiError(response.status, 'Failed to get cache stats')
@@ -94,8 +90,7 @@ export async function clearCache(): Promise<{ status: string; message: string }>
   try {
     const response = await fetch(getAbsoluteUrl(API_ENDPOINTS.cacheClear), {
       method: 'POST',
-      cache: 'no-store',
-      next: { revalidate: 0 }
+      cache: 'no-store'
     })
     if (!response.ok) {
       throw new ApiError(response.status, 'Failed to clear cache')
