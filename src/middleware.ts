@@ -4,19 +4,15 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   // Only apply to /api routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
-    // Set bypass header for all API requests
-    const headers = new Headers({
-      'x-vercel-protection-bypass': 'true',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key'
-    });
-
     // Handle preflight requests
     if (request.method === 'OPTIONS') {
       return new NextResponse(null, { 
         status: 200,
-        headers
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key'
+        }
       });
     }
 
@@ -53,19 +49,42 @@ export function middleware(request: NextRequest) {
           status: 401,
           headers: {
             'Content-Type': 'application/json',
-            ...Object.fromEntries(headers)
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key'
           }
         }
       );
     }
 
-    // Continue with valid API key
-    const response = NextResponse.next();
-    
-    // Add headers to the response
-    headers.forEach((value, key) => {
-      response.headers.set(key, value);
+    // Clone the request to modify headers
+    const modifiedRequest = new Request(request.url, {
+      method: request.method,
+      headers: new Headers(request.headers),
+      body: request.body,
+      cache: request.cache,
+      credentials: request.credentials,
+      integrity: request.integrity,
+      keepalive: request.keepalive,
+      mode: request.mode,
+      redirect: request.redirect,
+      referrer: request.referrer,
+      referrerPolicy: request.referrerPolicy,
+      signal: request.signal,
     });
+
+    // Add bypass header to the request
+    modifiedRequest.headers.set('x-custom-auth', 'true');
+    
+    // Continue with valid API key
+    const response = NextResponse.next({
+      request: modifiedRequest
+    });
+    
+    // Add CORS headers to the response
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key');
     
     return response;
   }
