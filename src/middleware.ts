@@ -12,6 +12,7 @@ export function middleware(request: NextRequest) {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
+          'x-vercel-protection-bypass': 'true'
         }
       });
     }
@@ -29,7 +30,8 @@ export function middleware(request: NextRequest) {
       keysMatch: apiKey === expectedKey,
       method: request.method,
       contentType: request.headers.get('content-type'),
-      url: request.url
+      url: request.url,
+      isVercelBypass: request.headers.get('x-vercel-protection-bypass')
     });
 
     // Verify API key
@@ -51,7 +53,8 @@ export function middleware(request: NextRequest) {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key'
+            'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
+            'x-vercel-protection-bypass': 'true'
           }
         }
       );
@@ -64,6 +67,7 @@ export function middleware(request: NextRequest) {
     response.headers.set('Access-Control-Allow-Origin', '*');
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key');
+    response.headers.set('x-vercel-protection-bypass', 'true');
     
     return response;
   }
