@@ -4,16 +4,19 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   // Only apply to /api routes
   if (request.nextUrl.pathname.startsWith('/api/')) {
+    // Set bypass header for all API requests
+    const headers = new Headers({
+      'x-vercel-protection-bypass': 'true',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key'
+    });
+
     // Handle preflight requests
     if (request.method === 'OPTIONS') {
       return new NextResponse(null, { 
         status: 200,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
-          'x-vercel-protection-bypass': 'true'
-        }
+        headers
       });
     }
 
@@ -30,8 +33,7 @@ export function middleware(request: NextRequest) {
       keysMatch: apiKey === expectedKey,
       method: request.method,
       contentType: request.headers.get('content-type'),
-      url: request.url,
-      isVercelBypass: request.headers.get('x-vercel-protection-bypass')
+      url: request.url
     });
 
     // Verify API key
@@ -51,10 +53,7 @@ export function middleware(request: NextRequest) {
           status: 401,
           headers: {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-api-key',
-            'x-vercel-protection-bypass': 'true'
+            ...Object.fromEntries(headers)
           }
         }
       );
@@ -63,11 +62,10 @@ export function middleware(request: NextRequest) {
     // Continue with valid API key
     const response = NextResponse.next();
     
-    // Add CORS headers to the response
-    response.headers.set('Access-Control-Allow-Origin', '*');
-    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-api-key');
-    response.headers.set('x-vercel-protection-bypass', 'true');
+    // Add headers to the response
+    headers.forEach((value, key) => {
+      response.headers.set(key, value);
+    });
     
     return response;
   }
