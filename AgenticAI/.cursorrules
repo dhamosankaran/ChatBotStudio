@@ -112,22 +112,19 @@ ALPHA_VANTAGE_API_KEY=
 
 # Scratchpad
 
-Current Task: [X] Ensure Portfolio Allocation and Summary Dynamic Updates - COMPLETED ✅
-Project Status: Enhancement Phase - Portfolio Data Synchronization SUCCESSFUL
+Current Task: [X] Rename MCP to FAP (Financial Analysis Pipeline) - COMPLETED ✅
+Project Status: Refactoring Phase - System Successfully Renamed to Avoid Confusion with Model Context Protocol
 
-## Current Task Breakdown
-[X] Examine current portfolio allocation implementation
-[X] Check user profile integration with portfolio data  
-[X] Fix identified issues with dynamic updates
-[X] Implement comprehensive report generation with synchronized data
-[X] Update Portfolio Agent to support 8 asset classes
-[X] Enhance API endpoints for dynamic allocation generation
-[X] Update Dashboard component with better allocation parsing
-[X] Add recommended allocations section to Portfolio component
-[X] Implement refresh mechanisms for real-time updates
-[X] Test portfolio agent with updated allocations
-[X] Test complete end-to-end functionality - ✅ PASSED
-[X] Verify dynamic allocation generation - ✅ VERIFIED
+## Current Task Breakdown - FAP Renaming
+[X] Rename Python files (mcp_context.py → fap_context.py, mcp_nodes.py → fap_nodes.py, mcp_graph.py → fap_pipeline.py)
+[X] Update class names (MCPContext → FAPContext)
+[X] Update API endpoints (/api/v1/mcp/analyze → /api/v1/fap/analyze)
+[X] Update frontend components (App.tsx, Dashboard.tsx)
+[X] Update test files (test_mcp.py → test_fap.py)
+[X] Update documentation and comments
+[X] Clean up mcp_host directory (contains mock/unused MCP implementation)
+[X] Test the renamed FAP system
+[X] Update any remaining references
 
 ## Final Implementation Verification Results
 ✅ **8 Asset Classes Working**: stocks, bonds, cash, real_estate, commodities, cryptocurrency, etfs, reits
@@ -173,6 +170,10 @@ The Portfolio Allocation and Summary section data are now being updated dynamica
 - **Synchronized Data Generation**: CoordinatorAgent.generate_comprehensive_report() ensures exact percentage matching between allocation list and recommendations text
 - **Dynamic Frontend Updates**: Profile changes trigger both Dashboard and Portfolio component refreshes for real-time updates
 - **Comprehensive Testing**: End-to-end testing verified all risk profiles generate proper 100% total allocations
+- **System Renaming Best Practices**: Successfully renamed custom "MCP" system to "FAP" (Financial Analysis Pipeline) to avoid confusion with Anthropic's Model Context Protocol
+- **Pydantic V2 Migration**: Updated deprecated .dict() method calls to .model_dump() to fix compatibility and remove warnings
+- **Async/Await Fix**: Fixed coroutine handling in portfolio_generation_node by properly awaiting portfolio_agent.generate_portfolio()
+- **Clean Codebase**: Removed unused mcp_host directory containing mock MCP implementation to prevent confusion
 
 # Next Steps
 1. Start API server and test complete functionality - ✅ COMPLETED
@@ -180,6 +181,7 @@ The Portfolio Allocation and Summary section data are now being updated dynamica
 3. Test dashboard and portfolio synchronization - ✅ COMPLETED  
 4. Document the implementation for future reference
 5. Update memory with successful implementation details - ✅ COMPLETED
+6. Fix missing frontend dependencies - ✅ COMPLETED
 
 # Final Status
 ✅ **ALL IMPLEMENTATION COMPLETED AND TESTED**
@@ -187,6 +189,7 @@ The Portfolio Allocation and Summary section data are now being updated dynamica
 - API endpoints working correctly (200 OK responses)
 - Dynamic portfolio allocation fully functional
 - End-to-end testing successful
+- Frontend dependencies resolved (react-icons, recharts)
 
 # Notes
 - Keep instructions simple

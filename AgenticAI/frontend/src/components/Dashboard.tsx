@@ -20,8 +20,8 @@ interface Allocation {
 
 interface DashboardProps {
   onCreateProfile?: () => void;
-  mcpContext?: any;
-  mcpHistory?: any[];
+  fapContext?: any;
+  fapHistory?: any[];
 }
 
 // Helper to parse allocation from report
@@ -69,7 +69,7 @@ function parseReportSections(report: string) {
   };
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ onCreateProfile, mcpContext, mcpHistory }) => {
+const Dashboard: React.FC<DashboardProps> = ({ onCreateProfile, fapContext, fapHistory }) => {
   const [allocation, setAllocation] = useState<Allocation[]>([]);
   const [report, setReport] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -202,11 +202,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onCreateProfile, mcpContext, mcpH
       <div className="max-w-5xl mx-auto">
         <h2 className="text-3xl md:text-4xl font-extrabold text-blue-900 mb-6 text-center drop-shadow-sm">Comprehensive Investment Report</h2>
         <Markets />
-        {mcpContext && mcpHistory && mcpHistory.length > 0 && (
+        {fapContext && fapHistory && fapHistory.length > 0 && (
           <div className="mt-8 p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">MCP Analysis Details</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">Financial Analysis Pipeline Details</h2>
             <pre className="bg-gray-100 p-4 rounded-md overflow-x-auto">
-              {JSON.stringify(mcpContext, null, 2)}
+              {JSON.stringify(fapContext, null, 2)}
             </pre>
           </div>
         )}

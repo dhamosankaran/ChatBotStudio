@@ -25,10 +25,10 @@ const App: React.FC = () => {
   const [showEdit, setShowEdit] = useState(false)
   const [profileData, setProfileData] = useState<UserProfileData | null>(null)
   const [investmentProposal, setInvestmentProposal] = useState<string | null>(null)
-  const [mcpContext, setMcpContext] = useState<any>(null);
-  const [mcpHistory, setMcpHistory] = useState<any[]>([]);
-  const [mcpLoading, setMcpLoading] = useState(false);
-  const [mcpError, setMcpError] = useState<string | null>(null);
+  const [fapContext, setFapContext] = useState<any>(null);
+  const [fapHistory, setFapHistory] = useState<any[]>([]);
+  const [fapLoading, setFapLoading] = useState(false);
+  const [fapError, setFapError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isChatOpen, setIsChatOpen] = useState(false);
 
@@ -136,24 +136,24 @@ const App: React.FC = () => {
     }
   }
 
-  const runMcpAnalysis = async () => {
+  const runFapAnalysis = async () => {
     if (!profileData) return;
-    setMcpLoading(true);
-    setMcpError(null);
+    setFapLoading(true);
+    setFapError(null);
     try {
-      const res = await fetch('/api/v1/mcp/analyze', {
+      const res = await fetch('/api/v1/fap/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...profileData }),
       });
-      if (!res.ok) throw new Error('Failed to run MCP analysis');
+      if (!res.ok) throw new Error('Failed to run Financial Analysis Pipeline');
       const data = await res.json();
-      setMcpContext(data.mcp_context);
-      setMcpHistory(data.mcp_context?.history || []);
+      setFapContext(data.fap_context);
+      setFapHistory(data.fap_context?.history || []);
     } catch (err) {
-      setMcpError(err instanceof Error ? err.message : 'An error occurred');
+      setFapError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
-      setMcpLoading(false);
+      setFapLoading(false);
     }
   };
 
@@ -193,7 +193,7 @@ const App: React.FC = () => {
         return (
           <>
             <div className="mb-8">
-              <Dashboard mcpContext={mcpContext} mcpHistory={mcpHistory} />
+              <Dashboard fapContext={fapContext} fapHistory={fapHistory} />
               <div className="flex gap-4 mt-4">
                 <button
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -202,15 +202,15 @@ const App: React.FC = () => {
                   Edit Profile
                 </button>
                 <button
-                  className={`px-4 py-2 rounded text-white ${mcpLoading ? 'bg-blue-300' : 'bg-blue-700 hover:bg-blue-800'}`}
-                  onClick={runMcpAnalysis}
-                  disabled={mcpLoading}
+                  className={`px-4 py-2 rounded text-white ${fapLoading ? 'bg-blue-300' : 'bg-blue-700 hover:bg-blue-800'}`}
+                  onClick={runFapAnalysis}
+                  disabled={fapLoading}
                 >
-                  {mcpLoading ? 'Analyzing...' : 'Run MCP Analysis'}
+                  {fapLoading ? 'Analyzing...' : 'Run Financial Analysis Pipeline'}
                 </button>
               </div>
-              {mcpError && (
-                <div className="mt-4 text-red-500">Error: {mcpError}</div>
+              {fapError && (
+                <div className="mt-4 text-red-500">Error: {fapError}</div>
               )}
             </div>
           </>

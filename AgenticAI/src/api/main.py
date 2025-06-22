@@ -18,8 +18,8 @@ from src.agents import CoordinatorAgent
 from langchain_openai import ChatOpenAI
 from src.services.user_profile_service import UserProfileService
 from src.models.user_profile import UserProfile, InvestmentPreference
-from src.models.mcp_context import MCPContext
-from src.agents.mcp_graph import run_mcp_workflow
+from src.models.fap_context import FAPContext
+from src.agents.fap_pipeline import run_fap_pipeline
 from src.models.portfolio import PortfolioHolding
 from src.services.portfolio_service import PortfolioService
 from src.models.journal import JournalEntry
@@ -85,7 +85,8 @@ class InvestmentProposalResponse(BaseModel):
     user_id: str
     proposal: str
 
-class MCPAnalyzeRequest(BaseModel):
+class FAPAnalyzeRequest(BaseModel):
+    """Request model for Financial Analysis Pipeline"""
     name: str
     age: int
     income: float
@@ -95,8 +96,9 @@ class MCPAnalyzeRequest(BaseModel):
     session_id: Optional[str] = None
     fallback: Optional[bool] = False
 
-class MCPAnalyzeResponse(BaseModel):
-    mcp_context: Dict
+class FAPAnalyzeResponse(BaseModel):
+    """Response model for Financial Analysis Pipeline"""
+    fap_context: Dict
     used_fallback: bool = False
     fallback_response: Optional[str] = None
 
@@ -255,17 +257,26 @@ async def get_portfolio_analysis():
         logger.error(f"Error loading portfolio analysis: {str(e)}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
-@app.post("/api/v1/mcp/analyze", response_model=MCPAnalyzeResponse)
-async def mcp_analyze(request: MCPAnalyzeRequest):
-    """Run the MCP workflow or fallback to the old agent pipeline."""
+@app.post("/api/v1/fap/analyze", response_model=FAPAnalyzeResponse)
+async def fap_analyze(request: FAPAnalyzeRequest):
+    """
+    Run the Financial Analysis Pipeline (FAP) or fallback to the old agent pipeline.
+    
+    This endpoint processes a complete financial analysis through 4 sequential steps:
+    1. Risk Assessment
+    2. Market Analysis  
+    3. Portfolio Generation
+    4. Report Generation
+    """
     if request.fallback:
         # Use the old agent pipeline as fallback
         coordinator = CoordinatorAgent()
         profile_str = f"Name: {request.name}, Age: {request.age}, Income: {request.income}, Risk Tolerance: {request.risk_tolerance}, Investment Goal: {request.investment_goal}, Investment Horizon: {request.investment_horizon}"
         response = await coordinator.process_message(profile_str)
-        return MCPAnalyzeResponse(mcp_context={}, used_fallback=True, fallback_response=response)
-    # Build MCP context
-    context = MCPContext(
+        return FAPAnalyzeResponse(fap_context={}, used_fallback=True, fallback_response=response)
+    
+    # Build FAP context
+    context = FAPContext(
         user_profile={
             "name": request.name,
             "age": request.age,
@@ -277,8 +288,10 @@ async def mcp_analyze(request: MCPAnalyzeRequest):
         session_id=request.session_id or str(uuid.uuid4()),
         history=[]
     )
-    context = await run_mcp_workflow(context)
-    return MCPAnalyzeResponse(mcp_context=context.dict(), used_fallback=False)
+    
+    # Execute the Financial Analysis Pipeline
+    context = await run_fap_pipeline(context)
+    return FAPAnalyzeResponse(fap_context=context.model_dump(), used_fallback=False)
 
 @app.get("/api/v1/portfolio/holdings")
 async def get_portfolio_holdings():
