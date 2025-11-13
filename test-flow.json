@@ -1,0 +1,110 @@
+{
+  "start_screen_id": "welcome",
+  "screens": {
+    "welcome": {
+      "screen_id": "welcome",
+      "type": "MESSAGE_SCREEN",
+      "message_text": "Welcome to the test flow! This flow was imported from a JSON file.",
+      "buttons": [
+        {
+          "label": "Continue",
+          "go_to_screen_id": "menu"
+        }
+      ]
+    },
+    "menu": {
+      "screen_id": "menu",
+      "type": "MESSAGE_SCREEN",
+      "message_text": "What would you like to test?",
+      "buttons": [
+        {
+          "label": "Test API Call",
+          "go_to_screen_id": "api_test"
+        },
+        {
+          "label": "Test Conditional",
+          "go_to_screen_id": "conditional_test"
+        },
+        {
+          "label": "End Test",
+          "go_to_screen_id": "end"
+        }
+      ]
+    },
+    "api_test": {
+      "screen_id": "api_test",
+      "type": "API_SCREEN",
+      "api_call": {
+        "url": "/api/test",
+        "method": "GET",
+        "save_response_to_variable": "api_result",
+        "on_success_go_to_screen_id": "api_success",
+        "on_error_go_to_screen_id": "api_error"
+      }
+    },
+    "api_success": {
+      "screen_id": "api_success",
+      "type": "MESSAGE_SCREEN",
+      "message_text": "API call successful! Result: {{api_result}}",
+      "buttons": [
+        {
+          "label": "Back to Menu",
+          "go_to_screen_id": "menu"
+        }
+      ]
+    },
+    "api_error": {
+      "screen_id": "api_error",
+      "type": "MESSAGE_SCREEN",
+      "message_text": "API call failed. Please try again.",
+      "buttons": [
+        {
+          "label": "Retry",
+          "go_to_screen_id": "api_test"
+        },
+        {
+          "label": "Back to Menu",
+          "go_to_screen_id": "menu"
+        }
+      ]
+    },
+    "conditional_test": {
+      "screen_id": "conditional_test",
+      "type": "CONDITIONAL_SCREEN",
+      "condition": {
+        "variable": "user_choice",
+        "operator": "equals",
+        "value": "test"
+      },
+      "go_to_screen_id": "condition_true",
+      "on_false_go_to_screen_id": "condition_false"
+    },
+    "condition_true": {
+      "screen_id": "condition_true",
+      "type": "MESSAGE_SCREEN",
+      "message_text": "Condition evaluated to TRUE!",
+      "buttons": [
+        {
+          "label": "Back to Menu",
+          "go_to_screen_id": "menu"
+        }
+      ]
+    },
+    "condition_false": {
+      "screen_id": "condition_false",
+      "type": "MESSAGE_SCREEN",
+      "message_text": "Condition evaluated to FALSE!",
+      "buttons": [
+        {
+          "label": "Back to Menu",
+          "go_to_screen_id": "menu"
+        }
+      ]
+    },
+    "end": {
+      "screen_id": "end",
+      "type": "END_SCREEN",
+      "message_text": "Thank you for testing the import functionality!"
+    }
+  }
+}

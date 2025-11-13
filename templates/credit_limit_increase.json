@@ -1,0 +1,128 @@
+{
+    "start_screen_id": "get_cards",
+    "screens": {
+        "get_cards": {
+            "screen_id": "get_cards",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards",
+                "method": "GET",
+                "mock_file": "mocks/mock_credit_cards.json",
+                "save_response_to": "cards"
+            },
+            "on_success": "select_card",
+            "on_error": "api_error"
+        },
+        "select_card": {
+            "screen_id": "select_card",
+            "type": "MENU",
+            "message_text": "📈 Credit Limit Increase Request\n\nWhich card would you like to request a credit limit increase for?",
+            "dynamic_buttons": {
+                "source_variable": "cards.cards",
+                "label_template": "{{name}} (...{{last_four}}) - Current Limit: ${{credit_limit}}",
+                "go_to_screen_id": "show_eligibility",
+                "set_variable": "selected_card"
+            },
+            "buttons": [
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "show_eligibility": {
+            "screen_id": "show_eligibility",
+            "type": "MENU",
+            "message_text": "✅ Good news! You're eligible for a credit limit increase.\n\nCurrent Limit: ${{selected_card.credit_limit}}\nAccount Age: 5 years\nPayment History: Excellent\n\nTo proceed, we'll need to verify your current income.",
+            "buttons": [
+                { "label": "▶️ Continue", "go_to_screen_id": "enter_income" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "enter_income": {
+            "screen_id": "enter_income",
+            "type": "MESSAGE",
+            "message_text": "💵 What is your current annual income?\n\n(Enter your total annual income before taxes)",
+            "input": {
+                "type": "text",
+                "variable": "annual_income"
+            },
+            "go_to_screen_id": "enter_employment"
+        },
+        "enter_employment": {
+            "screen_id": "enter_employment",
+            "type": "MENU",
+            "message_text": "What is your current employment status?",
+            "buttons": [
+                { "label": "💼 Employed Full-Time", "go_to_screen_id": "enter_requested_limit", "set_variable": "employment", "set_value": "full_time" },
+                { "label": "⏰ Employed Part-Time", "go_to_screen_id": "enter_requested_limit", "set_variable": "employment", "set_value": "part_time" },
+                { "label": "👔 Self-Employed", "go_to_screen_id": "enter_requested_limit", "set_variable": "employment", "set_value": "self_employed" },
+                { "label": "🏖️ Retired", "go_to_screen_id": "enter_requested_limit", "set_variable": "employment", "set_value": "retired" }
+            ]
+        },
+        "enter_requested_limit": {
+            "screen_id": "enter_requested_limit",
+            "type": "MESSAGE",
+            "message_text": "What credit limit would you like?\n\nCurrent Limit: ${{selected_card.credit_limit}}\n\n(We typically approve increases up to 3x your current limit based on your income)",
+            "input": {
+                "type": "text",
+                "variable": "requested_limit"
+            },
+            "go_to_screen_id": "confirm_request"
+        },
+        "confirm_request": {
+            "screen_id": "confirm_request",
+            "type": "MENU",
+            "message_text": "📋 Review Your Request:\n\nCard: {{selected_card.name}}\nCurrent Limit: ${{selected_card.credit_limit}}\nRequested Limit: ${{requested_limit}}\nAnnual Income: ${{annual_income}}\n\n⚠️ This will result in a hard inquiry on your credit report.",
+            "buttons": [
+                { "label": "✅ Submit Request", "go_to_screen_id": "process_request" },
+                { "label": "📝 Edit Request", "go_to_screen_id": "enter_requested_limit" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "process_request": {
+            "screen_id": "process_request",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/credit-limit/request",
+                "method": "POST",
+                "mock_response": {
+                    "status": "approved",
+                    "new_limit": 15000,
+                    "effective_date": "2025-11-12",
+                    "request_id": "CLI_8473920156"
+                }
+            },
+            "on_success": "request_approved",
+            "on_error": "request_error"
+        },
+        "request_approved": {
+            "screen_id": "request_approved",
+            "type": "MESSAGE",
+            "message_text": "🎉 Congratulations! Your request has been approved!\n\nNew Credit Limit: $15,000\nPrevious Limit: ${{selected_card.credit_limit}}\nIncrease: ${{15000 - selected_card.credit_limit}}\n\nYour new limit is effective immediately and you'll receive a confirmation email shortly.",
+            "buttons": [
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "request_error": {
+            "screen_id": "request_error",
+            "type": "MENU",
+            "message_text": "❌ Unable to Process Request\n\nWe're unable to approve your credit limit increase at this time. This may be due to:\n\n• Recent credit inquiries\n• Current account activity\n• Credit report factors\n\nYou can reapply in 6 months.",
+            "buttons": [
+                { "label": "📧 Email Details", "go_to_screen_id": "end_flow" },
+                { "label": "📞 Speak to Representative", "go_to_screen_id": "end_flow" },
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to retrieve your cards. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for choosing Citi!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

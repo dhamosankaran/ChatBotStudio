@@ -1,0 +1,29 @@
+{
+  "status": "success",
+  "statements": [
+    {
+      "statement_id": "stmt_oct2025",
+      "period": "October 2025",
+      "closing_date": "2025-10-31",
+      "due_date": "2025-11-25",
+      "balance": 1542.78,
+      "url": "/documents/statements/oct2025.pdf"
+    },
+    {
+      "statement_id": "stmt_sep2025",
+      "period": "September 2025",
+      "closing_date": "2025-09-30",
+      "due_date": "2025-10-25",
+      "balance": 2105.40,
+      "url": "/documents/statements/sep2025.pdf"
+    },
+    {
+      "statement_id": "stmt_aug2025",
+      "period": "August 2025",
+      "closing_date": "2025-08-31",
+      "due_date": "2025-09-25",
+      "balance": 876.12,
+      "url": "/documents/statements/aug2025.pdf"
+    }
+  ]
+}

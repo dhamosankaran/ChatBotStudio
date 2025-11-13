@@ -1,0 +1,54 @@
+{
+  "status": "success",
+  "cards": [
+    {
+      "card_id": "cc_8472953",
+      "name": "Citi Double Cash Card",
+      "card_type": "credit",
+      "last_four": "4532",
+      "card_network": "Mastercard",
+      "balance": 1245.67,
+      "available_credit": 8754.33,
+      "credit_limit": 10000.00,
+      "minimum_payment": 35.00,
+      "payment_due_date": "2025-11-28",
+      "status": "active",
+      "rewards_balance": 12456,
+      "apr": 18.24,
+      "account_open_date": "2020-03-15"
+    },
+    {
+      "card_id": "cc_9283746",
+      "name": "Citi Premier Card",
+      "card_type": "credit",
+      "last_four": "7821",
+      "card_network": "Visa",
+      "balance": 3892.45,
+      "available_credit": 11107.55,
+      "credit_limit": 15000.00,
+      "minimum_payment": 116.77,
+      "payment_due_date": "2025-12-05",
+      "status": "active",
+      "rewards_balance": 45820,
+      "apr": 20.49,
+      "account_open_date": "2019-06-22"
+    },
+    {
+      "card_id": "cc_5637281",
+      "name": "Citi Custom Cash Card",
+      "card_type": "credit",
+      "last_four": "3341",
+      "card_network": "Mastercard",
+      "balance": 524.18,
+      "available_credit": 4475.82,
+      "credit_limit": 5000.00,
+      "minimum_payment": 25.00,
+      "payment_due_date": "2025-11-25",
+      "status": "active",
+      "rewards_balance": 8920,
+      "apr": 17.99,
+      "account_open_date": "2022-01-10"
+    }
+  ]
+}
+

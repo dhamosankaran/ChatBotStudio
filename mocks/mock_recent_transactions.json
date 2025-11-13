@@ -1,0 +1,45 @@
+{
+  "status": "success",
+  "transactions": [
+    {
+      "transaction_id": "txn_12345",
+      "date": "2025-11-10",
+      "description": "Amazon Purchase",
+      "amount": 75.50,
+      "currency": "USD",
+      "status": "posted"
+    },
+    {
+      "transaction_id": "txn_12346",
+      "date": "2025-11-09",
+      "description": "Starbucks",
+      "amount": 5.25,
+      "currency": "USD",
+      "status": "posted"
+    },
+    {
+      "transaction_id": "txn_12347",
+      "date": "2025-11-09",
+      "description": "Shell Gas Station",
+      "amount": 45.30,
+      "currency": "USD",
+      "status": "pending"
+    },
+    {
+      "transaction_id": "txn_12348",
+      "date": "2025-11-08",
+      "description": "Netflix Subscription",
+      "amount": 15.99,
+      "currency": "USD",
+      "status": "posted"
+    },
+    {
+      "transaction_id": "txn_12349",
+      "date": "2025-11-07",
+      "description": "Whole Foods Market",
+      "amount": 120.15,
+      "currency": "USD",
+      "status": "posted"
+    }
+  ]
+}

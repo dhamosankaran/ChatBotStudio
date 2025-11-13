@@ -1,0 +1,227 @@
+{
+    "start_screen_id": "welcome_loan",
+    "screens": {
+        "welcome_loan": {
+            "screen_id": "welcome_loan",
+            "type": "MENU",
+            "message_text": "💰 Personal Loan Application\n\nGet funds for any purpose:\n• Home improvements\n• Debt consolidation\n• Major purchases\n• Medical expenses\n\n✨ Features:\n• Fixed rates as low as 7.99% APR\n• No origination fees\n• Flexible repayment: 2-7 years\n• Amounts: $5,000 - $50,000",
+            "buttons": [
+                { "label": "▶️ Apply Now", "go_to_screen_id": "select_loan_amount" },
+                { "label": "📊 Check Eligibility", "go_to_screen_id": "check_eligibility" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "check_eligibility": {
+            "screen_id": "check_eligibility",
+            "type": "MESSAGE",
+            "message_text": "✅ Eligibility Requirements:\n\n• Be 18 years or older\n• U.S. citizen or permanent resident\n• Annual income of at least $24,000\n• Credit score of 650+\n• Valid checking account\n• Debt-to-income ratio under 40%\n\n💡 Pre-qualification won't affect your credit score!",
+            "buttons": [
+                { "label": "✅ I Meet Requirements", "go_to_screen_id": "select_loan_amount" },
+                { "label": "❌ Not Eligible", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "select_loan_amount": {
+            "screen_id": "select_loan_amount",
+            "type": "MENU",
+            "message_text": "💵 How much would you like to borrow?",
+            "buttons": [
+                { "label": "$5,000 - $10,000", "go_to_screen_id": "enter_exact_amount", "set_variable": "loan_range", "set_value": "5000-10000" },
+                { "label": "$10,000 - $20,000", "go_to_screen_id": "enter_exact_amount", "set_variable": "loan_range", "set_value": "10000-20000" },
+                { "label": "$20,000 - $35,000", "go_to_screen_id": "enter_exact_amount", "set_variable": "loan_range", "set_value": "20000-35000" },
+                { "label": "$35,000 - $50,000", "go_to_screen_id": "enter_exact_amount", "set_variable": "loan_range", "set_value": "35000-50000" }
+            ]
+        },
+        "enter_exact_amount": {
+            "screen_id": "enter_exact_amount",
+            "type": "MESSAGE",
+            "message_text": "💰 Enter exact loan amount:\n\n(Minimum: $5,000 | Maximum: $50,000)",
+            "input": {
+                "type": "text",
+                "variable": "loan_amount"
+            },
+            "go_to_screen_id": "select_loan_term"
+        },
+        "select_loan_term": {
+            "screen_id": "select_loan_term",
+            "type": "MENU",
+            "message_text": "📅 Select repayment term:\n\nLonger terms = Lower monthly payment, more interest\nShorter terms = Higher monthly payment, less interest",
+            "buttons": [
+                { "label": "2 Years (24 months)", "go_to_screen_id": "show_estimated_payment", "set_variable": "loan_term", "set_value": "24" },
+                { "label": "3 Years (36 months)", "go_to_screen_id": "show_estimated_payment", "set_variable": "loan_term", "set_value": "36" },
+                { "label": "4 Years (48 months)", "go_to_screen_id": "show_estimated_payment", "set_variable": "loan_term", "set_value": "48" },
+                { "label": "5 Years (60 months)", "go_to_screen_id": "show_estimated_payment", "set_variable": "loan_term", "set_value": "60" },
+                { "label": "7 Years (84 months)", "go_to_screen_id": "show_estimated_payment", "set_variable": "loan_term", "set_value": "84" }
+            ]
+        },
+        "show_estimated_payment": {
+            "screen_id": "show_estimated_payment",
+            "type": "MENU",
+            "message_text": "Estimated Loan Details:\n\nLoan Amount: ${{loan_amount}}\nTerm: {{loan_term}} months\nEstimated APR: 10.99%\n\nEstimated Monthly Payment: ${{Math.round(loan_amount * 0.022)}}\nTotal Interest: ${{Math.round(loan_amount * 0.15)}}\nTotal Repayment: ${{Math.round(loan_amount * 1.15)}}\n\nFinal rate depends on credit review",
+            "buttons": [
+                { "label": "Continue Application", "go_to_screen_id": "select_loan_purpose" },
+                { "label": "Change Amount/Term", "go_to_screen_id": "select_loan_amount" },
+                { "label": "Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "select_loan_purpose": {
+            "screen_id": "select_loan_purpose",
+            "type": "MENU",
+            "message_text": "📝 What will you use this loan for?",
+            "buttons": [
+                { "label": "🏠 Home Improvement", "go_to_screen_id": "enter_personal_info", "set_variable": "loan_purpose", "set_value": "home_improvement" },
+                { "label": "💳 Debt Consolidation", "go_to_screen_id": "enter_personal_info", "set_variable": "loan_purpose", "set_value": "debt_consolidation" },
+                { "label": "🚗 Vehicle Purchase", "go_to_screen_id": "enter_personal_info", "set_variable": "loan_purpose", "set_value": "vehicle" },
+                { "label": "💒 Wedding", "go_to_screen_id": "enter_personal_info", "set_variable": "loan_purpose", "set_value": "wedding" },
+                { "label": "🏥 Medical Expenses", "go_to_screen_id": "enter_personal_info", "set_variable": "loan_purpose", "set_value": "medical" },
+                { "label": "📋 Other", "go_to_screen_id": "enter_other_purpose" }
+            ]
+        },
+        "enter_other_purpose": {
+            "screen_id": "enter_other_purpose",
+            "type": "MESSAGE",
+            "message_text": "Please specify the loan purpose:",
+            "input": {
+                "type": "text",
+                "variable": "other_purpose"
+            },
+            "go_to_screen_id": "enter_personal_info"
+        },
+        "enter_personal_info": {
+            "screen_id": "enter_personal_info",
+            "type": "MESSAGE",
+            "message_text": "📝 Personal Information\n\nFull legal name:",
+            "input": {
+                "type": "text",
+                "variable": "full_name"
+            },
+            "go_to_screen_id": "enter_dob"
+        },
+        "enter_dob": {
+            "screen_id": "enter_dob",
+            "type": "MESSAGE",
+            "message_text": "📅 Date of Birth (MM/DD/YYYY):",
+            "input": {
+                "type": "text",
+                "variable": "date_of_birth"
+            },
+            "go_to_screen_id": "enter_ssn"
+        },
+        "enter_ssn": {
+            "screen_id": "enter_ssn",
+            "type": "MESSAGE",
+            "message_text": "🔐 Social Security Number:\n\n(Required for credit check)",
+            "input": {
+                "type": "password",
+                "variable": "ssn"
+            },
+            "go_to_screen_id": "enter_annual_income"
+        },
+        "enter_annual_income": {
+            "screen_id": "enter_annual_income",
+            "type": "MESSAGE",
+            "message_text": "💵 Annual Income (before taxes):",
+            "input": {
+                "type": "text",
+                "variable": "annual_income"
+            },
+            "go_to_screen_id": "enter_employment_status"
+        },
+        "enter_employment_status": {
+            "screen_id": "enter_employment_status",
+            "type": "MENU",
+            "message_text": "💼 Employment Status:",
+            "buttons": [
+                { "label": "💼 Employed Full-Time", "go_to_screen_id": "enter_employer", "set_variable": "employment_status", "set_value": "full_time" },
+                { "label": "⏰ Employed Part-Time", "go_to_screen_id": "enter_employer", "set_variable": "employment_status", "set_value": "part_time" },
+                { "label": "👔 Self-Employed", "go_to_screen_id": "enter_employer", "set_variable": "employment_status", "set_value": "self_employed" },
+                { "label": "🏖️ Retired", "go_to_screen_id": "enter_housing", "set_variable": "employment_status", "set_value": "retired" }
+            ]
+        },
+        "enter_employer": {
+            "screen_id": "enter_employer",
+            "type": "MESSAGE",
+            "message_text": "🏢 Employer name:",
+            "input": {
+                "type": "text",
+                "variable": "employer_name"
+            },
+            "go_to_screen_id": "enter_housing"
+        },
+        "enter_housing": {
+            "screen_id": "enter_housing",
+            "type": "MENU",
+            "message_text": "🏠 Housing Status:",
+            "buttons": [
+                { "label": "🏡 Own (with mortgage)", "go_to_screen_id": "enter_monthly_payment", "set_variable": "housing_status", "set_value": "own_mortgage" },
+                { "label": "🏠 Own (no mortgage)", "go_to_screen_id": "review_application", "set_variable": "housing_status", "set_value": "own_free" },
+                { "label": "🏢 Rent", "go_to_screen_id": "enter_monthly_payment", "set_variable": "housing_status", "set_value": "rent" },
+                { "label": "👨‍👩‍👧 Live with family", "go_to_screen_id": "review_application", "set_variable": "housing_status", "set_value": "family" }
+            ]
+        },
+        "enter_monthly_payment": {
+            "screen_id": "enter_monthly_payment",
+            "type": "MESSAGE",
+            "message_text": "💵 Monthly {{housing_status == 'rent' ? 'rent' : 'mortgage'}} payment:",
+            "input": {
+                "type": "text",
+                "variable": "monthly_housing_payment"
+            },
+            "go_to_screen_id": "review_application"
+        },
+        "review_application": {
+            "screen_id": "review_application",
+            "type": "MENU",
+            "message_text": "Review Your Application:\n\nLoan Amount: ${{loan_amount}}\nTerm: {{loan_term}} months\nPurpose: {{loan_purpose}}\nName: {{full_name}}\nAnnual Income: ${{annual_income}}\n\nBy submitting:\n• You authorize a hard credit inquiry\n• You agree to loan terms and conditions\n• You confirm all information is accurate",
+            "buttons": [
+                { "label": "Submit Application", "go_to_screen_id": "process_application" },
+                { "label": "Edit Information", "go_to_screen_id": "enter_personal_info" },
+                { "label": "Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "process_application": {
+            "screen_id": "process_application",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/loans/apply",
+                "method": "POST",
+                "mock_response": {
+                    "status": "approved",
+                    "loan_id": "LOAN_8473920156",
+                    "approved_amount": 15000,
+                    "apr": 10.99,
+                    "monthly_payment": 330,
+                    "first_payment_date": "2025-12-11"
+                }
+            },
+            "on_success": "application_approved",
+            "on_error": "application_error"
+        },
+        "application_approved": {
+            "screen_id": "application_approved",
+            "type": "MESSAGE",
+            "message_text": "Congratulations! Your Loan is Approved!\n\nApproved Amount: $15,000\nAPR: 10.99%\nMonthly Payment: $330\nTerm: {{loan_term}} months\nFirst Payment: December 11, 2025\n\nNext Steps:\n1. Review and sign loan documents (emailed to you)\n2. Funds will be deposited within 2-3 business days\n3. Set up automatic payments (recommended)\n\nCheck your email for complete loan details.",
+            "buttons": [
+                { "label": "View Loan Documents", "go_to_screen_id": "end_flow" },
+                { "label": "Set Up AutoPay", "go_to_screen_id": "end_flow" },
+                { "label": "Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "application_error": {
+            "screen_id": "application_error",
+            "type": "MENU",
+            "message_text": "❌ Application Requires Review\n\nWe're unable to provide an instant decision. Your application will be reviewed by our loan specialists within 2-3 business days.\n\nPossible reasons:\n• Additional income verification needed\n• Credit history review required\n• Debt-to-income ratio assessment\n\nYou'll receive an email update soon.",
+            "buttons": [
+                { "label": "📧 Email Status Updates", "go_to_screen_id": "end_flow" },
+                { "label": "📞 Call Loan Specialist", "go_to_screen_id": "end_flow" },
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for choosing Citi!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

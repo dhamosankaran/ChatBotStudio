@@ -1,0 +1,4746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CitiFlow Studio - Chatbot Builder Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .logo-text h1 {
+            font-size: 20px;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-help {
+            background: #10b981;
+            color: white;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-help:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f7f7ff;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+            position: relative;
+            animation: pulse 2s infinite;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            animation: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 20px rgba(16, 185, 129, 0.6);
+            }
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Studio Panel */
+        .studio-panel {
+            flex: 1;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .studio-tabs {
+            display: flex;
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+            padding: 0 24px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .studio-workspace {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Node Palette */
+        .node-palette {
+            width: 280px;
+            min-width: 280px;
+            max-width: 280px;
+            flex-shrink: 0;
+            background: #f9fafb;
+            border-right: 1px solid #e5e7eb;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .palette-tabs {
+            display: flex;
+            background: #e5e7eb;
+            border-bottom: 2px solid #d1d5db;
+        }
+
+        .palette-tab {
+            flex: 1;
+            padding: 12px 8px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+        }
+
+        .palette-tab.active {
+            background: #f9fafb;
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .palette-tab:hover {
+            color: #667eea;
+        }
+
+        /* API Search */
+        .api-search-container {
+            margin-bottom: 16px;
+        }
+
+        .api-search {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: border-color 0.2s;
+        }
+
+        .api-search:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .api-count {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        .palette-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .palette-tab-pane {
+            display: none;
+        }
+
+        .palette-tab-pane.active {
+            display: block;
+        }
+
+        .palette-section {
+            margin-bottom: 24px;
+        }
+
+        .palette-title {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6b7280;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .node-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: grab;
+            border: 2px solid #e5e7eb;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .node-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .node-item:active {
+            cursor: grabbing;
+        }
+
+        .node-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .node-info {
+            flex: 1;
+        }
+
+        .node-name {
+            font-weight: 500;
+            font-size: 13px;
+            color: #1a1a1a;
+        }
+
+        .node-desc {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        /* Canvas */
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: auto;
+            background: 
+                linear-gradient(90deg, #f0f0f0 1px, transparent 1px),
+                linear-gradient(180deg, #f0f0f0 1px, transparent 1px);
+            background-size: 20px 20px;
+            background-color: #fafafa;
+        }
+
+        .canvas {
+            min-width: 2000px;
+            min-height: 2000px;
+            position: relative;
+        }
+
+        /* Connection SVG Layer */
+        #connectionSvg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2000px;
+            height: 2000px;
+            pointer-events: none;
+            z-index: 1;
+            overflow: visible;
+        }
+
+        .connection-line {
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            transition: stroke-width 0.2s, stroke 0.2s;
+            pointer-events: stroke;
+            cursor: pointer;
+        }
+
+        .connection-line:hover {
+            stroke-width: 4;
+            filter: brightness(1.2);
+        }
+
+        .connection-line.success {
+            stroke: #10b981;
+        }
+
+        .connection-line.error {
+            stroke: #ef4444;
+            stroke-dasharray: 5, 5;
+        }
+
+        .connection-line.default {
+            stroke: #667eea;
+        }
+
+        .connection-line.button {
+            stroke: #8b5cf6;
+        }
+
+        .connection-arrow {
+            transition: fill 0.2s;
+        }
+
+        .connection-arrow.success {
+            fill: #10b981;
+        }
+
+        .connection-arrow.error {
+            fill: #ef4444;
+        }
+
+        .connection-arrow.default {
+            fill: #667eea;
+        }
+
+        .connection-arrow.button {
+            fill: #8b5cf6;
+        }
+
+        .connection-label {
+            font-size: 11px;
+            font-weight: 600;
+            fill: #374151;
+            text-anchor: middle;
+            pointer-events: none;
+        }
+
+        .connection-label-bg {
+            fill: white;
+            stroke: #d1d5db;
+            stroke-width: 1;
+            rx: 4;
+        }
+
+        /* Connection Editor Popup */
+        .connection-editor {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            padding: 24px;
+            z-index: 10000;
+            min-width: 400px;
+            animation: popupSlide 0.2s ease-out;
+        }
+
+        .connection-editor.active {
+            display: block;
+        }
+
+        @keyframes popupSlide {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -45%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .connection-editor-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 9999;
+            backdrop-filter: blur(2px);
+        }
+
+        .connection-editor-overlay.active {
+            display: block;
+        }
+
+        .connection-editor-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .connection-editor-icon {
+            font-size: 24px;
+        }
+
+        .connection-editor-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .connection-editor-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #9ca3af;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .connection-editor-close:hover {
+            background: #f3f4f6;
+            color: #1a1a1a;
+        }
+
+        .connection-info {
+            margin-bottom: 20px;
+        }
+
+        .connection-info-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .connection-info-label {
+            font-weight: 600;
+            color: #6b7280;
+            min-width: 60px;
+        }
+
+        .connection-info-value {
+            flex: 1;
+            color: #1f2937;
+            font-family: monospace;
+        }
+
+        .connection-type-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .connection-type-badge.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .connection-type-badge.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .connection-type-badge.button {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .connection-type-badge.default {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .connection-editor-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .btn-connection {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-connection.edit {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-connection.edit:hover {
+            background: #5568d3;
+        }
+
+        .btn-connection.delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-connection.delete:hover {
+            background: #dc2626;
+        }
+
+        .canvas-node {
+            position: absolute;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            max-width: 300px;
+            cursor: move;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+
+        .canvas-node:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .canvas-node.selected {
+            border-color: #667eea;
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+            z-index: 20;
+        }
+
+        .canvas-node-header {
+            padding: 12px 16px;
+            border-bottom: 2px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .canvas-node-body {
+            padding: 12px 16px;
+        }
+
+        .canvas-node-title {
+            font-weight: 600;
+            font-size: 13px;
+            flex: 1;
+        }
+
+        .canvas-node-content {
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.5;
+            max-height: 100px;
+            overflow: hidden;
+        }
+
+        .node-delete {
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .node-delete:hover {
+            opacity: 1;
+        }
+
+        /* Config Panel */
+        .config-panel {
+            width: 360px;
+            min-width: 360px;
+            max-width: 360px;
+            flex-shrink: 0;
+            background: white;
+            border-left: 1px solid #e5e7eb;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .config-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .config-empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .config-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+
+        .button-list {
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .button-list-item {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .button-list-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .button-list-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .add-button-btn {
+            width: 100%;
+            padding: 8px;
+            background: #f3f4f6;
+            border: 2px dashed #d1d5db;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #6b7280;
+            margin-top: 8px;
+            transition: all 0.2s;
+        }
+
+        .add-button-btn:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
+        }
+
+        /* API Library Styles */
+        .api-item {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .api-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .api-item-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .api-method {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .api-method.get {
+            background: #10b981;
+            color: white;
+        }
+
+        .api-method.post {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .api-name {
+            flex: 1;
+            font-weight: 600;
+            font-size: 13px;
+            color: #1a1a1a;
+        }
+
+        .api-description {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .api-endpoint {
+            background: #f3f4f6;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 11px;
+            color: #374151;
+            word-break: break-all;
+            margin-bottom: 8px;
+        }
+
+        .api-response-toggle {
+            font-size: 11px;
+            color: #667eea;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 4px;
+        }
+
+        .api-response-toggle:hover {
+            color: #764ba2;
+        }
+
+        .api-mock-response {
+            display: none;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 11px;
+            margin-top: 8px;
+            overflow-x: auto;
+        }
+
+        .api-mock-response.active {
+            display: block;
+        }
+
+        .api-use-btn {
+            width: 100%;
+            padding: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 8px;
+            transition: transform 0.2s;
+        }
+
+        .api-use-btn:hover {
+            transform: scale(1.02);
+        }
+
+        /* FAQ Styles */
+        .faq-search {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s;
+        }
+
+        .faq-search:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .faq-category {
+            margin-bottom: 24px;
+        }
+
+        .faq-category-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .faq-item {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .faq-item:hover {
+            border-color: #667eea;
+        }
+
+        .faq-question {
+            padding: 12px 14px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .faq-question:hover {
+            background: #f9fafb;
+        }
+
+        .faq-icon {
+            font-size: 16px;
+            transition: transform 0.2s;
+        }
+
+        .faq-item.open .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            display: none;
+            padding: 12px 14px;
+            font-size: 12px;
+            color: #6b7280;
+            line-height: 1.6;
+            border-top: 1px solid #e5e7eb;
+            background: #f9fafb;
+        }
+
+        .faq-item.open .faq-answer {
+            display: block;
+        }
+
+        .faq-no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .faq-no-results-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        /* Help Panel/Modal */
+        .help-panel {
+            position: fixed;
+            top: 0;
+            right: -500px;
+            width: 500px;
+            height: 100vh;
+            background: white;
+            box-shadow: -4px 0 16px rgba(0, 0, 0, 0.2);
+            z-index: 3000;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .help-panel.active {
+            right: 0;
+        }
+
+        .help-panel-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .help-panel-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .help-panel-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .help-panel-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .help-panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .help-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 2999;
+        }
+
+        .help-overlay.active {
+            display: block;
+        }
+
+        /* Screen ID Selector */
+        .screen-id-selector {
+            position: relative;
+        }
+
+        .screen-id-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #667eea;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .screen-id-dropdown.active {
+            display: block;
+        }
+
+        .screen-id-option {
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #374151;
+            transition: background 0.2s;
+        }
+
+        .screen-id-option:hover {
+            background: #f3f4f6;
+        }
+
+        .screen-id-option.create-new {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .screen-id-option.create-new:hover {
+            background: #5568d3;
+        }
+
+        /* Preview Panel */
+        .preview-panel {
+            width: 550px;
+            min-width: 550px;
+            max-width: 550px;
+            flex-shrink: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .preview-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse"><path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .preview-header {
+            padding: 24px 20px;
+            color: white;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .preview-header h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .preview-header p {
+            font-size: 13px;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .chat-container {
+            flex: 1;
+            background: white;
+            margin: 0 24px 24px 24px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        .chat-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .chat-avatar {
+            width: 42px;
+            height: 42px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        .chat-avatar::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border: 2px solid white;
+            border-radius: 50%;
+            animation: pulse-dot 2s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+
+        .chat-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .chat-info p {
+            font-size: 12px;
+            opacity: 0.95;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 24px 24px;
+            overflow-y: auto;
+            background: #f3f4f6;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(102, 126, 234, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(118, 75, 162, 0.03) 0%, transparent 50%);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: messageSlide 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(15px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .message-bot {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .message-user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .message-content {
+            max-width: 90%;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 6px;
+            display: block;
+        }
+
+        .message-bubble {
+            padding: 14px 18px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.6;
+            position: relative;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .message-bot .message-bubble {
+            background: white;
+            color: #1f2937;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-bot .message-bubble::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -6px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 0 10px 10px;
+            border-color: transparent transparent white transparent;
+            filter: drop-shadow(-2px 2px 2px rgba(0, 0, 0, 0.05));
+        }
+
+        .message-user .message-bubble {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+            border-bottom-right-radius: 4px;
+        }
+
+        .quick-replies {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .quick-reply {
+            padding: 14px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.15);
+            position: relative;
+            overflow: hidden;
+            word-wrap: break-word;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        .quick-reply::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .quick-reply:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .quick-reply:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            border-color: transparent;
+        }
+
+        .quick-reply:active {
+            transform: translateY(0);
+        }
+
+        .chat-loading {
+            display: none;
+            padding: 16px 20px;
+            background: white;
+            border-radius: 18px;
+            width: fit-content;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-bottom-left-radius: 4px;
+        }
+
+        .chat-loading.active {
+            display: block;
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .typing-dot {
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-12px);
+                opacity: 1;
+            }
+        }
+
+        .chat-input-container {
+            padding: 16px 24px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .chat-input-disabled {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 12px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+        }
+
+        .preview-instructions {
+            text-align: center;
+            padding: 50px 30px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 20px;
+            margin: 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .preview-instructions-icon {
+            font-size: 72px;
+            margin-bottom: 24px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .preview-instructions h3 {
+            color: #1f2937;
+            font-size: 26px;
+            margin-bottom: 14px;
+            font-weight: 700;
+        }
+
+        .preview-instructions p {
+            color: #6b7280;
+            font-size: 15px;
+            margin-bottom: 28px;
+            line-height: 1.7;
+        }
+
+        .preview-instructions-steps {
+            background: white;
+            padding: 24px 28px;
+            border-radius: 16px;
+            text-align: left;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .preview-instructions-steps strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 14px;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .preview-instructions-steps ol {
+            margin: 0;
+            padding-left: 22px;
+            color: #4b5563;
+            font-size: 14px;
+        }
+
+        .preview-instructions-steps li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .reset-chat {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            width: 100%;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .reset-chat:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .reset-chat:active {
+            transform: translateY(0);
+        }
+
+        /* JSON View */
+        .json-view {
+            display: none;
+            padding: 24px;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .json-view.active {
+            display: block;
+        }
+
+        .json-editor {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            overflow: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #9ca3af;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #f3f4f6;
+            color: #1a1a1a;
+        }
+
+        .template-item {
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .template-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .template-desc {
+            font-size: 14px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        /* Success Message */
+        .success-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            z-index: 3000;
+            display: none;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .success-toast.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">CF</div>
+                <div class="logo-text">
+                    <h1>CitiFlow Studio</h1>
+                    <p>Enterprise Chatbot Builder Platform</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="loadTemplate()">
+                    📋 Load Template
+                </button>
+                <button class="btn btn-secondary" onclick="exportJSON()">
+                    💾 Export JSON
+                </button>
+                <button class="btn btn-success" onclick="deployFlow()" title="Deploy your flow to the Live Preview">
+                    🚀 Deploy & Test Flow
+                </button>
+                <button class="btn-help" onclick="toggleHelpPanel()" title="Help & Getting Started">
+                    ❓
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Studio Panel -->
+            <div class="studio-panel">
+                <div class="studio-tabs">
+                    <div class="tab active" onclick="switchTab('builder')">Flow Builder</div>
+                    <div class="tab" onclick="switchTab('json')">JSON Configuration</div>
+                </div>
+
+                <div class="studio-workspace">
+                    <!-- Builder View -->
+                    <div id="builderView" class="builder-view" style="display: flex; flex: 1;">
+                        <!-- Node Palette with Tabs -->
+                        <div class="node-palette">
+                            <!-- Palette Tabs -->
+                            <div class="palette-tabs">
+                                <div class="palette-tab active" onclick="switchPaletteTab('nodes')">📦 Nodes</div>
+                                <div class="palette-tab" onclick="switchPaletteTab('apis')">🔌 APIs</div>
+                            </div>
+
+                            <!-- Palette Content -->
+                            <div class="palette-content">
+                                <!-- Nodes Tab -->
+                                <div id="nodesTab" class="palette-tab-pane active">
+                            <div class="palette-section">
+                                <div class="palette-title">Flow Control</div>
+                                <div class="node-item" draggable="true" data-type="START">
+                                    <div class="node-icon" style="background: #10b981;">🏁</div>
+                                    <div class="node-info">
+                                        <div class="node-name">Start</div>
+                                        <div class="node-desc">Entry point</div>
+                                    </div>
+                                </div>
+                                <div class="node-item" draggable="true" data-type="END">
+                                    <div class="node-icon" style="background: #ef4444;">🛑</div>
+                                    <div class="node-info">
+                                        <div class="node-name">End Flow</div>
+                                        <div class="node-desc">Terminate</div>
+                                    </div>
+                                </div>
+                                <div class="node-item" draggable="true" data-type="CONDITIONAL">
+                                    <div class="node-icon" style="background: #f59e0b;">🔀</div>
+                                    <div class="node-info">
+                                        <div class="node-name">Condition</div>
+                                        <div class="node-desc">Branch logic</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="palette-section">
+                                <div class="palette-title">User Interaction</div>
+                                <div class="node-item" draggable="true" data-type="MESSAGE">
+                                    <div class="node-icon" style="background: #3b82f6;">💬</div>
+                                    <div class="node-info">
+                                        <div class="node-name">Message</div>
+                                        <div class="node-desc">Display text</div>
+                                    </div>
+                                </div>
+                                <div class="node-item" draggable="true" data-type="MENU">
+                                    <div class="node-icon" style="background: #8b5cf6;">📋</div>
+                                    <div class="node-info">
+                                        <div class="node-name">Menu</div>
+                                        <div class="node-desc">Show buttons</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="palette-section">
+                                <div class="palette-title">Integration</div>
+                                <div class="node-item" draggable="true" data-type="API">
+                                    <div class="node-icon" style="background: #06b6d4;">🔌</div>
+                                    <div class="node-info">
+                                        <div class="node-name">API Call</div>
+                                        <div class="node-desc">External data</div>
+                                    </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- APIs Tab -->
+                                <div id="apisTab" class="palette-tab-pane">
+                                    <div class="api-search-container">
+                                        <input type="text" class="api-search" id="apiSearch" placeholder="🔍 Search APIs..." onkeyup="searchAPIs()">
+                                        <div class="api-count" id="apiCount"></div>
+                                    </div>
+                                    <div id="apiLibrary"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Canvas -->
+                        <div class="canvas-container" id="canvasContainer">
+                            <div class="canvas" id="canvas">
+                                <svg id="connectionSvg">
+                                    <defs>
+                                        <!-- Arrow markers for different connection types -->
+                                        <marker id="arrowSuccess" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                            <path d="M0,0 L0,6 L9,3 z" class="connection-arrow success" />
+                                        </marker>
+                                        <marker id="arrowError" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                            <path d="M0,0 L0,6 L9,3 z" class="connection-arrow error" />
+                                        </marker>
+                                        <marker id="arrowDefault" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                            <path d="M0,0 L0,6 L9,3 z" class="connection-arrow default" />
+                                        </marker>
+                                        <marker id="arrowButton" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                            <path d="M0,0 L0,6 L9,3 z" class="connection-arrow button" />
+                                        </marker>
+                                    </defs>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Config Panel -->
+                        <div class="config-panel" id="configPanel">
+                            <div class="config-empty">
+                                <div class="config-empty-icon">⚙️</div>
+                                <p>Select a node to configure its properties</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- JSON View -->
+                    <div id="jsonView" class="json-view">
+                        <div class="json-editor">
+                            <pre id="jsonOutput"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <div class="preview-header">
+                    <h2>Live Preview</h2>
+                    <p>Test your chatbot flow in real-time</p>
+                </div>
+
+                <div class="chat-container">
+                    <div class="chat-header">
+                        <div class="chat-avatar">🤖</div>
+                        <div class="chat-info">
+                            <h3>Citi Assistant</h3>
+                            <p>Always here to help</p>
+                        </div>
+                    </div>
+
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="preview-instructions" id="previewInstructions">
+                            <div class="preview-instructions-icon">🚀</div>
+                            <h3>Ready to Test Your Flow!</h3>
+                            <p>Click the <strong>"🚀 Deploy Flow"</strong> button above to start testing your chatbot in this preview area.</p>
+                            <div class="preview-instructions-steps">
+                                <strong>Quick Start:</strong>
+                                <ol>
+                                    <li>Load a template OR build your flow</li>
+                                    <li>Click <strong>"🚀 Deploy Flow"</strong> button (top)</li>
+                                    <li>Chat interface will appear here</li>
+                                    <li>Test your bot by clicking buttons!</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-container">
+                        <div class="chat-input-disabled">
+                            💡 Interaction via quick reply buttons only
+                        </div>
+                        <button class="reset-chat" onclick="resetChat()">🔄 Reset Conversation</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Modal -->
+    <div class="modal" id="templateModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Load Template</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="template-item" onclick="loadCheckBalanceTemplate()">
+                <div class="template-name">💰 Check Account Balance</div>
+                <div class="template-desc">Complete retail banking flow with dynamic account selection, API integration, and error handling.</div>
+            </div>
+            <div class="template-item" onclick="loadBillPaymentTemplate()">
+                <div class="template-name">💳 Make Bill Payment</div>
+                <div class="template-desc">Complete bill payment flow with payee selection, amount entry, API integration, and confirmation.</div>
+            </div>
+            <div class="template-item" onclick="loadCreditCardPaymentTemplate()">
+                <div class="template-name">💳 Credit Card Payment</div>
+                <div class="template-desc">Make payment to credit card with minimum, full balance, or custom amount options. Includes dynamic card selection and bank account integration.</div>
+            </div>
+            <div class="template-item" onclick="loadWelcomeTemplate()">
+                <div class="template-name">👋 Welcome Flow</div>
+                <div class="template-desc">Simple greeting flow with menu options to demonstrate basic navigation.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div class="success-toast" id="successToast"></div>
+
+    <!-- Help Panel -->
+    <div class="help-overlay" id="helpOverlay" onclick="toggleHelpPanel()"></div>
+    <div class="help-panel" id="helpPanel">
+        <div class="help-panel-header">
+            <div class="help-panel-title">❓ Help & Getting Started</div>
+            <button class="help-panel-close" onclick="toggleHelpPanel()">×</button>
+        </div>
+        <div class="help-panel-content">
+            <input type="text" class="faq-search" id="faqSearch" placeholder="🔍 Search help topics..." onkeyup="searchFAQs()">
+            <div id="faqContent"></div>
+        </div>
+    </div>
+
+    <!-- Connection Editor Popup -->
+    <div class="connection-editor-overlay" id="connectionEditorOverlay" onclick="closeConnectionEditor()"></div>
+    <div class="connection-editor" id="connectionEditor">
+        <div class="connection-editor-header">
+            <div class="connection-editor-icon">🔗</div>
+            <div class="connection-editor-title">Connection Details</div>
+            <button class="connection-editor-close" onclick="closeConnectionEditor()">×</button>
+        </div>
+        <div class="connection-info" id="connectionInfo">
+            <!-- Connection details will be populated here -->
+        </div>
+        <div class="connection-editor-actions">
+            <button class="btn-connection edit" id="btnEditConnection">✏️ Edit Source Node</button>
+            <button class="btn-connection delete" id="btnDeleteConnection">🗑️ Delete Connection</button>
+        </div>
+    </div>
+
+    <script>
+        // Global State
+        let nodes = [];
+        let selectedNode = null;
+        let nodeIdCounter = 1;
+        let draggedNodeType = null;
+        let isDraggingNode = false;
+        let dragOffset = { x: 0, y: 0 };
+
+        // Chat State
+        let chatState = {
+            variables: {},
+            currentScreenId: null,
+            flowConfig: null,
+            messageHistory: []
+        };
+
+        // Mock API Library - Expanded with Banking Intents
+        const apiLibrary = [
+            {
+                name: 'Get User Accounts',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/user/accounts',
+                description: 'Retrieves all bank accounts for the authenticated user including checking, savings, and investment accounts.',
+                category: 'Accounts',
+                mockResponse: {
+                accounts: [
+                    { id: 'acc1', name: 'Checking', last_four: '8041', balance: '5,234.50' },
+                    { id: 'acc2', name: 'Savings', last_four: '5523', balance: '12,450.50' },
+                    { id: 'acc3', name: 'Investment', last_four: '3099', balance: '28,750.00' }
+                ]
+            }
+            },
+            {
+                name: 'Get Account Transactions',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/accounts/{account_id}/transactions',
+                description: 'Fetches recent transactions for a specific account including date, amount, description, and category.',
+                category: 'Accounts',
+                mockResponse: {
+                    transactions: [
+                        { date: '2024-11-08', amount: '-45.32', description: 'Amazon Purchase', category: 'Shopping' },
+                        { date: '2024-11-07', amount: '-12.50', description: 'Starbucks Coffee', category: 'Food & Dining' },
+                        { date: '2024-11-06', amount: '+2,500.00', description: 'Salary Deposit', category: 'Income' }
+                    ]
+                }
+            },
+            {
+                name: 'Check Account Balance',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/accounts/{account_id}/balance',
+                description: 'Get the current balance for a specific account with available and pending amounts.',
+                category: 'Accounts',
+                mockResponse: {
+                    account_id: 'acc1',
+                    account_name: 'Checking',
+                    current_balance: '5,234.50',
+                    available_balance: '5,134.50',
+                    pending_amount: '100.00',
+                    currency: 'USD'
+                }
+            },
+            {
+                name: 'Find Nearest ATMs',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/atms/nearby',
+                description: 'Locates Citi ATMs near the user based on their current location or provided coordinates.',
+                category: 'Locations',
+                mockResponse: {
+                    atms: [
+                        { name: 'Citi ATM - Main St', address: '123 Main Street', distance: '0.2 miles', available_24_7: true },
+                        { name: 'Citi ATM - Park Ave', address: '456 Park Avenue', distance: '0.5 miles', available_24_7: true },
+                        { name: 'Citi ATM - Downtown', address: '789 Center Plaza', distance: '0.8 miles', available_24_7: false }
+                    ]
+                }
+            },
+            {
+                name: 'Find Branch Locations',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/branches/nearby',
+                description: 'Find Citi branch locations near the user with hours and services offered.',
+                category: 'Locations',
+                mockResponse: {
+                    branches: [
+                        { name: 'Citi Branch - Main Street', address: '100 Main Street', distance: '0.3 miles', hours: 'Mon-Fri 9AM-5PM', services: ['Account Opening', 'Loans', 'Safe Deposit'] },
+                        { name: 'Citi Branch - Downtown', address: '500 Center Plaza', distance: '1.2 miles', hours: 'Mon-Sat 9AM-6PM', services: ['Account Opening', 'Notary', 'Business Banking'] }
+                    ]
+                }
+            },
+            {
+                name: 'Transfer Funds',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/transfer',
+                description: 'Transfers money between user accounts or to external accounts. Requires from_account, to_account, and amount.',
+                category: 'Transactions',
+                mockResponse: {
+                    status: 'success',
+                    transaction_id: 'TXN-2024-001234',
+                    message: 'Transfer completed successfully',
+                    amount: '500.00',
+                    from_account: 'Checking x8041',
+                    to_account: 'Savings x5523'
+                }
+            },
+            {
+                name: 'Schedule Transfer',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/transfer/schedule',
+                description: 'Schedule a future or recurring fund transfer between accounts.',
+                category: 'Transactions',
+                mockResponse: {
+                    status: 'scheduled',
+                    schedule_id: 'SCH-2024-567890',
+                    message: 'Transfer scheduled successfully',
+                    amount: '1,000.00',
+                    from_account: 'Checking x8041',
+                    to_account: 'Savings x5523',
+                    scheduled_date: '2024-11-20',
+                    frequency: 'monthly'
+                }
+            },
+            {
+                name: 'Get Credit Card Info',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/credit-cards',
+                description: 'Retrieves credit card details including available credit, current balance, payment due date, and rewards points.',
+                category: 'Credit Cards',
+                mockResponse: {
+                    cards: [
+                        { 
+                            card_name: 'Citi Rewards Card', 
+                            last_four: '4532', 
+                            available_credit: '8,500.00',
+                            current_balance: '1,234.50',
+                            due_date: '2024-11-28',
+                            minimum_payment: '35.00',
+                            rewards_points: 12450
+                        }
+                    ]
+                }
+            },
+            {
+                name: 'Activate Credit Card',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/credit-cards/activate',
+                description: 'Activate a newly issued credit card by providing card number and security code.',
+                category: 'Credit Cards',
+                mockResponse: {
+                    status: 'activated',
+                    message: 'Your Citi Rewards Card has been activated successfully',
+                    card_last_four: '4532',
+                    activation_date: '2024-11-10'
+                }
+            },
+            {
+                name: 'Report Lost/Stolen Card',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/credit-cards/report-lost',
+                description: 'Report a credit or debit card as lost or stolen and request a replacement.',
+                category: 'Credit Cards',
+                mockResponse: {
+                    status: 'reported',
+                    message: 'Card has been blocked. Replacement card will arrive in 5-7 business days',
+                    old_card_last_four: '4532',
+                    replacement_tracking_id: 'REPL-2024-789012',
+                    estimated_delivery: '2024-11-17'
+                }
+            },
+            {
+                name: 'Make Credit Card Payment',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/credit-cards/payment',
+                description: 'Make a payment towards credit card balance from a checking or savings account.',
+                category: 'Credit Cards',
+                mockResponse: {
+                    status: 'success',
+                    confirmation_number: 'PAY-CC-2024-345678',
+                    message: 'Payment processed successfully',
+                    amount: '500.00',
+                    from_account: 'Checking x8041',
+                    to_card: 'Citi Rewards x4532',
+                    payment_date: '2024-11-10',
+                    new_balance: '734.50'
+                }
+            },
+            {
+                name: 'Get Rewards Points Balance',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/rewards/balance',
+                description: 'Check current rewards points balance and available redemption options.',
+                category: 'Credit Cards',
+                mockResponse: {
+                    total_points: 12450,
+                    cash_value: '124.50',
+                    tier: 'Gold',
+                    points_to_next_tier: 2550,
+                    expiring_soon: {
+                        points: 500,
+                        expiry_date: '2024-12-31'
+                    }
+                }
+            },
+            {
+                name: 'Pay Bill',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/bills/pay',
+                description: 'Processes bill payment from user account. Requires payee information, amount, and payment date.',
+                category: 'Payments',
+                mockResponse: {
+                    status: 'success',
+                    confirmation_number: 'PAY-2024-567890',
+                    message: 'Bill payment scheduled successfully',
+                    payee: 'Electric Company',
+                    amount: '125.75',
+                    from_account: 'Checking x8041',
+                    payment_date: '2024-11-15'
+                }
+            },
+            {
+                name: 'Get Payees List',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/bills/payees',
+                description: 'Retrieve list of saved bill payees with account information.',
+                category: 'Payments',
+                mockResponse: {
+                    payees: [
+                        { payee_id: 'p1', name: 'Electric Company', account_number: '9876543210', nickname: 'Home Electric' },
+                        { payee_id: 'p2', name: 'Water Utility', account_number: '1234567890', nickname: 'Water Bill' },
+                        { payee_id: 'p3', name: 'Internet Provider', account_number: '5555555555', nickname: 'Home Internet' }
+                    ]
+                }
+            },
+            {
+                name: 'Setup Auto-Pay',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/bills/autopay',
+                description: 'Set up automatic bill payment for a specific payee with recurring schedule.',
+                category: 'Payments',
+                mockResponse: {
+                    status: 'activated',
+                    autopay_id: 'AUTO-2024-123456',
+                    message: 'Auto-pay activated successfully',
+                    payee: 'Electric Company',
+                    amount_type: 'full_balance',
+                    frequency: 'monthly',
+                    from_account: 'Checking x8041'
+                }
+            },
+            {
+                name: 'Get User Profile',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/user/profile',
+                description: 'Retrieves authenticated user profile information including name, email, phone, and address.',
+                category: 'Profile',
+                mockResponse: {
+                    user: {
+                        first_name: 'John',
+                        last_name: 'Doe',
+                        email: 'john.doe@email.com',
+                        phone: '+1-555-0123',
+                        address: '123 Main Street, New York, NY 10001',
+                        member_since: '2020-01-15'
+                    }
+                }
+            },
+            {
+                name: 'Update Contact Information',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/user/update-contact',
+                description: 'Update user contact information including email, phone, and mailing address.',
+                category: 'Profile',
+                mockResponse: {
+                    status: 'success',
+                    message: 'Contact information updated successfully',
+                    updated_fields: ['email', 'phone']
+                }
+            },
+            {
+                name: 'Change Password',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/user/change-password',
+                description: 'Change account password with verification of current password.',
+                category: 'Security',
+                mockResponse: {
+                    status: 'success',
+                    message: 'Password changed successfully',
+                    last_changed: '2024-11-10T10:30:00Z'
+                }
+            },
+            {
+                name: 'Setup Two-Factor Authentication',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/security/2fa/setup',
+                description: 'Enable two-factor authentication for enhanced account security.',
+                category: 'Security',
+                mockResponse: {
+                    status: 'enabled',
+                    message: '2FA setup completed',
+                    method: 'sms',
+                    phone_last_four: '0123'
+                }
+            },
+            {
+                name: 'Get Exchange Rates',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/forex/rates',
+                description: 'Provides current foreign exchange rates for currency conversion and international transactions.',
+                category: 'International',
+                mockResponse: {
+                    base_currency: 'USD',
+                    rates: {
+                        EUR: 0.92,
+                        GBP: 0.79,
+                        JPY: 149.50,
+                        CAD: 1.36,
+                        AUD: 1.53
+                    },
+                    last_updated: '2024-11-10T14:30:00Z'
+                }
+            },
+            {
+                name: 'Request Check Book',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/accounts/order-checkbook',
+                description: 'Order a new checkbook for a checking account with delivery tracking.',
+                category: 'Services',
+                mockResponse: {
+                    status: 'ordered',
+                    order_id: 'CHK-2024-987654',
+                    message: 'Checkbook ordered successfully',
+                    account: 'Checking x8041',
+                    delivery_address: '123 Main Street, New York, NY 10001',
+                    estimated_delivery: '7-10 business days'
+                }
+            },
+            {
+                name: 'Get Account Statements',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/accounts/{account_id}/statements',
+                description: 'Retrieve list of available account statements with download links.',
+                category: 'Services',
+                mockResponse: {
+                    statements: [
+                        { period: 'October 2024', date: '2024-10-31', format: 'PDF', size: '245 KB' },
+                        { period: 'September 2024', date: '2024-09-30', format: 'PDF', size: '238 KB' },
+                        { period: 'August 2024', date: '2024-08-31', format: 'PDF', size: '251 KB' }
+                    ]
+                }
+            },
+            {
+                name: 'Dispute Transaction',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/transactions/dispute',
+                description: 'File a dispute for an unauthorized or incorrect transaction.',
+                category: 'Support',
+                mockResponse: {
+                    status: 'submitted',
+                    dispute_id: 'DISP-2024-456789',
+                    message: 'Dispute submitted successfully. Investigation will complete in 10 business days',
+                    transaction_id: 'TXN-2024-999888',
+                    amount: '45.32',
+                    temporary_credit: true
+                }
+            },
+            {
+                name: 'Schedule Branch Appointment',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/appointments/schedule',
+                description: 'Schedule an appointment at a Citi branch for account services.',
+                category: 'Support',
+                mockResponse: {
+                    status: 'scheduled',
+                    appointment_id: 'APPT-2024-111222',
+                    message: 'Appointment scheduled successfully',
+                    branch: 'Citi Branch - Main Street',
+                    date: '2024-11-15',
+                    time: '2:00 PM',
+                    service: 'Account Opening Consultation'
+                }
+            },
+            {
+                name: 'Get Loan Information',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/loans',
+                description: 'Retrieve information about current loans including balance, interest rate, and payment schedule.',
+                category: 'Loans',
+                mockResponse: {
+                    loans: [
+                        { 
+                            loan_type: 'Personal Loan', 
+                            account_number: '8765432',
+                            original_amount: '10,000.00',
+                            current_balance: '7,234.50',
+                            interest_rate: '6.5%',
+                            next_payment_date: '2024-11-25',
+                            next_payment_amount: '312.50'
+                        }
+                    ]
+                }
+            },
+            {
+                name: 'Check Loan Eligibility',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/loans/pre-qualify',
+                description: 'Check eligibility for various loan products without impacting credit score.',
+                category: 'Loans',
+                mockResponse: {
+                    status: 'pre-qualified',
+                    eligible_products: [
+                        { product: 'Personal Loan', max_amount: '25,000', estimated_rate: '6.5%' },
+                        { product: 'Home Equity', max_amount: '50,000', estimated_rate: '5.25%' }
+                    ],
+                    message: 'You are pre-qualified for the following products'
+                }
+            },
+            {
+                name: 'Get Credit Cards List',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/creditcards/list',
+                description: 'Retrieve list of user\'s credit cards with balance, minimum payment, and due date information.',
+                category: 'Credit Cards',
+                mockResponse: {
+                    cards: [
+                        { 
+                            card_id: 'cc1', 
+                            card_name: 'Citi Rewards+', 
+                            last_four: '4521', 
+                            current_balance: '2,450.75',
+                            minimum_payment: '75.00',
+                            due_date: 'November 25, 2024',
+                            available_credit: '7,549.25',
+                            credit_limit: '10,000.00'
+                        },
+                        { 
+                            card_id: 'cc2', 
+                            card_name: 'Citi Cash Back', 
+                            last_four: '8901', 
+                            current_balance: '1,125.50',
+                            minimum_payment: '35.00',
+                            due_date: 'November 28, 2024',
+                            available_credit: '8,874.50',
+                            credit_limit: '10,000.00'
+                        },
+                        { 
+                            card_id: 'cc3', 
+                            card_name: 'Citi Premier', 
+                            last_four: '3456', 
+                            current_balance: '3,890.00',
+                            minimum_payment: '120.00',
+                            due_date: 'November 22, 2024',
+                            available_credit: '11,110.00',
+                            credit_limit: '15,000.00'
+                        }
+                    ]
+                }
+            },
+            {
+                name: 'Get Checking Accounts',
+                method: 'GET',
+                endpoint: 'https://api.citi.com/v1/accounts/checking',
+                description: 'Retrieve list of user\'s checking and savings accounts for payment sources.',
+                category: 'Accounts',
+                mockResponse: {
+                    accounts: [
+                        { 
+                            account_type: 'Checking', 
+                            last_four: '8041', 
+                            available_balance: '5,432.10',
+                            account_nickname: 'Primary Checking'
+                        },
+                        { 
+                            account_type: 'Savings', 
+                            last_four: '9123', 
+                            available_balance: '12,890.00',
+                            account_nickname: 'Emergency Fund'
+                        },
+                        { 
+                            account_type: 'Checking', 
+                            last_four: '5678', 
+                            available_balance: '2,100.50',
+                            account_nickname: 'Business Checking'
+                        }
+                    ]
+                }
+            },
+            {
+                name: 'Process Credit Card Payment',
+                method: 'POST',
+                endpoint: 'https://api.citi.com/v1/creditcards/payment',
+                description: 'Process a payment towards credit card balance from a checking or savings account.',
+                category: 'Credit Cards',
+                mockResponse: {
+                    status: 'success',
+                    confirmation_number: 'CCPAY-2024-789456',
+                    message: 'Payment processed successfully',
+                    posting_date: 'November 12, 2024',
+                    amount: '500.00',
+                    from_account: 'Checking x8041',
+                    to_card: 'Citi Rewards+ x4521'
+                }
+            }
+        ];
+
+        // Mock API Responses (for runtime execution)
+        const mockAPIResponses = {};
+        apiLibrary.forEach(api => {
+            mockAPIResponses[api.endpoint] = api.mockResponse;
+        });
+
+        // FAQ Data
+        const faqData = [
+            {
+                category: '🚀 Getting Started',
+                questions: [
+                    {
+                        q: 'What is a flow?',
+                        a: 'A flow is a complete conversation path in your chatbot. It consists of connected screens that guide users through different interactions like checking balances, finding ATMs, or transferring funds.'
+                    },
+                    {
+                        q: 'How do I start building a flow?',
+                        a: 'Start by dragging a START node from the Nodes tab onto the canvas. Then add MESSAGE or MENU nodes to create conversation steps. Connect them by setting the "Go To Screen" property in each node.'
+                    },
+                    {
+                        q: 'What are screen IDs?',
+                        a: 'Screen IDs are unique identifiers for each step in your flow. Use descriptive names like "welcome_screen" or "check_balance". These IDs are used to navigate between screens.'
+                    }
+                ]
+            },
+            {
+                category: '💬 Messages & Menus',
+                questions: [
+                    {
+                        q: 'What is the difference between MESSAGE and MENU nodes?',
+                        a: 'MESSAGE nodes display text to users, while MENU nodes display text with interactive buttons. Use MENU when you want to give users choices, and MESSAGE for information display.'
+                    },
+                    {
+                        q: 'How do I add buttons to a menu?',
+                        a: 'Select a MENU node, then in the config panel on the right, click "+ Add Button". Enter the button label and the screen ID it should navigate to when clicked.'
+                    },
+                    {
+                        q: 'Can I use variables in messages?',
+                        a: 'Yes! Use double curly braces like {{variable_name}} in your message text. For example: "Your balance is ${{selected_balance}}". Variables are populated from API responses or user selections.'
+                    },
+                    {
+                        q: 'What are dynamic buttons?',
+                        a: 'Dynamic buttons are automatically generated from API data. For example, showing all user accounts as buttons. Configure this in the JSON view using "dynamic_buttons" with source_variable and label_template.'
+                    }
+                ]
+            },
+            {
+                category: '🔌 API Integration',
+                questions: [
+                    {
+                        q: 'How do I integrate an API?',
+                        a: 'Drag an API node to the canvas. In the config panel, enter the API URL (check the APIs tab for available endpoints), select the method (GET/POST), and specify where to save the response data.'
+                    },
+                    {
+                        q: 'Where can I see available APIs?',
+                        a: 'Click the "🔌 APIs" tab in the left panel to browse all available banking APIs with their endpoints, descriptions, and mock response formats.'
+                    },
+                    {
+                        q: 'How do I use API response data?',
+                        a: 'Set "Save Response To Variable" in your API node (e.g., "account_data"). Then access the data in messages using {{account_data.field_name}} or use it for dynamic buttons.'
+                    },
+                    {
+                        q: 'What happens if an API call fails?',
+                        a: 'Configure "On Error Go To Screen ID" in your API node. This directs users to an error handling screen where you can show a friendly message and provide alternative options.'
+                    }
+                ]
+            },
+            {
+                category: '🔀 Logic & Conditions',
+                questions: [
+                    {
+                        q: 'How do conditional branches work?',
+                        a: 'CONDITIONAL nodes check if a variable meets certain criteria (equals, exists, greater than). Based on true/false, users go to different screens. Use this for personalized experiences.'
+                    },
+                    {
+                        q: 'What operators can I use in conditions?',
+                        a: 'Available operators: "equals" (checks if variable equals a value), "exists" (checks if variable is set), "greater_than" (compares numbers). Select these in the config panel.'
+                    },
+                    {
+                        q: 'Can I have multiple conditions?',
+                        a: 'Yes! Chain multiple CONDITIONAL nodes together. Each one checks a different condition and routes users accordingly. This allows complex decision trees.'
+                    }
+                ]
+            },
+            {
+                category: '🎨 Best Practices',
+                questions: [
+                    {
+                        q: 'How many buttons should a menu have?',
+                        a: 'Limit to 3-5 buttons per menu for better user experience. Too many options can overwhelm users. If you need more, consider creating categories or sub-menus.'
+                    },
+                    {
+                        q: 'How should I name my screens?',
+                        a: 'Use descriptive, lowercase names with underscores: "welcome_screen", "check_balance", "select_account". This makes your flow easier to understand and maintain.'
+                    },
+                    {
+                        q: 'Should I always have a way back to main menu?',
+                        a: 'Yes! Always include a "Main Menu" button in your screens so users can restart or navigate away. This prevents users from getting stuck in a flow.'
+                    },
+                    {
+                        q: 'How do I handle errors gracefully?',
+                        a: 'Create error screens for API failures and dead ends. Provide helpful messages and always give users options to retry or return to the main menu.'
+                    }
+                ]
+            },
+            {
+                category: '🧪 Testing & Deployment',
+                questions: [
+                    {
+                        q: 'How do I test my flow?',
+                        a: 'Use the Live Preview panel on the right side. Click "🚀 Deploy Flow" to load your current flow, then interact with it as users would. Click "Reset Conversation" to restart.'
+                    },
+                    {
+                        q: 'How do I export my flow?',
+                        a: 'Click "💾 Export JSON" in the header. This downloads a JSON configuration file that can be imported into production chatbot systems or shared with developers.'
+                    },
+                    {
+                        q: 'Can I save and load templates?',
+                        a: 'Click "📋 Load Template" to see pre-built flows like Check Balance. You can also export your own flows and reload them later by importing the JSON.'
+                    }
+                ]
+            }
+        ];
+
+        // Initialize
+        function init() {
+            setupDragAndDrop();
+            renderAPILibrary();
+            renderFAQs();
+            
+            // Show welcome message
+            setTimeout(() => {
+                showToast('👋 Welcome! Click "📋 Load Template" to see a demo, or start building your own flow!');
+            }, 500);
+            
+            // Optionally load default template (commented out for now - users can load manually)
+            // loadCheckBalanceTemplate();
+        }
+
+        // Toggle Help Panel
+        function toggleHelpPanel() {
+            const panel = document.getElementById('helpPanel');
+            const overlay = document.getElementById('helpOverlay');
+            panel.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+
+        // Switch Palette Tab
+        function switchPaletteTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.palette-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update tab panes
+            document.querySelectorAll('.palette-tab-pane').forEach(pane => {
+                pane.classList.remove('active');
+            });
+
+            if (tabName === 'nodes') {
+                document.getElementById('nodesTab').classList.add('active');
+            } else if (tabName === 'apis') {
+                document.getElementById('apisTab').classList.add('active');
+            }
+        }
+
+        // Render API Library
+        function renderAPILibrary(filteredAPIs = null) {
+            const container = document.getElementById('apiLibrary');
+            const countEl = document.getElementById('apiCount');
+            container.innerHTML = '';
+
+            const apisToRender = filteredAPIs || apiLibrary;
+            
+            // Update count
+            countEl.textContent = `Showing ${apisToRender.length} of ${apiLibrary.length} APIs`;
+
+            apisToRender.forEach((api, index) => {
+                const actualIndex = apiLibrary.indexOf(api);
+                const apiEl = document.createElement('div');
+                apiEl.className = 'api-item';
+                apiEl.dataset.category = api.category || '';
+                apiEl.innerHTML = `
+                    <div class="api-item-header">
+                        <span class="api-method ${api.method.toLowerCase()}">${api.method}</span>
+                        <div class="api-name">${api.name}</div>
+                    </div>
+                    <div class="api-description">${api.description}</div>
+                    <div class="api-endpoint">${api.endpoint}</div>
+                    <div class="api-response-toggle" onclick="toggleAPIResponse(${actualIndex})">
+                        📄 View Mock Response
+                    </div>
+                    <div class="api-mock-response" id="apiResponse${actualIndex}">
+                        <pre>${JSON.stringify(api.mockResponse, null, 2)}</pre>
+                    </div>
+                    <button class="api-use-btn" onclick="useAPI('${api.endpoint.replace(/'/g, "\\'")}', '${api.method}')">
+                        ✨ Use This API
+                    </button>
+                `;
+                container.appendChild(apiEl);
+            });
+
+            // Show no results message if needed
+            if (apisToRender.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: #9ca3af;">
+                        <div style="font-size: 48px; margin-bottom: 12px;">🔍</div>
+                        <div>No APIs found</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Search APIs
+        function searchAPIs() {
+            const searchTerm = document.getElementById('apiSearch').value.toLowerCase();
+            
+            if (searchTerm === '') {
+                renderAPILibrary();
+                return;
+            }
+
+            const filtered = apiLibrary.filter(api => {
+                const nameMatch = api.name.toLowerCase().includes(searchTerm);
+                const descMatch = api.description.toLowerCase().includes(searchTerm);
+                const endpointMatch = api.endpoint.toLowerCase().includes(searchTerm);
+                const categoryMatch = (api.category || '').toLowerCase().includes(searchTerm);
+                return nameMatch || descMatch || endpointMatch || categoryMatch;
+            });
+
+            renderAPILibrary(filtered);
+        }
+
+        function toggleAPIResponse(index) {
+            const responseEl = document.getElementById(`apiResponse${index}`);
+            responseEl.classList.toggle('active');
+        }
+
+        function useAPI(endpoint, method) {
+            // Create an API node with pre-filled data
+            const canvas = document.getElementById('canvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = 400;
+            const y = 200;
+            
+            const nodeId = `node_${nodeIdCounter++}`;
+            const node = {
+                id: nodeId,
+                type: 'API',
+                x: x,
+                y: y,
+                config: {
+                    screen_id: `api_${Date.now()}`,
+                    type: 'API_SCREEN',
+                    api_call: {
+                        url: endpoint,
+                        method: method,
+                        save_response_to_variable: 'api_response',
+                        on_success_go_to_screen_id: '',
+                        on_error_go_to_screen_id: ''
+                    }
+                }
+            };
+            nodes.push(node);
+            renderCanvas();
+            selectNode(nodeId);
+            
+            // Switch to nodes tab to see the added node
+            document.querySelector('.palette-tab').click();
+            
+            showToast(`✅ ${method} API node added! Configure success/error paths in the config panel.`);
+        }
+
+        // Render FAQs
+        function renderFAQs() {
+            const container = document.getElementById('faqContent');
+            container.innerHTML = '';
+
+            faqData.forEach(category => {
+                const categoryEl = document.createElement('div');
+                categoryEl.className = 'faq-category';
+                
+                const titleEl = document.createElement('div');
+                titleEl.className = 'faq-category-title';
+                titleEl.textContent = category.category;
+                categoryEl.appendChild(titleEl);
+
+                category.questions.forEach((item, index) => {
+                    const faqEl = document.createElement('div');
+                    faqEl.className = 'faq-item';
+                    faqEl.dataset.question = item.q.toLowerCase();
+                    faqEl.dataset.answer = item.a.toLowerCase();
+                    
+                    faqEl.innerHTML = `
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>${item.q}</span>
+                            <span class="faq-icon">▼</span>
+                        </div>
+                        <div class="faq-answer">${item.a}</div>
+                    `;
+                    categoryEl.appendChild(faqEl);
+                });
+
+                container.appendChild(categoryEl);
+            });
+        }
+
+        function toggleFAQ(element) {
+            const faqItem = element.closest('.faq-item');
+            faqItem.classList.toggle('open');
+        }
+
+        function searchFAQs() {
+            const searchTerm = document.getElementById('faqSearch').value.toLowerCase();
+            const faqItems = document.querySelectorAll('.faq-item');
+            const categories = document.querySelectorAll('.faq-category');
+            let visibleCount = 0;
+
+            faqItems.forEach(item => {
+                const question = item.dataset.question;
+                const answer = item.dataset.answer;
+                
+                if (searchTerm === '' || question.includes(searchTerm) || answer.includes(searchTerm)) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Hide empty categories
+            categories.forEach(cat => {
+                const visibleItems = cat.querySelectorAll('.faq-item[style="display: block;"], .faq-item:not([style*="display"])').length;
+                if (searchTerm !== '' && visibleItems === 0) {
+                    cat.style.display = 'none';
+                } else {
+                    cat.style.display = 'block';
+                }
+            });
+
+            // Show no results message
+            const existingNoResults = document.getElementById('faqNoResults');
+            if (existingNoResults) {
+                existingNoResults.remove();
+            }
+
+            if (searchTerm !== '' && visibleCount === 0) {
+                const noResults = document.createElement('div');
+                noResults.id = 'faqNoResults';
+                noResults.className = 'faq-no-results';
+                noResults.innerHTML = `
+                    <div class="faq-no-results-icon">🔍</div>
+                    <div>No FAQs found for "${searchTerm}"</div>
+                `;
+                document.getElementById('faqContent').appendChild(noResults);
+            }
+        }
+
+        // Setup Drag and Drop
+        function setupDragAndDrop() {
+            const nodeItems = document.querySelectorAll('.node-item');
+            nodeItems.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    draggedNodeType = e.target.closest('.node-item').dataset.type;
+                });
+            });
+
+            const canvas = document.getElementById('canvas');
+            canvas.addEventListener('dragover', (e) => {
+                e.preventDefault();
+            });
+
+            canvas.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left + canvas.parentElement.scrollLeft;
+                const y = e.clientY - rect.top + canvas.parentElement.scrollTop;
+                addNode(draggedNodeType, x, y);
+            });
+        }
+
+        // Add Node to Canvas
+        function addNode(type, x, y) {
+            const nodeId = `node_${nodeIdCounter++}`;
+            const node = {
+                id: nodeId,
+                type: type,
+                x: x,
+                y: y,
+                config: getDefaultConfig(type)
+            };
+            nodes.push(node);
+            renderCanvas();
+            selectNode(nodeId);
+        }
+
+        // Get Default Config
+        function getDefaultConfig(type) {
+            const configs = {
+                START: {
+                    screen_id: 'start',
+                    type: 'START',
+                    go_to_screen_id: ''
+                },
+                MESSAGE: {
+                    screen_id: '',
+                    type: 'MESSAGE_SCREEN',
+                    message_text: 'Enter your message here',
+                    buttons: []
+                },
+                MENU: {
+                    screen_id: '',
+                    type: 'MESSAGE_SCREEN',
+                    message_text: 'Please select an option',
+                    buttons: []
+                },
+                API: {
+                    screen_id: '',
+                    type: 'API_SCREEN',
+                    api_call: {
+                        url: '',
+                        method: 'GET',
+                        save_response_to_variable: '',
+                        on_success_go_to_screen_id: '',
+                        on_error_go_to_screen_id: ''
+                    }
+                },
+                CONDITIONAL: {
+                    screen_id: '',
+                    type: 'CONDITIONAL_SCREEN',
+                    condition: {
+                        variable: '',
+                        operator: 'equals',
+                        value: ''
+                    },
+                    go_to_screen_id: '',
+                    on_false_go_to_screen_id: ''
+                },
+                END: {
+                    screen_id: 'end',
+                    type: 'END_SCREEN',
+                    message_text: 'Thank you!'
+                }
+            };
+            return configs[type] || {};
+        }
+
+        // Render Canvas
+        function renderCanvas() {
+            console.log('🎨 Rendering canvas with', nodes.length, 'nodes');
+            const canvas = document.getElementById('canvas');
+            // Keep the SVG element
+            const svg = document.getElementById('connectionSvg');
+            canvas.innerHTML = '';
+            canvas.appendChild(svg);
+
+            nodes.forEach(node => {
+                const nodeEl = createNodeElement(node);
+                canvas.appendChild(nodeEl);
+            });
+
+            // Draw connections after nodes are rendered
+            setTimeout(() => {
+                drawConnections();
+            }, 100);
+            
+            updateJSONView();
+        }
+
+        // Create Node Element
+        function createNodeElement(node) {
+            const div = document.createElement('div');
+            div.className = 'canvas-node';
+            if (selectedNode === node.id) {
+                div.classList.add('selected');
+            }
+            div.style.left = node.x + 'px';
+            div.style.top = node.y + 'px';
+            div.dataset.id = node.id;
+
+            const icons = {
+                START: { icon: '🏁', color: '#10b981', label: 'Start' },
+                MESSAGE: { icon: '💬', color: '#3b82f6', label: 'Message' },
+                MENU: { icon: '📋', color: '#8b5cf6', label: 'Menu' },
+                API: { icon: '🔌', color: '#06b6d4', label: 'API Call' },
+                CONDITIONAL: { icon: '🔀', color: '#f59e0b', label: 'Condition' },
+                END: { icon: '🛑', color: '#ef4444', label: 'End' }
+            };
+
+            const nodeInfo = icons[node.type] || { icon: '📦', color: '#6b7280', label: 'Unknown' };
+
+            div.innerHTML = `
+                <div class="canvas-node-header" style="background: ${nodeInfo.color}20;">
+                    <div class="node-icon" style="background: ${nodeInfo.color};">${nodeInfo.icon}</div>
+                    <div class="canvas-node-title" style="color: ${nodeInfo.color};">${nodeInfo.label}</div>
+                    <button class="node-delete" onclick="deleteNode('${node.id}')">×</button>
+                </div>
+                <div class="canvas-node-body">
+                    <div class="canvas-node-content">${getNodePreview(node)}</div>
+                </div>
+            `;
+
+            // Click to select node
+            div.addEventListener('click', (e) => {
+                if (e.target.closest('.node-delete')) return;
+                e.stopPropagation();
+                console.log('🖱️ Node clicked:', node.id, node.type);
+                selectNode(node.id);
+            });
+
+            // Mousedown to initiate drag
+            div.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.node-delete')) return;
+                isDraggingNode = true;
+                dragOffset.x = e.clientX - node.x;
+                dragOffset.y = e.clientY - node.y;
+            });
+
+            return div;
+        }
+
+        // Get Node Preview
+        function getNodePreview(node) {
+            const config = node.config;
+            switch (node.type) {
+                case 'START':
+                    return `Entry point → ${config.go_to_screen_id || 'Not set'}`;
+                case 'MESSAGE':
+                case 'MENU':
+                    return config.message_text || 'No message';
+                case 'API':
+                    return config.api_call?.url || 'No URL configured';
+                case 'CONDITIONAL':
+                    return `If ${config.condition?.variable || '?'} ${config.condition?.operator || '?'} ${config.condition?.value || '?'}`;
+                case 'END':
+                    return config.message_text || 'Flow ends here';
+                default:
+                    return 'Configure this node';
+            }
+        }
+
+        // Node Dragging
+        document.addEventListener('mousemove', (e) => {
+            if (isDraggingNode && selectedNode) {
+                const canvas = document.getElementById('canvas');
+                const rect = canvas.getBoundingClientRect();
+                const node = nodes.find(n => n.id === selectedNode);
+                if (node) {
+                    node.x = e.clientX - rect.left + canvas.parentElement.scrollLeft - dragOffset.x + rect.left;
+                    node.y = e.clientY - rect.top + canvas.parentElement.scrollTop - dragOffset.y + rect.top;
+                    renderCanvas();
+                }
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDraggingNode = false;
+        });
+
+        // Select Node
+        function selectNode(nodeId) {
+            console.log('✅ Selecting node:', nodeId);
+            selectedNode = nodeId;
+            renderCanvas();
+            renderConfigPanel();
+        }
+
+        // Delete Node
+        function deleteNode(nodeId) {
+            nodes = nodes.filter(n => n.id !== nodeId);
+            if (selectedNode === nodeId) {
+                selectedNode = null;
+            }
+            renderCanvas();
+            renderConfigPanel();
+        }
+
+        // Render Config Panel
+        function renderConfigPanel() {
+            const panel = document.getElementById('configPanel');
+            console.log('⚙️ Rendering config panel for:', selectedNode);
+            
+            if (!selectedNode) {
+                panel.innerHTML = `
+                    <div class="config-empty">
+                        <div class="config-empty-icon">⚙️</div>
+                        <p>Select a node to configure its properties</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const node = nodes.find(n => n.id === selectedNode);
+            if (!node) {
+                console.warn('⚠️ Node not found:', selectedNode);
+                return;
+            }
+
+            console.log('📝 Rendering', node.type, 'config panel');
+            panel.innerHTML = `<div class="config-title">Configure ${node.type}</div>`;
+
+            switch (node.type) {
+                case 'START':
+                    renderStartConfig(panel, node);
+                    break;
+                case 'MESSAGE':
+                case 'MENU':
+                    renderMessageConfig(panel, node);
+                    break;
+                case 'API':
+                    renderAPIConfig(panel, node);
+                    break;
+                case 'CONDITIONAL':
+                    renderConditionalConfig(panel, node);
+                    break;
+                case 'END':
+                    renderEndConfig(panel, node);
+                    break;
+            }
+            
+            // Re-attach event listeners after innerHTML update
+            attachConfigEventListeners(node);
+        }
+        
+        // Helper function to attach event listeners
+        function attachConfigEventListeners(node) {
+            // Event listeners for dropdowns will be attached here
+            const selects = document.querySelectorAll('#configPanel select');
+            selects.forEach(select => {
+                if (!select.onchange) {
+                    const handler = select.getAttribute('data-handler');
+                    if (handler) {
+                        select.onchange = function() {
+                            eval(handler);
+                        };
+                    }
+                }
+            });
+        }
+
+        // Helper: Get all available screen IDs
+        function getAvailableScreenIds() {
+            return nodes
+                .filter(n => n.config.screen_id && n.config.screen_id !== '')
+                .map(n => n.config.screen_id);
+        }
+
+        // Helper: Create screen ID selector
+        function createScreenSelector(currentValue, onChangeHandler, placeholder = 'Select or type screen ID') {
+            const availableScreens = getAvailableScreenIds();
+            const selectId = 'sel_' + Math.random().toString(36).substr(2, 9);
+            
+            let html = `
+                <select class="form-select" id="${selectId}" onchange="${onChangeHandler}">
+                    <option value="">-- ${placeholder} --</option>
+                    ${availableScreens.map(screenId => 
+                        `<option value="${screenId}" ${currentValue === screenId ? 'selected' : ''}>${screenId}</option>`
+                    ).join('')}
+                </select>
+                <input type="text" class="form-input" style="margin-top: 8px;" placeholder="Or type custom ID..." 
+                    value="${currentValue && !availableScreens.includes(currentValue) ? currentValue : ''}"
+                    onchange="${onChangeHandler}">
+            `;
+            return html;
+        }
+
+        // Config Renderers
+        function renderStartConfig(panel, node) {
+            const availableScreens = getAvailableScreenIds();
+            const screenCount = availableScreens.length;
+            
+            const configHTML = `
+                <div class="form-group">
+                    <label class="form-label">Screen ID</label>
+                    <input type="text" class="form-input" id="start_screen_id" value="${node.config.screen_id || ''}" 
+                        placeholder="e.g., start">
+                    <small style="display: block; margin-top: 4px; font-size: 11px; color: #6b7280;">✓ Unique identifier for this start point</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Go To Screen <span style="color: #10b981; font-size: 11px;">(${screenCount} screens available)</span></label>
+                    <select class="form-select" id="start_goto_dropdown">
+                        <option value="">-- Select first screen --</option>
+                        ${availableScreens.map(screenId => 
+                            `<option value="${screenId}" ${node.config.go_to_screen_id === screenId ? 'selected' : ''}>${screenId}</option>`
+                        ).join('')}
+                    </select>
+                    <input type="text" class="form-input" id="start_goto_input" style="margin-top: 8px;" placeholder="Or type custom screen ID..." 
+                        value="${node.config.go_to_screen_id && !availableScreens.includes(node.config.go_to_screen_id) ? node.config.go_to_screen_id : ''}">
+                    <small style="display: block; margin-top: 4px; font-size: 11px; color: #6b7280;">💡 Select from dropdown or type a new screen ID</small>
+                </div>
+            `;
+            
+            panel.innerHTML += configHTML;
+            
+            // Attach event listeners
+            setTimeout(() => {
+                const screenIdInput = document.getElementById('start_screen_id');
+                const dropdownSelect = document.getElementById('start_goto_dropdown');
+                const customInput = document.getElementById('start_goto_input');
+                
+                if (screenIdInput) {
+                    screenIdInput.addEventListener('change', function() {
+                        updateNodeConfig(node.id, 'screen_id', this.value);
+                    });
+                }
+                
+                if (dropdownSelect) {
+                    dropdownSelect.addEventListener('change', function() {
+                        if (this.value) {
+                            updateNodeConfig(node.id, 'go_to_screen_id', this.value);
+                            if (customInput) customInput.value = '';
+                        }
+                    });
+                }
+                
+                if (customInput) {
+                    customInput.addEventListener('change', function() {
+                        if (this.value) {
+                            updateNodeConfig(node.id, 'go_to_screen_id', this.value);
+                            if (dropdownSelect) dropdownSelect.value = '';
+                        }
+                    });
+                }
+            }, 0);
+        }
+
+        function renderMessageConfig(panel, node) {
+            const configHTML = `
+                <div class="form-group">
+                    <label class="form-label">Screen ID</label>
+                    <input type="text" class="form-input" id="msg_screen_id_${node.id}" value="${node.config.screen_id || ''}" 
+                        placeholder="e.g., welcome_screen">
+                    <small style="display: block; margin-top: 4px; font-size: 11px; color: #6b7280;">✓ Use lowercase with underscores</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Message Text</label>
+                    <textarea class="form-textarea" id="msg_text_${node.id}"
+                        placeholder="Enter the message to display to users...">${node.config.message_text || ''}</textarea>
+                    <small style="display: block; margin-top: 4px; font-size: 11px; color: #6b7280;">💡 Use {{variable_name}} for dynamic values</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Buttons</label>
+                    <div class="button-list" id="buttonList"></div>
+                    <button class="add-button-btn" id="add_btn_${node.id}">+ Add Button</button>
+                </div>
+            `;
+            
+            panel.innerHTML += configHTML;
+            
+            // Attach event listeners
+            setTimeout(() => {
+                const screenIdInput = document.getElementById(`msg_screen_id_${node.id}`);
+                const msgTextArea = document.getElementById(`msg_text_${node.id}`);
+                const addBtn = document.getElementById(`add_btn_${node.id}`);
+                
+                if (screenIdInput) {
+                    screenIdInput.addEventListener('change', function() {
+                        updateNodeConfig(node.id, 'screen_id', this.value);
+                    });
+                }
+                
+                if (msgTextArea) {
+                    msgTextArea.addEventListener('change', function() {
+                        updateNodeConfig(node.id, 'message_text', this.value);
+                    });
+                }
+                
+                if (addBtn) {
+                    addBtn.addEventListener('click', function() {
+                        addButton(node.id);
+                    });
+                }
+                
+                renderButtonList(node);
+            }, 0);
+        }
+
+        function renderButtonList(node) {
+            const list = document.getElementById('buttonList');
+            if (!list) return;
+            
+            const availableScreens = getAvailableScreenIds();
+            const screenCount = availableScreens.length;
+            
+            list.innerHTML = '';
+            (node.config.buttons || []).forEach((btn, idx) => {
+                const div = document.createElement('div');
+                div.className = 'button-list-item';
+                div.innerHTML = `
+                    <button class="button-list-remove" id="remove_btn_${node.id}_${idx}">×</button>
+                    <div class="form-group" style="margin-bottom: 8px;">
+                        <input type="text" class="form-input" id="btn_label_${node.id}_${idx}" 
+                            placeholder="Button label (e.g., Check Balance)" 
+                            value="${btn.label || ''}">
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label style="font-size: 11px; color: #6b7280; margin-bottom: 4px; display: block;">
+                            Target Screen <span style="color: #10b981;">(${screenCount} available)</span>
+                        </label>
+                        <select class="form-select" id="btn_dropdown_${node.id}_${idx}">
+                            <option value="">-- Select screen --</option>
+                            ${availableScreens.map(screenId => 
+                                `<option value="${screenId}" ${btn.go_to_screen_id === screenId ? 'selected' : ''}>${screenId}</option>`
+                            ).join('')}
+                        </select>
+                        <input type="text" class="form-input" id="btn_input_${node.id}_${idx}" 
+                            style="margin-top: 6px;" placeholder="Or type custom screen ID..." 
+                            value="${btn.go_to_screen_id && !availableScreens.includes(btn.go_to_screen_id) ? btn.go_to_screen_id : ''}">
+                    </div>
+                `;
+                list.appendChild(div);
+                
+                // Attach event listeners for this button
+                setTimeout(() => {
+                    const removeBtn = document.getElementById(`remove_btn_${node.id}_${idx}`);
+                    const labelInput = document.getElementById(`btn_label_${node.id}_${idx}`);
+                    const dropdown = document.getElementById(`btn_dropdown_${node.id}_${idx}`);
+                    const customInput = document.getElementById(`btn_input_${node.id}_${idx}`);
+                    
+                    if (removeBtn) {
+                        removeBtn.addEventListener('click', () => removeButton(node.id, idx));
+                    }
+                    
+                    if (labelInput) {
+                        labelInput.addEventListener('change', function() {
+                            updateButton(node.id, idx, 'label', this.value);
+                        });
+                    }
+                    
+                    if (dropdown) {
+                        dropdown.addEventListener('change', function() {
+                            if (this.value) {
+                                updateButton(node.id, idx, 'go_to_screen_id', this.value);
+                                if (customInput) customInput.value = '';
+                            }
+                        });
+                    }
+                    
+                    if (customInput) {
+                        customInput.addEventListener('change', function() {
+                            if (this.value) {
+                                updateButton(node.id, idx, 'go_to_screen_id', this.value);
+                                if (dropdown) dropdown.value = '';
+                            }
+                        });
+                    }
+                }, 0);
+            });
+        }
+
+        function renderAPIConfig(panel, node) {
+            const api = node.config.api_call || {};
+            const availableScreens = getAvailableScreenIds();
+            
+            panel.innerHTML += `
+                <div class="form-group">
+                    <label class="form-label">Screen ID</label>
+                    <input type="text" class="form-input" value="${node.config.screen_id}" 
+                        onchange="updateNodeConfig('${node.id}', 'screen_id', this.value)"
+                        placeholder="e.g., api_get_accounts">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">API URL</label>
+                    <input type="text" class="form-input" value="${api.url || ''}" 
+                        onchange="updateAPIConfig('${node.id}', 'url', this.value)"
+                        placeholder="https://api.citi.com/v1/...">
+                    <small style="display: block; margin-top: 4px; font-size: 11px; color: #6b7280;">Check the APIs tab for available endpoints</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Method</label>
+                    <select class="form-select" onchange="updateAPIConfig('${node.id}', 'method', this.value)">
+                        <option value="GET" ${api.method === 'GET' ? 'selected' : ''}>GET</option>
+                        <option value="POST" ${api.method === 'POST' ? 'selected' : ''}>POST</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Save Response To Variable</label>
+                    <input type="text" class="form-input" value="${api.save_response_to_variable || ''}" 
+                        onchange="updateAPIConfig('${node.id}', 'save_response_to_variable', this.value)"
+                        placeholder="e.g., account_data">
+                    <small style="display: block; margin-top: 4px; font-size: 11px; color: #6b7280;">Access later using {{variable_name.field}}</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">On Success Go To</label>
+                    <select class="form-select" onchange="updateAPIConfig('${node.id}', 'on_success_go_to_screen_id', this.value)">
+                        <option value="">-- Select screen --</option>
+                        ${availableScreens.map(screenId => 
+                            `<option value="${screenId}" ${api.on_success_go_to_screen_id === screenId ? 'selected' : ''}>${screenId}</option>`
+                        ).join('')}
+                    </select>
+                    <input type="text" class="form-input" style="margin-top: 6px;" placeholder="Or type screen ID..." 
+                        value="${api.on_success_go_to_screen_id && !availableScreens.includes(api.on_success_go_to_screen_id) ? api.on_success_go_to_screen_id : ''}"
+                        onchange="updateAPIConfig('${node.id}', 'on_success_go_to_screen_id', this.value)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">On Error Go To</label>
+                    <select class="form-select" onchange="updateAPIConfig('${node.id}', 'on_error_go_to_screen_id', this.value)">
+                        <option value="">-- Select screen --</option>
+                        ${availableScreens.map(screenId => 
+                            `<option value="${screenId}" ${api.on_error_go_to_screen_id === screenId ? 'selected' : ''}>${screenId}</option>`
+                        ).join('')}
+                    </select>
+                    <input type="text" class="form-input" style="margin-top: 6px;" placeholder="Or type screen ID..." 
+                        value="${api.on_error_go_to_screen_id && !availableScreens.includes(api.on_error_go_to_screen_id) ? api.on_error_go_to_screen_id : ''}"
+                        onchange="updateAPIConfig('${node.id}', 'on_error_go_to_screen_id', this.value)">
+                </div>
+            `;
+        }
+
+        function renderConditionalConfig(panel, node) {
+            const cond = node.config.condition || {};
+            const availableScreens = getAvailableScreenIds();
+            
+            panel.innerHTML += `
+                <div class="form-group">
+                    <label class="form-label">Screen ID</label>
+                    <input type="text" class="form-input" value="${node.config.screen_id}" 
+                        onchange="updateNodeConfig('${node.id}', 'screen_id', this.value)"
+                        placeholder="e.g., condition_check">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Variable</label>
+                    <input type="text" class="form-input" value="${cond.variable || ''}" 
+                        onchange="updateConditionConfig('${node.id}', 'variable', this.value)"
+                        placeholder="e.g., user_balance">
+                    <small style="display: block; margin-top: 4px; font-size: 11px; color: #6b7280;">Variable to check (from API responses)</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Operator</label>
+                    <select class="form-select" onchange="updateConditionConfig('${node.id}', 'operator', this.value)">
+                        <option value="equals" ${cond.operator === 'equals' ? 'selected' : ''}>Equals</option>
+                        <option value="exists" ${cond.operator === 'exists' ? 'selected' : ''}>Exists</option>
+                        <option value="greater_than" ${cond.operator === 'greater_than' ? 'selected' : ''}>Greater Than</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Value</label>
+                    <input type="text" class="form-input" value="${cond.value || ''}" 
+                        onchange="updateConditionConfig('${node.id}', 'value', this.value)"
+                        placeholder="Value to compare">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">On True Go To</label>
+                    <select class="form-select" onchange="updateNodeConfig('${node.id}', 'go_to_screen_id', this.value)">
+                        <option value="">-- Select screen --</option>
+                        ${availableScreens.map(screenId => 
+                            `<option value="${screenId}" ${node.config.go_to_screen_id === screenId ? 'selected' : ''}>${screenId}</option>`
+                        ).join('')}
+                    </select>
+                    <input type="text" class="form-input" style="margin-top: 6px;" placeholder="Or type screen ID..." 
+                        value="${node.config.go_to_screen_id && !availableScreens.includes(node.config.go_to_screen_id) ? node.config.go_to_screen_id : ''}"
+                        onchange="updateNodeConfig('${node.id}', 'go_to_screen_id', this.value)">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">On False Go To</label>
+                    <select class="form-select" onchange="updateNodeConfig('${node.id}', 'on_false_go_to_screen_id', this.value)">
+                        <option value="">-- Select screen --</option>
+                        ${availableScreens.map(screenId => 
+                            `<option value="${screenId}" ${node.config.on_false_go_to_screen_id === screenId ? 'selected' : ''}>${screenId}</option>`
+                        ).join('')}
+                    </select>
+                    <input type="text" class="form-input" style="margin-top: 6px;" placeholder="Or type screen ID..." 
+                        value="${node.config.on_false_go_to_screen_id && !availableScreens.includes(node.config.on_false_go_to_screen_id) ? node.config.on_false_go_to_screen_id : ''}"
+                        onchange="updateNodeConfig('${node.id}', 'on_false_go_to_screen_id', this.value)">
+                </div>
+            `;
+        }
+
+        function renderEndConfig(panel, node) {
+            panel.innerHTML += `
+                <div class="form-group">
+                    <label class="form-label">Screen ID</label>
+                    <input type="text" class="form-input" value="${node.config.screen_id}" 
+                        onchange="updateNodeConfig('${node.id}', 'screen_id', this.value)"
+                        placeholder="e.g., end_screen">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Final Message</label>
+                    <textarea class="form-textarea" 
+                        onchange="updateNodeConfig('${node.id}', 'message_text', this.value)"
+                        placeholder="Thank you for using our service!">${node.config.message_text}</textarea>
+                    <small style="display: block; margin-top: 4px; font-size: 11px; color: #6b7280;">Last message shown before conversation ends</small>
+                </div>
+            `;
+        }
+
+        // Update Configs
+        function updateNodeConfig(nodeId, key, value) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (node) {
+                node.config[key] = value;
+                renderCanvas();
+            }
+        }
+
+        function updateAPIConfig(nodeId, key, value) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (node && node.config.api_call) {
+                node.config.api_call[key] = value;
+                renderCanvas();
+            }
+        }
+
+        function updateConditionConfig(nodeId, key, value) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (node && node.config.condition) {
+                node.config.condition[key] = value;
+                renderCanvas();
+            }
+        }
+
+        function addButton(nodeId) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (node) {
+                if (!node.config.buttons) node.config.buttons = [];
+                node.config.buttons.push({ label: 'New Button', go_to_screen_id: '' });
+                renderConfigPanel();
+                renderCanvas();
+            }
+        }
+
+        function removeButton(nodeId, index) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (node && node.config.buttons) {
+                node.config.buttons.splice(index, 1);
+                renderConfigPanel();
+                renderCanvas();
+            }
+        }
+
+        function updateButton(nodeId, index, key, value) {
+            const node = nodes.find(n => n.id === nodeId);
+            if (node && node.config.buttons && node.config.buttons[index]) {
+                node.config.buttons[index][key] = value;
+                renderCanvas();
+            }
+        }
+
+        // Generate CitiFlow JSON
+        function generateCitiFlowJSON() {
+            const startNode = nodes.find(n => n.type === 'START');
+            const screens = {};
+
+            nodes.forEach(node => {
+                if (node.config.screen_id) {
+                    screens[node.config.screen_id] = { ...node.config };
+                }
+            });
+
+            return {
+                start_screen_id: startNode?.config.go_to_screen_id || '',
+                screens: screens
+            };
+        }
+
+        // Draw Connections between nodes
+        function drawConnections() {
+            const svg = document.getElementById('connectionSvg');
+            if (!svg) {
+                console.warn('⚠️ Connection SVG not found');
+                return;
+            }
+
+            // Clear existing connections (except defs)
+            const defs = svg.querySelector('defs');
+            svg.innerHTML = '';
+            if (defs) {
+                svg.appendChild(defs);
+            }
+
+            // Collect all connections
+            const connections = [];
+            console.log('🔗 Drawing connections for', nodes.length, 'nodes');
+
+            nodes.forEach(sourceNode => {
+                const fromId = sourceNode.config.screen_id || sourceNode.id;
+                
+                if (sourceNode.type === 'START' && sourceNode.config.go_to_screen_id) {
+                    connections.push({
+                        from: fromId,
+                        to: sourceNode.config.go_to_screen_id,
+                        type: 'default',
+                        label: 'Start'
+                    });
+                }
+
+                if (sourceNode.type === 'MESSAGE' && sourceNode.config.go_to_screen_id) {
+                    connections.push({
+                        from: fromId,
+                        to: sourceNode.config.go_to_screen_id,
+                        type: 'default',
+                        label: ''
+                    });
+                }
+
+                if (sourceNode.type === 'MENU' && sourceNode.config.buttons) {
+                    sourceNode.config.buttons.forEach((button, index) => {
+                        if (button.go_to_screen_id) {
+                            connections.push({
+                                from: fromId,
+                                to: button.go_to_screen_id,
+                                type: 'button',
+                                label: button.label || `Button ${index + 1}`
+                            });
+                        }
+                    });
+                }
+
+                if (sourceNode.type === 'API') {
+                    if (sourceNode.config.on_success_go_to) {
+                        connections.push({
+                            from: fromId,
+                            to: sourceNode.config.on_success_go_to,
+                            type: 'success',
+                            label: 'Success'
+                        });
+                    }
+                    if (sourceNode.config.on_error_go_to) {
+                        connections.push({
+                            from: fromId,
+                            to: sourceNode.config.on_error_go_to,
+                            type: 'error',
+                            label: 'Error'
+                        });
+                    }
+                }
+
+                if (sourceNode.type === 'CONDITIONAL' && sourceNode.config.conditions) {
+                    sourceNode.config.conditions.forEach((condition, index) => {
+                        if (condition.go_to_screen_id) {
+                            connections.push({
+                                from: fromId,
+                                to: condition.go_to_screen_id,
+                                type: 'button',
+                                label: condition.condition || `Condition ${index + 1}`
+                            });
+                        }
+                    });
+                }
+            });
+
+            // Draw each connection
+            console.log('📊 Found', connections.length, 'connections to draw');
+            connections.forEach(conn => {
+                // Find nodes by ID first, then by screen_id
+                const fromNode = nodes.find(n => n.id === conn.from || n.config.screen_id === conn.from);
+                const toNode = nodes.find(n => n.id === conn.to || n.config.screen_id === conn.to);
+                
+                if (fromNode && toNode) {
+                    console.log('  ✓ Drawing:', conn.from, '→', conn.to, `(${conn.type})`);
+                    drawConnection(svg, fromNode, toNode, conn.type, conn.label);
+                } else {
+                    console.warn('  ✗ Missing node for connection:', conn.from, '→', conn.to);
+                    if (!fromNode) console.warn('    Missing FROM node:', conn.from);
+                    if (!toNode) console.warn('    Missing TO node:', conn.to);
+                }
+            });
+            console.log('✅ Connections drawn');
+        }
+
+        // Draw a single connection
+        function drawConnection(svg, fromNode, toNode, type, label) {
+            const from = getNodeCenter(fromNode);
+            const to = getNodeCenter(toNode);
+
+            // Create bezier curve path
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            const pathData = createBezierPath(from.x, from.y, to.x, to.y);
+            
+            path.setAttribute('d', pathData);
+            path.setAttribute('class', `connection-line ${type}`);
+            
+            // Set marker (arrow) based on type
+            const markerMap = {
+                'success': 'arrowSuccess',
+                'error': 'arrowError',
+                'default': 'arrowDefault',
+                'button': 'arrowButton'
+            };
+            path.setAttribute('marker-end', `url(#${markerMap[type] || 'arrowDefault'})`);
+            
+            // Add click handler
+            path.addEventListener('click', (e) => {
+                e.stopPropagation();
+                console.log('🖱️ Connection clicked:', fromNode.id, '→', toNode.id);
+                showConnectionEditor(fromNode, toNode, type, label);
+            });
+            
+            svg.appendChild(path);
+
+            // Add label if provided
+            if (label && label.length > 0) {
+                const midPoint = getBezierMidpoint(from.x, from.y, to.x, to.y);
+                addConnectionLabel(svg, midPoint.x, midPoint.y, label);
+            }
+        }
+
+        // Get center coordinates of a node
+        function getNodeCenter(node) {
+            return {
+                x: node.x + 120, // Half of node width (240px / 2)
+                y: node.y + 40   // Half of node height (80px / 2)
+            };
+        }
+
+        // Create bezier curve path
+        function createBezierPath(x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            
+            // Control points for smooth curve
+            const controlPoint1X = x1 + dx * 0.5;
+            const controlPoint1Y = y1;
+            const controlPoint2X = x2 - dx * 0.5;
+            const controlPoint2Y = y2;
+
+            return `M ${x1} ${y1} C ${controlPoint1X} ${controlPoint1Y}, ${controlPoint2X} ${controlPoint2Y}, ${x2} ${y2}`;
+        }
+
+        // Get midpoint of bezier curve for label placement
+        function getBezierMidpoint(x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            
+            // Approximate midpoint of bezier curve (t = 0.5)
+            const cp1x = x1 + dx * 0.5;
+            const cp1y = y1;
+            const cp2x = x2 - dx * 0.5;
+            const cp2y = y2;
+            
+            // Bezier formula at t = 0.5
+            const t = 0.5;
+            const mt = 1 - t;
+            const mt2 = mt * mt;
+            const t2 = t * t;
+            
+            return {
+                x: mt * mt2 * x1 + 3 * mt2 * t * cp1x + 3 * mt * t2 * cp2x + t * t2 * x2,
+                y: mt * mt2 * y1 + 3 * mt2 * t * cp1y + 3 * mt * t2 * cp2y + t * t2 * y2
+            };
+        }
+
+        // Add label to connection
+        function addConnectionLabel(svg, x, y, text) {
+            // Truncate long labels
+            const displayText = text.length > 20 ? text.substring(0, 18) + '...' : text;
+            const padding = 6;
+            const textWidth = displayText.length * 6.5; // Approximate width
+            
+            // Background rectangle
+            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+            rect.setAttribute('x', x - textWidth / 2 - padding);
+            rect.setAttribute('y', y - 10);
+            rect.setAttribute('width', textWidth + padding * 2);
+            rect.setAttribute('height', 20);
+            rect.setAttribute('class', 'connection-label-bg');
+            svg.appendChild(rect);
+            
+            // Text label
+            const textEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            textEl.setAttribute('x', x);
+            textEl.setAttribute('y', y + 4);
+            textEl.setAttribute('class', 'connection-label');
+            textEl.textContent = displayText;
+            svg.appendChild(textEl);
+        }
+
+        // Connection Editor Functions
+        let currentConnection = null;
+
+        function showConnectionEditor(fromNode, toNode, type, label) {
+            currentConnection = { fromNode, toNode, type, label };
+            
+            const typeLabels = {
+                'success': 'Success Path',
+                'error': 'Error Path',
+                'button': 'Button Action',
+                'default': 'Default Flow'
+            };
+            
+            const connectionInfo = document.getElementById('connectionInfo');
+            connectionInfo.innerHTML = `
+                <div class="connection-info-row">
+                    <div class="connection-info-label">From:</div>
+                    <div class="connection-info-value">${fromNode.config.screen_id || fromNode.id}</div>
+                </div>
+                <div class="connection-info-row">
+                    <div class="connection-info-label">To:</div>
+                    <div class="connection-info-value">${toNode.config.screen_id || toNode.id}</div>
+                </div>
+                <div class="connection-info-row">
+                    <div class="connection-info-label">Type:</div>
+                    <span class="connection-type-badge ${type}">${typeLabels[type] || type}</span>
+                </div>
+                ${label ? `
+                <div class="connection-info-row">
+                    <div class="connection-info-label">Label:</div>
+                    <div class="connection-info-value">${label}</div>
+                </div>
+                ` : ''}
+            `;
+            
+            // Show editor
+            document.getElementById('connectionEditor').classList.add('active');
+            document.getElementById('connectionEditorOverlay').classList.add('active');
+            
+            // Attach event handlers
+            document.getElementById('btnEditConnection').onclick = () => {
+                closeConnectionEditor();
+                selectNode(fromNode.id);
+            };
+            
+            document.getElementById('btnDeleteConnection').onclick = () => {
+                deleteConnection(fromNode, toNode, type, label);
+            };
+        }
+
+        function closeConnectionEditor() {
+            document.getElementById('connectionEditor').classList.remove('active');
+            document.getElementById('connectionEditorOverlay').classList.remove('active');
+            currentConnection = null;
+        }
+
+        function deleteConnection(fromNode, toNode, type, label) {
+            console.log('🗑️ Deleting connection:', fromNode.id, '→', toNode.id);
+            
+            // Find and remove the connection based on type
+            if (fromNode.type === 'START') {
+                fromNode.config.go_to_screen_id = '';
+            } else if (fromNode.type === 'MESSAGE') {
+                fromNode.config.go_to_screen_id = '';
+            } else if (fromNode.type === 'MENU' && fromNode.config.buttons) {
+                // Find and remove button connection
+                const button = fromNode.config.buttons.find(b => 
+                    b.go_to_screen_id === (toNode.config.screen_id || toNode.id) && 
+                    b.label === label
+                );
+                if (button) {
+                    button.go_to_screen_id = '';
+                }
+            } else if (fromNode.type === 'API') {
+                if (type === 'success') {
+                    fromNode.config.on_success_go_to = '';
+                } else if (type === 'error') {
+                    fromNode.config.on_error_go_to = '';
+                }
+            } else if (fromNode.type === 'CONDITIONAL' && fromNode.config.conditions) {
+                // Find and remove condition connection
+                const condition = fromNode.config.conditions.find(c => 
+                    c.go_to_screen_id === (toNode.config.screen_id || toNode.id)
+                );
+                if (condition) {
+                    condition.go_to_screen_id = '';
+                }
+            }
+            
+            // Close editor and re-render
+            closeConnectionEditor();
+            renderCanvas();
+            showToast('✅ Connection deleted successfully!');
+        }
+
+        // Update JSON View
+        function updateJSONView() {
+            const json = generateCitiFlowJSON();
+            const output = document.getElementById('jsonOutput');
+            if (output) {
+                output.textContent = JSON.stringify(json, null, 2);
+            }
+        }
+
+        // Switch Tabs
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (tab === 'builder') {
+                document.getElementById('builderView').style.display = 'flex';
+                document.getElementById('jsonView').classList.remove('active');
+            } else if (tab === 'json') {
+                document.getElementById('builderView').style.display = 'none';
+                document.getElementById('jsonView').classList.add('active');
+                updateJSONView();
+            }
+        }
+
+        // Template Management
+        function loadTemplate() {
+            document.getElementById('templateModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('templateModal').classList.remove('active');
+        }
+
+        function loadCheckBalanceTemplate() {
+            // Load the complete Check Balance flow
+            const template = {
+                "start_screen_id": "welcome_screen",
+                "screens": {
+                    "welcome_screen": {
+                        "screen_id": "welcome_screen",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Welcome to Citi. How can I help you today?",
+                        "buttons": [
+                            { "label": "Check Balance", "go_to_screen_id": "api_get_accounts" },
+                            { "label": "Find ATM", "go_to_screen_id": "end_find_atm" }
+                        ]
+                    },
+                    "api_get_accounts": {
+                        "screen_id": "api_get_accounts",
+                        "type": "API_SCREEN",
+                        "api_call": {
+                            "url": "https://api.citi.com/v1/user/accounts",
+                            "method": "GET",
+                            "save_response_to_variable": "account_list_data",
+                            "on_success_go_to_screen_id": "screen_select_account",
+                            "on_error_go_to_screen_id": "screen_api_error"
+                        }
+                    },
+                    "screen_select_account": {
+                        "screen_id": "screen_select_account",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Please select an account.",
+                        "dynamic_buttons": {
+                            "source_variable": "account_list_data.accounts",
+                            "label_template": "{{item.name}} - x{{item.last_four}}",
+                            "set_variable_on_click": {
+                                "selected_balance": "{{item.balance}}",
+                                "selected_name": "{{item.name}}",
+                                "selected_last_four": "{{item.last_four}}"
+                            },
+                            "go_to_screen_id": "screen_show_balance"
+                        },
+                        "buttons": [
+                            { "label": "Main Menu", "go_to_screen_id": "welcome_screen" }
+                        ]
+                    },
+                    "screen_show_balance": {
+                        "screen_id": "screen_show_balance",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "The balance for your {{selected_name}} - x{{selected_last_four}} account is ${{selected_balance}}.",
+                        "buttons": [
+                            { "label": "Check Another Account", "go_to_screen_id": "screen_select_account" },
+                            { "label": "Main Menu", "go_to_screen_id": "welcome_screen" }
+                        ]
+                    },
+                    "screen_api_error": {
+                        "screen_id": "screen_api_error",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "I'm sorry, I was unable to retrieve your account information at this time. Please try again later.",
+                        "buttons": [
+                            { "label": "Main Menu", "go_to_screen_id": "welcome_screen" }
+                        ]
+                    },
+                    "end_find_atm": {
+                        "screen_id": "end_find_atm",
+                        "type": "END_SCREEN",
+                        "message_text": "This feature is coming soon. Redirecting to the main menu."
+                    }
+                }
+            };
+
+            loadFlowFromJSON(template);
+            closeModal();
+            showToast('✅ Check Balance flow loaded successfully!');
+        }
+
+        function loadBillPaymentTemplate() {
+            const template = {
+                "start_screen_id": "welcome_screen",
+                "screens": {
+                    "welcome_screen": {
+                        "screen_id": "welcome_screen",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Welcome to Citi Banking! How can I help you today?",
+                        "buttons": [
+                            { "label": "💳 Pay Bills", "go_to_screen_id": "api_get_payees" },
+                            { "label": "💰 Check Balance", "go_to_screen_id": "end_other_service" },
+                            { "label": "🏧 Find ATM", "go_to_screen_id": "end_other_service" }
+                        ]
+                    },
+                    "api_get_payees": {
+                        "screen_id": "api_get_payees",
+                        "type": "API_SCREEN",
+                        "api_call": {
+                            "url": "https://api.citi.com/v1/bills/payees",
+                            "method": "GET",
+                            "save_response_to_variable": "payee_list_data",
+                            "on_success_go_to_screen_id": "select_payee_screen",
+                            "on_error_go_to_screen_id": "api_error_screen"
+                        }
+                    },
+                    "select_payee_screen": {
+                        "screen_id": "select_payee_screen",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Which bill would you like to pay?",
+                        "dynamic_buttons": {
+                            "source_variable": "payee_list_data.payees",
+                            "label_template": "{{item.name}} - {{item.nickname}}",
+                            "set_variable_on_click": {
+                                "selected_payee_name": "{{item.name}}",
+                                "selected_payee_id": "{{item.payee_id}}",
+                                "selected_payee_account": "{{item.account_number}}"
+                            },
+                            "go_to_screen_id": "api_get_accounts"
+                        },
+                        "buttons": [
+                            { "label": "⬅️ Back to Main Menu", "go_to_screen_id": "welcome_screen" }
+                        ]
+                    },
+                    "api_get_accounts": {
+                        "screen_id": "api_get_accounts",
+                        "type": "API_SCREEN",
+                        "api_call": {
+                            "url": "https://api.citi.com/v1/user/accounts",
+                            "method": "GET",
+                            "save_response_to_variable": "account_list_data",
+                            "on_success_go_to_screen_id": "select_account_screen",
+                            "on_error_go_to_screen_id": "api_error_screen"
+                        }
+                    },
+                    "select_account_screen": {
+                        "screen_id": "select_account_screen",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Select the account to pay from:",
+                        "dynamic_buttons": {
+                            "source_variable": "account_list_data.accounts",
+                            "label_template": "{{item.name}} - x{{item.last_four}} (${{item.balance}})",
+                            "set_variable_on_click": {
+                                "selected_account_name": "{{item.name}}",
+                                "selected_account_last_four": "{{item.last_four}}",
+                                "selected_account_balance": "{{item.balance}}"
+                            },
+                            "go_to_screen_id": "enter_amount_screen"
+                        },
+                        "buttons": [
+                            { "label": "⬅️ Back to Payees", "go_to_screen_id": "select_payee_screen" }
+                        ]
+                    },
+                    "enter_amount_screen": {
+                        "screen_id": "enter_amount_screen",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "You're paying {{selected_payee_name}}.\n\nHow much would you like to pay?\n\nAccount: {{selected_account_name}} - x{{selected_account_last_four}}\nAvailable: ${{selected_account_balance}}",
+                        "buttons": [
+                            { "label": "$50", "go_to_screen_id": "confirm_payment_screen_50" },
+                            { "label": "$100", "go_to_screen_id": "confirm_payment_screen_100" },
+                            { "label": "$200", "go_to_screen_id": "confirm_payment_screen_200" },
+                            { "label": "⬅️ Back", "go_to_screen_id": "select_account_screen" }
+                        ]
+                    },
+                    "confirm_payment_screen_50": {
+                        "screen_id": "confirm_payment_screen_50",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Please confirm your payment:\n\n💳 To: {{selected_payee_name}}\n💰 Amount: $50.00\n🏦 From: {{selected_account_name}} - x{{selected_account_last_four}}\n\nDo you want to proceed?",
+                        "buttons": [
+                            { "label": "✅ Yes, Pay $50", "go_to_screen_id": "api_pay_bill_50" },
+                            { "label": "❌ Cancel", "go_to_screen_id": "welcome_screen" }
+                        ]
+                    },
+                    "confirm_payment_screen_100": {
+                        "screen_id": "confirm_payment_screen_100",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Please confirm your payment:\n\n💳 To: {{selected_payee_name}}\n💰 Amount: $100.00\n🏦 From: {{selected_account_name}} - x{{selected_account_last_four}}\n\nDo you want to proceed?",
+                        "buttons": [
+                            { "label": "✅ Yes, Pay $100", "go_to_screen_id": "api_pay_bill_100" },
+                            { "label": "❌ Cancel", "go_to_screen_id": "welcome_screen" }
+                        ]
+                    },
+                    "confirm_payment_screen_200": {
+                        "screen_id": "confirm_payment_screen_200",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Please confirm your payment:\n\n💳 To: {{selected_payee_name}}\n💰 Amount: $200.00\n🏦 From: {{selected_account_name}} - x{{selected_account_last_four}}\n\nDo you want to proceed?",
+                        "buttons": [
+                            { "label": "✅ Yes, Pay $200", "go_to_screen_id": "api_pay_bill_200" },
+                            { "label": "❌ Cancel", "go_to_screen_id": "welcome_screen" }
+                        ]
+                    },
+                    "api_pay_bill_50": {
+                        "screen_id": "api_pay_bill_50",
+                        "type": "API_SCREEN",
+                        "api_call": {
+                            "url": "https://api.citi.com/v1/bills/pay",
+                            "method": "POST",
+                            "save_response_to_variable": "payment_response",
+                            "on_success_go_to_screen_id": "payment_success_screen",
+                            "on_error_go_to_screen_id": "api_error_screen"
+                        }
+                    },
+                    "api_pay_bill_100": {
+                        "screen_id": "api_pay_bill_100",
+                        "type": "API_SCREEN",
+                        "api_call": {
+                            "url": "https://api.citi.com/v1/bills/pay",
+                            "method": "POST",
+                            "save_response_to_variable": "payment_response",
+                            "on_success_go_to_screen_id": "payment_success_screen",
+                            "on_error_go_to_screen_id": "api_error_screen"
+                        }
+                    },
+                    "api_pay_bill_200": {
+                        "screen_id": "api_pay_bill_200",
+                        "type": "API_SCREEN",
+                        "api_call": {
+                            "url": "https://api.citi.com/v1/bills/pay",
+                            "method": "POST",
+                            "save_response_to_variable": "payment_response",
+                            "on_success_go_to_screen_id": "payment_success_screen",
+                            "on_error_go_to_screen_id": "api_error_screen"
+                        }
+                    },
+                    "payment_success_screen": {
+                        "screen_id": "payment_success_screen",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "✅ Payment Successful!\n\nConfirmation Number: {{payment_response.confirmation_number}}\n\nYour payment to {{selected_payee_name}} has been processed successfully.\n\nWhat would you like to do next?",
+                        "buttons": [
+                            { "label": "💳 Pay Another Bill", "go_to_screen_id": "api_get_payees" },
+                            { "label": "🏠 Main Menu", "go_to_screen_id": "welcome_screen" },
+                            { "label": "✅ Done", "go_to_screen_id": "end_screen" }
+                        ]
+                    },
+                    "api_error_screen": {
+                        "screen_id": "api_error_screen",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "⚠️ We're sorry, we're experiencing technical difficulties. Please try again later or contact customer service.",
+                        "buttons": [
+                            { "label": "🔄 Try Again", "go_to_screen_id": "welcome_screen" },
+                            { "label": "❌ Exit", "go_to_screen_id": "end_screen" }
+                        ]
+                    },
+                    "end_other_service": {
+                        "screen_id": "end_other_service",
+                        "type": "END_SCREEN",
+                        "message_text": "This feature is coming soon. Thank you for using Citi Banking!"
+                    },
+                    "end_screen": {
+                        "screen_id": "end_screen",
+                        "type": "END_SCREEN",
+                        "message_text": "Thank you for using Citi Banking! Have a great day! 😊"
+                    }
+                }
+            };
+
+            loadFlowFromJSON(template);
+            closeModal();
+            showToast('✅ Bill Payment flow loaded successfully!');
+        }
+
+        function loadCreditCardPaymentTemplate() {
+            const template = {
+                "start_screen_id": "welcome_screen",
+                "screens": {
+                    "welcome_screen": {
+                        "screen_id": "welcome_screen",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Welcome to Citi Credit Cards! How can I help you today?",
+                        "buttons": [
+                            { "label": "💳 Make a Payment", "go_to_screen_id": "api_get_credit_cards" },
+                            { "label": "📊 Check Balance", "go_to_screen_id": "end_other_service" },
+                            { "label": "📜 View Statement", "go_to_screen_id": "end_other_service" }
+                        ]
+                    },
+                    "api_get_credit_cards": {
+                        "screen_id": "api_get_credit_cards",
+                        "type": "API_SCREEN",
+                        "api_call": {
+                            "url": "https://api.citi.com/v1/creditcards/list",
+                            "method": "GET",
+                            "save_response_to_variable": "credit_card_list",
+                            "on_success_go_to_screen_id": "select_card_screen",
+                            "on_error_go_to_screen_id": "api_error_screen"
+                        }
+                    },
+                    "select_card_screen": {
+                        "screen_id": "select_card_screen",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Which credit card would you like to make a payment for?",
+                        "dynamic_buttons": {
+                            "source_variable": "credit_card_list.cards",
+                            "label_template": "{{item.card_name}} x{{item.last_four}} - Balance: ${{item.current_balance}}",
+                            "set_variable_on_click": {
+                                "selected_card_name": "{{item.card_name}}",
+                                "selected_card_id": "{{item.card_id}}",
+                                "selected_card_last_four": "{{item.last_four}}",
+                                "selected_card_balance": "{{item.current_balance}}",
+                                "selected_card_min_payment": "{{item.minimum_payment}}",
+                                "selected_card_due_date": "{{item.due_date}}"
+                            },
+                            "go_to_screen_id": "api_get_bank_accounts"
+                        },
+                        "buttons": [
+                            { "label": "⬅️ Back to Main Menu", "go_to_screen_id": "welcome_screen" }
+                        ]
+                    },
+                    "api_get_bank_accounts": {
+                        "screen_id": "api_get_bank_accounts",
+                        "type": "API_SCREEN",
+                        "api_call": {
+                            "url": "https://api.citi.com/v1/accounts/checking",
+                            "method": "GET",
+                            "save_response_to_variable": "bank_accounts",
+                            "on_success_go_to_screen_id": "select_payment_source",
+                            "on_error_go_to_screen_id": "api_error_screen"
+                        }
+                    },
+                    "select_payment_source": {
+                        "screen_id": "select_payment_source",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Select account to pay from:\n\n💳 Credit Card: {{selected_card_name}} x{{selected_card_last_four}}\n💰 Current Balance: ${{selected_card_balance}}\n📅 Due Date: {{selected_card_due_date}}",
+                        "dynamic_buttons": {
+                            "source_variable": "bank_accounts.accounts",
+                            "label_template": "{{item.account_type}} x{{item.last_four}} - ${{item.available_balance}}",
+                            "set_variable_on_click": {
+                                "payment_account_type": "{{item.account_type}}",
+                                "payment_account_last_four": "{{item.last_four}}",
+                                "payment_account_balance": "{{item.available_balance}}"
+                            },
+                            "go_to_screen_id": "choose_payment_amount"
+                        },
+                        "buttons": [
+                            { "label": "⬅️ Back to Cards", "go_to_screen_id": "select_card_screen" }
+                        ]
+                    },
+                    "choose_payment_amount": {
+                        "screen_id": "choose_payment_amount",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "How much would you like to pay?\n\n💳 Card: {{selected_card_name}} x{{selected_card_last_four}}\n💵 Balance: ${{selected_card_balance}}\n📌 Minimum Payment: ${{selected_card_min_payment}}\n📅 Due: {{selected_card_due_date}}\n\n🏦 From: {{payment_account_type}} x{{payment_account_last_four}}",
+                        "buttons": [
+                            { "label": "💵 Minimum Payment (${{selected_card_min_payment}})", "go_to_screen_id": "confirm_min_payment" },
+                            { "label": "💰 Full Balance (${{selected_card_balance}})", "go_to_screen_id": "confirm_full_payment" },
+                            { "label": "✏️ Custom Amount ($500)", "go_to_screen_id": "confirm_custom_payment" },
+                            { "label": "⬅️ Back", "go_to_screen_id": "select_payment_source" }
+                        ]
+                    },
+                    "confirm_min_payment": {
+                        "screen_id": "confirm_min_payment",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Please confirm your payment:\n\n💳 Credit Card: {{selected_card_name}} x{{selected_card_last_four}}\n💰 Payment Amount: ${{selected_card_min_payment}}\n🏦 From: {{payment_account_type}} x{{payment_account_last_four}}\n📅 Due Date: {{selected_card_due_date}}\n\nThis will pay the minimum amount due. Proceed?",
+                        "buttons": [
+                            { "label": "✅ Yes, Pay Minimum", "go_to_screen_id": "api_process_payment_min" },
+                            { "label": "❌ Cancel", "go_to_screen_id": "welcome_screen" }
+                        ]
+                    },
+                    "confirm_full_payment": {
+                        "screen_id": "confirm_full_payment",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Please confirm your payment:\n\n💳 Credit Card: {{selected_card_name}} x{{selected_card_last_four}}\n💰 Payment Amount: ${{selected_card_balance}} (FULL BALANCE)\n🏦 From: {{payment_account_type}} x{{payment_account_last_four}}\n\nThis will pay your full balance. Proceed?",
+                        "buttons": [
+                            { "label": "✅ Yes, Pay Full Balance", "go_to_screen_id": "api_process_payment_full" },
+                            { "label": "❌ Cancel", "go_to_screen_id": "welcome_screen" }
+                        ]
+                    },
+                    "confirm_custom_payment": {
+                        "screen_id": "confirm_custom_payment",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Please confirm your payment:\n\n💳 Credit Card: {{selected_card_name}} x{{selected_card_last_four}}\n💰 Payment Amount: $500.00\n🏦 From: {{payment_account_type}} x{{payment_account_last_four}}\n\nProceed with this payment?",
+                        "buttons": [
+                            { "label": "✅ Yes, Pay $500", "go_to_screen_id": "api_process_payment_custom" },
+                            { "label": "❌ Cancel", "go_to_screen_id": "welcome_screen" }
+                        ]
+                    },
+                    "api_process_payment_min": {
+                        "screen_id": "api_process_payment_min",
+                        "type": "API_SCREEN",
+                        "api_call": {
+                            "url": "https://api.citi.com/v1/creditcards/payment",
+                            "method": "POST",
+                            "save_response_to_variable": "payment_result",
+                            "on_success_go_to_screen_id": "payment_success",
+                            "on_error_go_to_screen_id": "api_error_screen"
+                        }
+                    },
+                    "api_process_payment_full": {
+                        "screen_id": "api_process_payment_full",
+                        "type": "API_SCREEN",
+                        "api_call": {
+                            "url": "https://api.citi.com/v1/creditcards/payment",
+                            "method": "POST",
+                            "save_response_to_variable": "payment_result",
+                            "on_success_go_to_screen_id": "payment_success",
+                            "on_error_go_to_screen_id": "api_error_screen"
+                        }
+                    },
+                    "api_process_payment_custom": {
+                        "screen_id": "api_process_payment_custom",
+                        "type": "API_SCREEN",
+                        "api_call": {
+                            "url": "https://api.citi.com/v1/creditcards/payment",
+                            "method": "POST",
+                            "save_response_to_variable": "payment_result",
+                            "on_success_go_to_screen_id": "payment_success",
+                            "on_error_go_to_screen_id": "api_error_screen"
+                        }
+                    },
+                    "payment_success": {
+                        "screen_id": "payment_success",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "✅ Payment Successful!\n\n🎉 Confirmation: {{payment_result.confirmation_number}}\n\n💳 Card: {{selected_card_name}} x{{selected_card_last_four}}\n✅ Your payment has been processed!\n📅 Posting Date: {{payment_result.posting_date}}\n\nWhat would you like to do next?",
+                        "buttons": [
+                            { "label": "💳 Pay Another Card", "go_to_screen_id": "api_get_credit_cards" },
+                            { "label": "🏠 Main Menu", "go_to_screen_id": "welcome_screen" },
+                            { "label": "✅ Done", "go_to_screen_id": "end_screen" }
+                        ]
+                    },
+                    "api_error_screen": {
+                        "screen_id": "api_error_screen",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "⚠️ We're experiencing technical difficulties. Please try again later or contact customer service at 1-800-CITI-CARD.",
+                        "buttons": [
+                            { "label": "🔄 Try Again", "go_to_screen_id": "welcome_screen" },
+                            { "label": "❌ Exit", "go_to_screen_id": "end_screen" }
+                        ]
+                    },
+                    "end_other_service": {
+                        "screen_id": "end_other_service",
+                        "type": "END_SCREEN",
+                        "message_text": "This feature is coming soon. Thank you for using Citi Credit Cards!"
+                    },
+                    "end_screen": {
+                        "screen_id": "end_screen",
+                        "type": "END_SCREEN",
+                        "message_text": "Thank you for using Citi Credit Cards! Have a great day! 😊"
+                    }
+                }
+            };
+
+            loadFlowFromJSON(template);
+            closeModal();
+            showToast('✅ Credit Card Payment flow loaded successfully!');
+        }
+
+        function loadWelcomeTemplate() {
+            const template = {
+                "start_screen_id": "welcome",
+                "screens": {
+                    "welcome": {
+                        "screen_id": "welcome",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "Hello! Welcome to our service.",
+                        "buttons": [
+                            { "label": "Get Started", "go_to_screen_id": "menu" }
+                        ]
+                    },
+                    "menu": {
+                        "screen_id": "menu",
+                        "type": "MESSAGE_SCREEN",
+                        "message_text": "What would you like to do?",
+                        "buttons": [
+                            { "label": "Option 1", "go_to_screen_id": "end" },
+                            { "label": "Option 2", "go_to_screen_id": "end" }
+                        ]
+                    },
+                    "end": {
+                        "screen_id": "end",
+                        "type": "END_SCREEN",
+                        "message_text": "Thank you for using our service!"
+                    }
+                }
+            };
+
+            loadFlowFromJSON(template);
+            closeModal();
+            showToast('✅ Welcome flow loaded successfully!');
+        }
+
+        function loadFlowFromJSON(flowConfig) {
+            nodes = [];
+            nodeIdCounter = 1;
+            selectedNode = null;
+
+            // Create nodes from screens
+            let yPos = 100;
+            let xPos = 100;
+            
+            // Add start node
+            nodes.push({
+                id: `node_${nodeIdCounter++}`,
+                type: 'START',
+                x: xPos,
+                y: yPos,
+                config: {
+                    screen_id: 'start',
+                    type: 'START',
+                    go_to_screen_id: flowConfig.start_screen_id
+                }
+            });
+
+            xPos += 350;
+
+            // Add screen nodes
+            Object.values(flowConfig.screens).forEach((screen, idx) => {
+                if (idx > 0 && idx % 3 === 0) {
+                    yPos += 200;
+                    xPos = 100;
+                }
+
+                let nodeType = 'MESSAGE';
+                if (screen.type === 'API_SCREEN') nodeType = 'API';
+                else if (screen.type === 'END_SCREEN') nodeType = 'END';
+                else if (screen.type === 'CONDITIONAL_SCREEN') nodeType = 'CONDITIONAL';
+                else if (screen.buttons && screen.buttons.length > 0) nodeType = 'MENU';
+
+                nodes.push({
+                    id: `node_${nodeIdCounter++}`,
+                    type: nodeType,
+                    x: xPos,
+                    y: yPos,
+                    config: screen
+                });
+
+                xPos += 350;
+            });
+
+            renderCanvas();
+            
+            // Start the chat with this flow
+            chatState.flowConfig = flowConfig;
+            resetChat();
+        }
+
+        // Export/Deploy
+        function exportJSON() {
+            const json = generateCitiFlowJSON();
+            const blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'citiflow-config.json';
+            a.click();
+            showToast('✅ JSON configuration exported successfully!');
+        }
+
+        function deployFlow() {
+            const json = generateCitiFlowJSON();
+            
+            // Validate flow has screens
+            if (!json.screens || Object.keys(json.screens).length === 0) {
+                showToast('⚠️ Please add some nodes to your flow first!');
+                return;
+            }
+            
+            if (!json.start_screen_id) {
+                showToast('⚠️ Please set a start screen in your START node!');
+                return;
+            }
+            
+            chatState.flowConfig = json;
+            resetChat();
+            showToast('🚀 Flow deployed! Test it in the chat preview →');
+            
+            // Scroll preview into view if needed
+            const preview = document.querySelector('.preview-panel');
+            if (preview) {
+                preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('successToast');
+            toast.textContent = message;
+            toast.classList.add('active');
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+
+        // ========== CHAT RENDERER ==========
+
+        function resetChat() {
+            chatState.variables = {};
+            chatState.messageHistory = [];
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+            
+            // Hide instructions
+            const instructions = document.getElementById('previewInstructions');
+            if (instructions) {
+                instructions.style.display = 'none';
+            }
+
+            if (chatState.flowConfig && chatState.flowConfig.start_screen_id) {
+                chatState.currentScreenId = chatState.flowConfig.start_screen_id;
+                renderScreen(chatState.currentScreenId);
+            } else {
+                addBotMessage("Please load or deploy a flow to start testing.");
+            }
+        }
+
+        function renderScreen(screenId) {
+            const screen = chatState.flowConfig.screens[screenId];
+            if (!screen) {
+                addBotMessage("Error: Screen not found - " + screenId);
+                return;
+            }
+
+            // Handle different screen types
+            if (screen.type === 'API_SCREEN') {
+                handleAPIScreen(screen);
+            } else if (screen.type === 'CONDITIONAL_SCREEN') {
+                handleConditionalScreen(screen);
+            } else if (screen.type === 'END_SCREEN') {
+                handleEndScreen(screen);
+            } else {
+                handleMessageScreen(screen);
+            }
+        }
+
+        function handleMessageScreen(screen) {
+            // Process message text with variable substitution
+            const message = substituteVariables(screen.message_text);
+            
+            // Show bot message
+            addBotMessage(message);
+
+            // Render buttons
+            const buttons = [];
+
+            // Static buttons
+            if (screen.buttons && screen.buttons.length > 0) {
+                buttons.push(...screen.buttons);
+            }
+
+            // Dynamic buttons
+            if (screen.dynamic_buttons) {
+                const dynamicButtons = generateDynamicButtons(screen.dynamic_buttons);
+                buttons.push(...dynamicButtons);
+            }
+
+            // Show quick replies
+            if (buttons.length > 0) {
+                addQuickReplies(buttons, screen.dynamic_buttons);
+            }
+        }
+
+        function handleAPIScreen(screen) {
+            const apiCall = screen.api_call;
+            
+            // Show loading
+            showLoading();
+
+            // Simulate API call with mock data
+            setTimeout(() => {
+                hideLoading();
+
+                const mockResponse = mockAPIResponses[apiCall.url];
+                if (mockResponse) {
+                    // Save response to variable
+                    if (apiCall.save_response_to_variable) {
+                        chatState.variables[apiCall.save_response_to_variable] = mockResponse;
+                    }
+                    // Go to success screen
+                    if (apiCall.on_success_go_to_screen_id) {
+                        chatState.currentScreenId = apiCall.on_success_go_to_screen_id;
+                        renderScreen(apiCall.on_success_go_to_screen_id);
+                    }
+                } else {
+                    // Go to error screen
+                    if (apiCall.on_error_go_to_screen_id) {
+                        chatState.currentScreenId = apiCall.on_error_go_to_screen_id;
+                        renderScreen(apiCall.on_error_go_to_screen_id);
+                    }
+                }
+            }, 800);
+        }
+
+        function handleConditionalScreen(screen) {
+            const condition = screen.condition;
+            const variable = chatState.variables[condition.variable];
+            let result = false;
+
+            switch (condition.operator) {
+                case 'equals':
+                    result = variable == condition.value;
+                    break;
+                case 'exists':
+                    result = variable !== undefined && variable !== null;
+                    break;
+                case 'greater_than':
+                    result = parseFloat(variable) > parseFloat(condition.value);
+                    break;
+            }
+
+            const nextScreenId = result ? screen.go_to_screen_id : screen.on_false_go_to_screen_id;
+            if (nextScreenId) {
+                chatState.currentScreenId = nextScreenId;
+                renderScreen(nextScreenId);
+            }
+        }
+
+        function handleEndScreen(screen) {
+            if (screen.message_text) {
+                const message = substituteVariables(screen.message_text);
+                addBotMessage(message);
+            }
+            addBotMessage("Conversation ended. Click Reset to start over.");
+        }
+
+        function substituteVariables(text) {
+            if (!text) return '';
+            
+            return text.replace(/\{\{([^}]+)\}\}/g, (match, varPath) => {
+                const value = getNestedValue(chatState.variables, varPath.trim());
+                return value !== undefined ? value : match;
+            });
+        }
+
+        function getNestedValue(obj, path) {
+            return path.split('.').reduce((current, prop) => {
+                return current ? current[prop] : undefined;
+            }, obj);
+        }
+
+        function generateDynamicButtons(dynamicConfig) {
+            const sourceData = getNestedValue(chatState.variables, dynamicConfig.source_variable);
+            if (!Array.isArray(sourceData)) return [];
+
+            return sourceData.map(item => {
+                const label = dynamicConfig.label_template.replace(/\{\{item\.([^}]+)\}\}/g, (match, prop) => {
+                    return item[prop] || match;
+                });
+
+                return {
+                    label: label,
+                    go_to_screen_id: dynamicConfig.go_to_screen_id,
+                    dynamicData: item,
+                    setVariables: dynamicConfig.set_variable_on_click
+                };
+            });
+        }
+
+        function addBotMessage(text) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message message-bot';
+            const timestamp = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            messageDiv.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <div class="message-bubble">
+                        ${text}
+                        <span class="message-time">${timestamp}</span>
+                    </div>
+                </div>
+            `;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function addUserMessage(text) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message message-user';
+            const timestamp = new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="message-bubble">
+                        ${text}
+                        <span class="message-time" style="color: rgba(255,255,255,0.8);">${timestamp}</span>
+                    </div>
+                </div>
+            `;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function addQuickReplies(buttons, dynamicConfig) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const lastMessage = messagesContainer.lastElementChild;
+            
+            const repliesDiv = document.createElement('div');
+            repliesDiv.className = 'quick-replies';
+            repliesDiv.id = 'currentQuickReplies';
+
+            buttons.forEach(btn => {
+                const button = document.createElement('button');
+                button.className = 'quick-reply';
+                button.textContent = btn.label;
+                button.onclick = () => handleQuickReply(btn);
+                repliesDiv.appendChild(button);
+            });
+
+            if (lastMessage) {
+                const contentDiv = lastMessage.querySelector('.message-content');
+                if (contentDiv) {
+                    contentDiv.appendChild(repliesDiv);
+                }
+            }
+        }
+
+        function handleQuickReply(button) {
+            // Remove quick replies
+            const repliesDiv = document.getElementById('currentQuickReplies');
+            if (repliesDiv) {
+                repliesDiv.remove();
+            }
+
+            // Show user's choice
+            addUserMessage(button.label);
+
+            // Handle dynamic button data
+            if (button.dynamicData && button.setVariables) {
+                Object.keys(button.setVariables).forEach(varName => {
+                    const template = button.setVariables[varName];
+                    const value = template.replace(/\{\{item\.([^}]+)\}\}/g, (match, prop) => {
+                        return button.dynamicData[prop] || match;
+                    });
+                    chatState.variables[varName] = value;
+                });
+            }
+
+            // Navigate to next screen
+            if (button.go_to_screen_id) {
+                chatState.currentScreenId = button.go_to_screen_id;
+                setTimeout(() => {
+                    renderScreen(button.go_to_screen_id);
+                }, 500);
+            }
+        }
+
+        function showLoading() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message message-bot';
+            loadingDiv.id = 'loadingMessage';
+            loadingDiv.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">
+                    <div class="chat-loading active">
+                        <div class="typing-indicator">
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                            <span class="typing-dot"></span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            messagesContainer.appendChild(loadingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function hideLoading() {
+            const loading = document.getElementById('loadingMessage');
+            if (loading) {
+                loading.remove();
+            }
+        }
+
+        // Initialize on load
+        window.onload = init;
+    </script>
+</body>
+</html>

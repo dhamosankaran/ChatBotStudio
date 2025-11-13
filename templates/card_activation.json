@@ -1,0 +1,138 @@
+{
+    "start_screen_id": "welcome_activation",
+    "screens": {
+        "welcome_activation": {
+            "screen_id": "welcome_activation",
+            "type": "MESSAGE",
+            "message_text": "💳 Welcome to Card Activation!\n\nTo activate your new Citi card, you'll need:\n• The last 4 digits of your card\n• Your card's expiration date\n• The 3-digit CVV code",
+            "buttons": [
+                { "label": "▶️ Continue", "go_to_screen_id": "enter_card_digits" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "enter_card_digits": {
+            "screen_id": "enter_card_digits",
+            "type": "MESSAGE",
+            "message_text": "Please enter the last 4 digits of your card:",
+            "input": {
+                "type": "text",
+                "variable": "card_last_four"
+            },
+            "go_to_screen_id": "verify_card"
+        },
+        "verify_card": {
+            "screen_id": "verify_card",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards/verify",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "card_found": true,
+                    "card_name": "Citi Double Cash Card",
+                    "card_type": "credit"
+                },
+                "save_response_to": "card_info"
+            },
+            "on_success": "enter_expiry",
+            "on_error": "verification_error"
+        },
+        "enter_expiry": {
+            "screen_id": "enter_expiry",
+            "type": "MESSAGE",
+            "message_text": "Card found: {{card_info.card_name}}\n\nPlease enter your card's expiration date (MM/YY):",
+            "input": {
+                "type": "text",
+                "variable": "expiry_date"
+            },
+            "go_to_screen_id": "enter_cvv"
+        },
+        "enter_cvv": {
+            "screen_id": "enter_cvv",
+            "type": "MESSAGE",
+            "message_text": "Please enter the 3-digit CVV code from the back of your card:",
+            "input": {
+                "type": "text",
+                "variable": "cvv"
+            },
+            "go_to_screen_id": "set_pin"
+        },
+        "set_pin": {
+            "screen_id": "set_pin",
+            "type": "MESSAGE",
+            "message_text": "🔐 Set your 4-digit PIN:\n\nYou'll use this PIN for ATM withdrawals and purchases.",
+            "input": {
+                "type": "password",
+                "variable": "new_pin"
+            },
+            "go_to_screen_id": "confirm_pin"
+        },
+        "confirm_pin": {
+            "screen_id": "confirm_pin",
+            "type": "MESSAGE",
+            "message_text": "Please confirm your 4-digit PIN:",
+            "input": {
+                "type": "password",
+                "variable": "confirm_pin"
+            },
+            "go_to_screen_id": "activate_card"
+        },
+        "activate_card": {
+            "screen_id": "activate_card",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards/activate",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "activation_date": "2025-11-11",
+                    "card_status": "active"
+                }
+            },
+            "on_success": "activation_success",
+            "on_error": "activation_error"
+        },
+        "activation_success": {
+            "screen_id": "activation_success",
+            "type": "MENU",
+            "message_text": "✅ Your card has been activated!\n\nYour {{card_info.card_name}} is now ready to use. You can start making purchases immediately.",
+            "buttons": [
+                { "label": "📱 Add to Digital Wallet", "go_to_screen_id": "add_to_wallet" },
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "add_to_wallet": {
+            "screen_id": "add_to_wallet",
+            "type": "MESSAGE",
+            "message_text": "📲 To add your card to Apple Pay or Google Pay:\n\n1. Open your wallet app\n2. Tap 'Add Card'\n3. Follow the prompts\n\nYour card is ready to be added!",
+            "buttons": [
+                { "label": "✅ Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "verification_error": {
+            "screen_id": "verification_error",
+            "type": "MENU",
+            "message_text": "❌ We couldn't verify your card information. Please check your details and try again.",
+            "buttons": [
+                { "label": "🔄 Try Again", "go_to_screen_id": "enter_card_digits" },
+                { "label": "📞 Contact Support", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "activation_error": {
+            "screen_id": "activation_error",
+            "type": "MENU",
+            "message_text": "❌ We're unable to activate your card at this time. Please try again or contact customer service.",
+            "buttons": [
+                { "label": "🔄 Try Again", "go_to_screen_id": "activate_card" },
+                { "label": "📞 Call Support", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for choosing Citi!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

@@ -1,0 +1,75 @@
+{
+    "start_screen_id": "get_cards",
+    "screens": {
+        "get_cards": {
+            "screen_id": "get_cards",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards",
+                "method": "GET",
+                "mock_file": "mocks/mock_credit_cards.json",
+                "save_response_to": "cards"
+            },
+            "on_success": "select_card",
+            "on_error": "api_error"
+        },
+        "select_card": {
+            "screen_id": "select_card",
+            "type": "MENU",
+            "message_text": "📄 For which card would you like to view statements?",
+            "dynamic_buttons": {
+                "source_variable": "cards.cards",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "fetch_statements",
+                "set_variable": "selected_card"
+            },
+            "buttons": [
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "fetch_statements": {
+            "screen_id": "fetch_statements",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards/{{selected_card.card_id}}/statements",
+                "method": "GET",
+                "mock_file": "mocks/mock_statements.json",
+                "save_response_to": "statement_data"
+            },
+            "on_success": "display_statements",
+            "on_error": "api_error"
+        },
+        "display_statements": {
+            "screen_id": "display_statements",
+            "type": "MENU",
+            "message_text": "Here are the available statements for your {{selected_card.name}}:",
+            "dynamic_buttons": {
+                "source_variable": "statement_data.statements",
+                "label_template": "View {{period}} Statement",
+                "go_to_screen_id": "statement_action",
+                "set_variable": "selected_statement"
+            },
+             "buttons": [
+                { "label": "⬅️ Back", "go_to_screen_id": "select_card" }
+            ]
+        },
+        "statement_action": {
+            "screen_id": "statement_action",
+            "type": "MESSAGE",
+            "message_text": "Your statement for {{selected_statement.period}} is available for download at the following link: [Download Statement]({{selected_statement.url}})",
+             "go_to_screen_id": "end_flow"
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to retrieve data at this time. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Is there anything else I can help with?",
+            "go_to_screen_id": null
+        }
+    }
+}

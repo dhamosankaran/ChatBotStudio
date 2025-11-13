@@ -1,0 +1,104 @@
+{
+    "start_screen_id": "get_cards",
+    "screens": {
+        "get_cards": {
+            "screen_id": "get_cards",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards",
+                "method": "GET",
+                "mock_file": "mocks/mock_credit_cards.json",
+                "save_response_to": "cards"
+            },
+            "on_success": "select_card",
+            "on_error": "api_error"
+        },
+        "select_card": {
+            "screen_id": "select_card",
+            "type": "MENU",
+            "message_text": "For which card would you like to see recent transactions?",
+            "dynamic_buttons": {
+                "source_variable": "cards.cards",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "fetch_transactions",
+                "set_variable": "selected_card"
+            },
+            "buttons": [
+                { "label": "Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "fetch_transactions": {
+            "screen_id": "fetch_transactions",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards/{{selected_card.card_id}}/transactions",
+                "method": "GET",
+                "mock_file": "mocks/mock_recent_transactions.json",
+                "save_response_to": "transaction_data"
+            },
+            "on_success": "display_transactions",
+            "on_error": "api_error"
+        },
+        "display_transactions": {
+            "screen_id": "display_transactions",
+            "type": "MENU",
+            "message_text": "**Recent Transactions** - {{selected_card.name}}\n\n**Nov 10, 2025**\nAmazon Purchase\n$75.50 • Posted\n\n**Nov 09, 2025**\nStarbucks\n$5.25 • Posted\n\n**Nov 09, 2025**\nShell Gas Station\n$45.30 • Pending\n\n**Nov 08, 2025**\nNetflix Subscription\n$15.99 • Posted\n\n**Nov 07, 2025**\nWhole Foods Market\n$120.15 • Posted",
+            "buttons": [
+                { "label": "Load More Transactions", "go_to_screen_id": "load_more_info" },
+                { "label": "Dispute a Transaction", "go_to_screen_id": "dispute_info" },
+                { "label": "Email Transaction List", "go_to_screen_id": "email_transactions" },
+                { "label": "Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "load_more_info": {
+            "screen_id": "load_more_info",
+            "type": "MENU",
+            "message_text": "To view more transactions beyond the recent 5:\n\n**Mobile App:**\nCiti Mobile → Your Card → Recent Activity → View All\n\n**Online:**\nciti.com → Account Summary → Transaction History\n\n**Download:**\nYou can also download statements with complete transaction history.\n\nWould you like help with anything else?",
+            "buttons": [
+                { "label": "Download Statement", "go_to_screen_id": "statement_info" },
+                { "label": "Set Up Transaction Alerts", "go_to_screen_id": "alerts_info" },
+                { "label": "Back to Transactions", "go_to_screen_id": "display_transactions" },
+                { "label": "Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "statement_info": {
+            "screen_id": "statement_info",
+            "type": "MESSAGE",
+            "message_text": "**Download Card Statements**\n\nYou can download detailed statements with all transactions:\n\n**Mobile App:**\nCiti Mobile → Documents → Statements\n\n**Online:**\nciti.com → Statements & Documents\n\nStatements include:\n• Complete transaction history\n• Interest charges and fees\n• Payment history\n• Rewards earned\n\nStatements are available for the past 7 years.",
+            "go_to_screen_id": "end_flow"
+        },
+        "alerts_info": {
+            "screen_id": "alerts_info",
+            "type": "MESSAGE",
+            "message_text": "**Set Up Transaction Alerts**\n\nGet instant notifications for:\n• Every transaction (any amount)\n• Large purchases (you set the limit)\n• Online/international transactions\n• Recurring charges\n\n**To set up:**\n\n**Mobile App:**\nCiti Mobile → Settings → Alerts & Notifications\n\n**Online:**\nciti.com → Profile → Alert Settings\n\nAlerts help you detect fraud immediately and stay on budget!",
+            "go_to_screen_id": "end_flow"
+        },
+        "dispute_info": {
+            "screen_id": "dispute_info",
+            "type": "MESSAGE",
+            "message_text": "**Dispute a Transaction**\n\nI can help you dispute unauthorized or incorrect charges.\n\nFor the best experience, I recommend using our dedicated Dispute Flow which will:\n• Guide you through the dispute process\n• Help you provide all necessary details\n• Submit your dispute immediately\n• Provide temporary credit options\n\nWould you like to proceed with the dispute process?",
+            "buttons": [
+                { "label": "Start Dispute Process", "go_to_screen_id": "end_flow" },
+                { "label": "Back to Transactions", "go_to_screen_id": "display_transactions" }
+            ]
+        },
+        "email_transactions": {
+            "screen_id": "email_transactions",
+            "type": "MESSAGE",
+            "message_text": "**Transaction List Sent**\n\nYour recent transactions have been emailed to your address on file.\n\nThe email includes:\n• All recent transactions (last 30 days)\n• Transaction details and dates\n• Pending vs. posted status\n• Current balance summary\n\nYou should receive it within a few minutes. Check your spam folder if you don't see it right away.",
+            "go_to_screen_id": "end_flow"
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "Unable to retrieve data at this time. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Is there anything else I can help with?",
+            "go_to_screen_id": null
+        }
+    }
+}

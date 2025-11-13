@@ -1,0 +1,45 @@
+{
+    "start_screen_id": "api_get_accounts",
+    "screens": {
+        "api_get_accounts": {
+            "screen_id": "api_get_accounts",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/accounts",
+                "method": "GET",
+                "save_response_to": "accounts"
+            },
+            "on_success": "screen_select_account",
+            "on_error": "api_error_screen"
+        },
+        "screen_select_account": {
+            "screen_id": "screen_select_account",
+            "type": "MENU",
+            "message_text": "Please select an account to check the balance:",
+            "dynamic_buttons": {
+                "source_variable": "accounts.accounts",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "screen_show_balance",
+                "set_variable": "selected_account"
+            },
+            "buttons": [
+                { "label": "❌ Cancel", "go_to_screen_id": "welcome_screen" }
+            ]
+        },
+        "screen_show_balance": {
+            "screen_id": "screen_show_balance",
+            "type": "MESSAGE",
+            "message_text": "The balance for your {{selected_account.name}} (...{{selected_account.last_four}}) account is ${{selected_account.balance}}.",
+            "buttons": [
+                { "label": "⬅️ Check Another Account", "go_to_screen_id": "screen_select_account" },
+                { "label": "🏠 Main Menu", "go_to_screen_id": "welcome_screen" }
+            ]
+        },
+        "api_error_screen": {
+            "screen_id": "api_error_screen",
+            "type": "MESSAGE",
+            "message_text": "I'm sorry, we couldn't retrieve your account information. Please try again later.",
+            "go_to_screen_id": "welcome_screen"
+        }
+    }
+}

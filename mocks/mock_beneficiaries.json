@@ -1,0 +1,55 @@
+{
+  "status": "success",
+  "beneficiaries": [
+    {
+      "beneficiary_id": "ben_847293561",
+      "name": "Electric Company",
+      "nickname": "Power Bill",
+      "account_number": "****7392",
+      "type": "bill_payment",
+      "category": "utilities",
+      "last_payment_amount": 142.58,
+      "last_payment_date": "2025-10-15",
+      "autopay_enabled": true,
+      "status": "active"
+    },
+    {
+      "beneficiary_id": "ben_928374651",
+      "name": "John Smith",
+      "nickname": "Brother John",
+      "account_number": "****4521",
+      "routing_number": "026009593",
+      "type": "person",
+      "category": "family",
+      "last_payment_amount": 500.00,
+      "last_payment_date": "2025-09-01",
+      "autopay_enabled": false,
+      "status": "active"
+    },
+    {
+      "beneficiary_id": "ben_564738291",
+      "name": "City Water Department",
+      "nickname": "Water Bill",
+      "account_number": "****2847",
+      "type": "bill_payment",
+      "category": "utilities",
+      "last_payment_amount": 68.92,
+      "last_payment_date": "2025-10-20",
+      "autopay_enabled": false,
+      "status": "active"
+    },
+    {
+      "beneficiary_id": "ben_374829156",
+      "name": "Verizon Wireless",
+      "nickname": "Phone Bill",
+      "account_number": "****8934",
+      "type": "bill_payment",
+      "category": "telecommunications",
+      "last_payment_amount": 89.99,
+      "last_payment_date": "2025-11-01",
+      "autopay_enabled": true,
+      "status": "active"
+    }
+  ]
+}
+

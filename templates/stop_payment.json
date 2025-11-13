@@ -1,0 +1,163 @@
+{
+    "start_screen_id": "welcome_stop_payment",
+    "screens": {
+        "welcome_stop_payment": {
+            "screen_id": "welcome_stop_payment",
+            "type": "MESSAGE",
+            "message_text": "🛑 Stop Payment Request\n\nStop payment on a check you've written.\n\n⚠️ Important:\n• Fee: $30 per request\n• Valid for 6 months\n• Cannot stop electronic payments\n• Check must not have cleared yet",
+            "buttons": [
+                { "label": "▶️ Continue", "go_to_screen_id": "get_accounts" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "get_accounts": {
+            "screen_id": "get_accounts",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/accounts",
+                "method": "GET",
+                "mock_file": "mocks/mock_accounts.json",
+                "save_response_to": "accounts"
+            },
+            "on_success": "select_account",
+            "on_error": "api_error"
+        },
+        "select_account": {
+            "screen_id": "select_account",
+            "type": "MENU",
+            "message_text": "Which account is the check written from?",
+            "dynamic_buttons": {
+                "source_variable": "accounts.accounts",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "enter_check_number",
+                "set_variable": "selected_account"
+            },
+            "buttons": [
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "enter_check_number": {
+            "screen_id": "enter_check_number",
+            "type": "MESSAGE",
+            "message_text": "📝 Enter the check number:\n\n(Found in the upper right corner of your check)",
+            "input": {
+                "type": "text",
+                "variable": "check_number"
+            },
+            "go_to_screen_id": "enter_check_amount"
+        },
+        "enter_check_amount": {
+            "screen_id": "enter_check_amount",
+            "type": "MESSAGE",
+            "message_text": "💵 Enter the exact check amount:\n\n(Include cents, e.g., 125.50)",
+            "input": {
+                "type": "text",
+                "variable": "check_amount"
+            },
+            "go_to_screen_id": "enter_payee"
+        },
+        "enter_payee": {
+            "screen_id": "enter_payee",
+            "type": "MESSAGE",
+            "message_text": "👤 Who was the check made payable to?\n\n(Enter the payee name exactly as written)",
+            "input": {
+                "type": "text",
+                "variable": "payee_name"
+            },
+            "go_to_screen_id": "enter_date_written"
+        },
+        "enter_date_written": {
+            "screen_id": "enter_date_written",
+            "type": "MESSAGE",
+            "message_text": "📅 When was the check written?\n\n(MM/DD/YYYY format)",
+            "input": {
+                "type": "text",
+                "variable": "check_date"
+            },
+            "go_to_screen_id": "enter_reason"
+        },
+        "enter_reason": {
+            "screen_id": "enter_reason",
+            "type": "MENU",
+            "message_text": "Why are you requesting a stop payment?",
+            "buttons": [
+                { "label": "❌ Check was lost", "go_to_screen_id": "review_stop_payment", "set_variable": "stop_reason", "set_value": "lost" },
+                { "label": "🚨 Check was stolen", "go_to_screen_id": "review_stop_payment", "set_variable": "stop_reason", "set_value": "stolen" },
+                { "label": "🔄 Duplicate check", "go_to_screen_id": "review_stop_payment", "set_variable": "stop_reason", "set_value": "duplicate" },
+                { "label": "📝 Error in amount", "go_to_screen_id": "review_stop_payment", "set_variable": "stop_reason", "set_value": "error" },
+                { "label": "💼 Dispute with payee", "go_to_screen_id": "review_stop_payment", "set_variable": "stop_reason", "set_value": "dispute" },
+                { "label": "📋 Other reason", "go_to_screen_id": "enter_other_reason" }
+            ]
+        },
+        "enter_other_reason": {
+            "screen_id": "enter_other_reason",
+            "type": "MESSAGE",
+            "message_text": "Please describe the reason for the stop payment:",
+            "input": {
+                "type": "text",
+                "variable": "other_reason"
+            },
+            "go_to_screen_id": "review_stop_payment"
+        },
+        "review_stop_payment": {
+            "screen_id": "review_stop_payment",
+            "type": "MENU",
+            "message_text": "Review Stop Payment Request:\n\nAccount: {{selected_account.name}} (...{{selected_account.last_four}})\nCheck Number: {{check_number}}\nAmount: ${{check_amount}}\nPayee: {{payee_name}}\nDate: {{check_date}}\nReason: {{stop_reason}}\n\nStop Payment Fee: $30\nValid for: 6 months",
+            "buttons": [
+                { "label": "✅ Submit Request", "go_to_screen_id": "process_stop_payment" },
+                { "label": "📝 Edit Details", "go_to_screen_id": "enter_check_number" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "process_stop_payment": {
+            "screen_id": "process_stop_payment",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/stop-payment",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "stop_payment_id": "STOP_8473920156",
+                    "confirmation_number": "CONF847392",
+                    "effective_date": "2025-11-11",
+                    "expiration_date": "2026-05-11"
+                }
+            },
+            "on_success": "stop_payment_success",
+            "on_error": "stop_payment_error"
+        },
+        "stop_payment_success": {
+            "screen_id": "stop_payment_success",
+            "type": "MESSAGE",
+            "message_text": "✅ Stop Payment Placed!\n\nConfirmation #: CONF847392\n\nCheck #{{check_number}} for ${{check_amount}} to {{payee_name}} will not be honored if presented.\n\n📅 Effective: Today\n📅 Expires: May 11, 2026\n💵 Fee: $30 (debited from your account)\n\n⚠️ If the check has already cleared, the stop payment cannot be processed and you'll be refunded the fee.",
+            "buttons": [
+                { "label": "📧 Email Confirmation", "go_to_screen_id": "end_flow" },
+                { "label": "🔄 Stop Another Check", "go_to_screen_id": "welcome_stop_payment" },
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "stop_payment_error": {
+            "screen_id": "stop_payment_error",
+            "type": "MENU",
+            "message_text": "❌ Unable to Process Stop Payment\n\nYour request could not be processed. Possible reasons:\n\n• Check has already cleared\n• Insufficient funds for the fee\n• Check number not found\n• Account restrictions",
+            "buttons": [
+                { "label": "🔄 Try Again", "go_to_screen_id": "review_stop_payment" },
+                { "label": "📞 Call Customer Service", "go_to_screen_id": "end_flow" },
+                { "label": "🏠 Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to retrieve your accounts. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for banking with Citi!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

@@ -1,0 +1,202 @@
+{
+    "start_screen_id": "select_statement_type",
+    "screens": {
+        "select_statement_type": {
+            "screen_id": "select_statement_type",
+            "type": "MENU",
+            "message_text": "📄 Statements & Documents\n\nWhat would you like to view or download?",
+            "buttons": [
+                { "label": "💳 Account Statements", "go_to_screen_id": "get_accounts", "set_variable": "statement_type", "set_value": "account" },
+                { "label": "💰 Tax Documents", "go_to_screen_id": "show_tax_documents", "set_variable": "statement_type", "set_value": "tax" },
+                { "label": "📋 Trade Confirmations", "go_to_screen_id": "show_trade_confirmations", "set_variable": "statement_type", "set_value": "trade" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "get_accounts": {
+            "screen_id": "get_accounts",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/accounts",
+                "method": "GET",
+                "mock_file": "mocks/mock_accounts.json",
+                "save_response_to": "accounts"
+            },
+            "on_success": "select_account",
+            "on_error": "api_error"
+        },
+        "select_account": {
+            "screen_id": "select_account",
+            "type": "MENU",
+            "message_text": "Select an account to view statements:",
+            "dynamic_buttons": {
+                "source_variable": "accounts.accounts",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "select_date_range",
+                "set_variable": "selected_account"
+            },
+            "buttons": [
+                { "label": "⬅️ Back", "go_to_screen_id": "select_statement_type" }
+            ]
+        },
+        "select_date_range": {
+            "screen_id": "select_date_range",
+            "type": "MENU",
+            "message_text": "📅 Select Statement Period:\n\nAccount: {{selected_account.name}}",
+            "buttons": [
+                { "label": "📄 November 2025", "go_to_screen_id": "show_statement_list", "set_variable": "statement_period", "set_value": "2025-11" },
+                { "label": "📄 October 2025", "go_to_screen_id": "show_statement_list", "set_variable": "statement_period", "set_value": "2025-10" },
+                { "label": "📄 September 2025", "go_to_screen_id": "show_statement_list", "set_variable": "statement_period", "set_value": "2025-09" },
+                { "label": "📄 August 2025", "go_to_screen_id": "show_statement_list", "set_variable": "statement_period", "set_value": "2025-08" },
+                { "label": "📅 Custom Date Range", "go_to_screen_id": "enter_custom_range" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_account" }
+            ]
+        },
+        "enter_custom_range": {
+            "screen_id": "enter_custom_range",
+            "type": "MESSAGE",
+            "message_text": "Enter start date (MM/DD/YYYY):",
+            "input": {
+                "type": "text",
+                "variable": "start_date"
+            },
+            "go_to_screen_id": "enter_end_date"
+        },
+        "enter_end_date": {
+            "screen_id": "enter_end_date",
+            "type": "MESSAGE",
+            "message_text": "Enter end date (MM/DD/YYYY):",
+            "input": {
+                "type": "text",
+                "variable": "end_date"
+            },
+            "go_to_screen_id": "show_statement_list"
+        },
+        "show_statement_list": {
+            "screen_id": "show_statement_list",
+            "type": "MENU",
+            "message_text": "📋 Available Statements:\n\n{{selected_account.name}} - {{statement_period}}\n\n📄 Statement (PDF) - 245 KB\n📊 Activity Summary - 128 KB\n🧾 Transaction Details - 89 KB",
+            "buttons": [
+                { "label": "📥 Download Statement PDF", "go_to_screen_id": "download_statement" },
+                { "label": "📧 Email Statement", "go_to_screen_id": "email_statement" },
+                { "label": "👁️ View Online", "go_to_screen_id": "view_statement" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_date_range" }
+            ]
+        },
+        "download_statement": {
+            "screen_id": "download_statement",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/statements/download",
+                "method": "GET",
+                "mock_response": {
+                    "status": "success",
+                    "download_url": "https://secure.citi.com/statements/download/8473920156",
+                    "file_name": "Citi_Statement_Nov2025.pdf",
+                    "file_size": "245 KB"
+                }
+            },
+            "on_success": "download_success",
+            "on_error": "download_error"
+        },
+        "download_success": {
+            "screen_id": "download_success",
+            "type": "MESSAGE",
+            "message_text": "✅ Download Ready!\n\nFile: Citi_Statement_Nov2025.pdf\nSize: 245 KB\n\n📥 Your statement is being downloaded.\n\n💡 Tip: Statements are available for the past 7 years.",
+            "buttons": [
+                { "label": "📥 Download Another", "go_to_screen_id": "select_date_range" },
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "email_statement": {
+            "screen_id": "email_statement",
+            "type": "MESSAGE",
+            "message_text": "📧 Email Statement\n\nEnter email address:\n\n(Statement will be sent as a secure PDF attachment)",
+            "input": {
+                "type": "text",
+                "variable": "email_address"
+            },
+            "go_to_screen_id": "send_email"
+        },
+        "send_email": {
+            "screen_id": "send_email",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/statements/email",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "sent_to": "user@example.com"
+                }
+            },
+            "on_success": "email_sent",
+            "on_error": "email_error"
+        },
+        "email_sent": {
+            "screen_id": "email_sent",
+            "type": "MESSAGE",
+            "message_text": "✅ Statement Emailed!\n\nSent to: {{email_address}}\n\n📧 Please allow a few minutes for delivery. Check your spam folder if you don't see it.",
+            "buttons": [
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "view_statement": {
+            "screen_id": "view_statement",
+            "type": "MESSAGE",
+            "message_text": "👁️ Viewing Statement Online\n\n[Statement viewer would open here]\n\nYour statement for {{statement_period}} is being displayed.",
+            "buttons": [
+                { "label": "📥 Download This Statement", "go_to_screen_id": "download_statement" },
+                { "label": "⬅️ Back", "go_to_screen_id": "show_statement_list" }
+            ]
+        },
+        "show_tax_documents": {
+            "screen_id": "show_tax_documents",
+            "type": "MENU",
+            "message_text": "💰 Tax Documents\n\nAvailable documents for 2025:\n\n📄 1099-INT (Interest Income)\n📄 1099-DIV (Dividend Income)\n📄 1098 (Mortgage Interest)",
+            "buttons": [
+                { "label": "📥 Download All", "go_to_screen_id": "download_success" },
+                { "label": "📧 Email All", "go_to_screen_id": "email_statement" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_statement_type" }
+            ]
+        },
+        "show_trade_confirmations": {
+            "screen_id": "show_trade_confirmations",
+            "type": "MESSAGE",
+            "message_text": "📋 Trade Confirmations\n\nRecent trade confirmations:\n\n• Nov 10, 2025 - Stock Purchase\n• Nov 05, 2025 - Bond Sale\n• Oct 28, 2025 - Mutual Fund",
+            "buttons": [
+                { "label": "📥 Download All", "go_to_screen_id": "download_success" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_statement_type" }
+            ]
+        },
+        "download_error": {
+            "screen_id": "download_error",
+            "type": "MENU",
+            "message_text": "❌ Download Failed\n\nUnable to download statement. Please try again or contact support.",
+            "buttons": [
+                { "label": "🔄 Try Again", "go_to_screen_id": "download_statement" },
+                { "label": "📞 Contact Support", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "email_error": {
+            "screen_id": "email_error",
+            "type": "MENU",
+            "message_text": "❌ Email Failed\n\nUnable to send statement. Please verify the email address and try again.",
+            "buttons": [
+                { "label": "🔄 Try Again", "go_to_screen_id": "email_statement" },
+                { "label": "🏠 Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to retrieve information. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for banking with Citi!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Import JSON</title>
+</head>
+<body>
+    <h1>Test Import JSON Button</h1>
+    <button id="testImportBtn">📁 Test Import JSON</button>
+
+    <script>
+        // Test function
+        function importJSON() {
+            console.log('📁 Import JSON function called!');
+            alert('Import JSON function called successfully!');
+        }
+
+        // Test event listener setup
+        window.onload = function() {
+            console.log('Page loaded, setting up listeners...');
+            const btn = document.getElementById('testImportBtn');
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    console.log('Button clicked!');
+                    importJSON();
+                });
+                console.log('Event listener attached');
+            } else {
+                console.log('Button not found');
+            }
+        };
+    </script>
+</body>
+</html>

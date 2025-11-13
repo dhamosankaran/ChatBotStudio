@@ -1,0 +1,72 @@
+{
+    "start_screen_id": "get_cards",
+    "screens": {
+        "get_cards": {
+            "screen_id": "get_cards",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards",
+                "method": "GET",
+                "mock_file": "mocks/mock_credit_cards.json",
+                "save_response_to": "cards"
+            },
+            "on_success": "select_card",
+            "on_error": "api_error"
+        },
+        "select_card": {
+            "screen_id": "select_card",
+            "type": "MENU",
+            "message_text": "For which card would you like to check the balance?",
+            "dynamic_buttons": {
+                "source_variable": "cards.cards",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "display_balance",
+                "set_variable": "selected_card"
+            },
+            "buttons": [
+                { "label": "Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "display_balance": {
+            "screen_id": "display_balance",
+            "type": "MENU",
+            "message_text": "Here's your {{selected_card.name}} balance:\n\n**Current Balance:** ${{selected_card.balance}}\n**Available Credit:** ${{selected_card.available_credit}}\n**Minimum Payment:** ${{selected_card.minimum_payment}}\n**Due Date:** {{selected_card.payment_due_date}}\n\nWould you like to take any action?",
+            "buttons": [
+                { "label": "Make a payment", "go_to_screen_id": "payment_info" },
+                { "label": "View recent transactions", "go_to_screen_id": "transactions_info" },
+                { "label": "Set up AutoPay", "go_to_screen_id": "autopay_info" },
+                { "label": "Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "payment_info": {
+            "screen_id": "payment_info",
+            "type": "MESSAGE",
+            "message_text": "To make a payment on your {{selected_card.name}}:\n\n**Online:** Log into citi.com or use the Citi Mobile app\n**Phone:** Call 1-800-950-5114\n**Mail:** Send check to the address on your statement\n\n**Quick Payment Options:**\n• Pay minimum: ${{selected_card.minimum_payment}}\n• Pay full balance: ${{selected_card.balance}}\n• Pay custom amount\n\nPayments made before 8 PM ET are processed the same day.",
+            "go_to_screen_id": "end_flow"
+        },
+        "transactions_info": {
+            "screen_id": "transactions_info",
+            "type": "MESSAGE",
+            "message_text": "To view your recent transactions:\n\n**Mobile App:** Citi Mobile → Your Card → Recent Activity\n**Online:** citi.com → Account Summary → Transaction History\n**Chat:** I can show you recent transactions - just ask!\n\nYou can also set up account alerts to get notified of all transactions in real-time.",
+            "go_to_screen_id": "end_flow"
+        },
+        "autopay_info": {
+            "screen_id": "autopay_info",
+            "type": "MESSAGE",
+            "message_text": "AutoPay ensures you never miss a payment! You can set up:\n\n• **Minimum payment** - Never pay late fees\n• **Full balance** - Never pay interest\n• **Fixed amount** - Pay the same amount each month\n\n**To set up:** Citi Mobile App → Payments → AutoPay\n**Or online:** citi.com → Payments → Set Up AutoPay\n\nAutoPay can be cancelled anytime with no fees.",
+            "go_to_screen_id": "end_flow"
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "Unable to retrieve your cards at this time. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Is there anything else I can help with?",
+            "go_to_screen_id": null
+        }
+    }
+}

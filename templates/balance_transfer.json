@@ -1,0 +1,118 @@
+{
+    "start_screen_id": "get_cards",
+    "screens": {
+        "get_cards": {
+            "screen_id": "get_cards",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards",
+                "method": "GET",
+                "mock_file": "mocks/mock_credit_cards.json",
+                "save_response_to": "cards"
+            },
+            "on_success": "select_destination_card",
+            "on_error": "api_error"
+        },
+        "select_destination_card": {
+            "screen_id": "select_destination_card",
+            "type": "MENU",
+            "message_text": "🔄 Balance Transfer\n\nWhich Citi card would you like to transfer a balance TO?",
+            "dynamic_buttons": {
+                "source_variable": "cards.cards",
+                "label_template": "{{name}} (...{{last_four}}) - Available: ${{available_credit}}",
+                "go_to_screen_id": "enter_source_card",
+                "set_variable": "destination_card"
+            },
+            "buttons": [
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "enter_source_card": {
+            "screen_id": "enter_source_card",
+            "type": "MESSAGE",
+            "message_text": "Enter the card number you want to transfer FROM:\n\n(Enter the full 16-digit card number)",
+            "input": {
+                "type": "text",
+                "variable": "source_card_number"
+            },
+            "go_to_screen_id": "enter_transfer_amount"
+        },
+        "enter_transfer_amount": {
+            "screen_id": "enter_transfer_amount",
+            "type": "MESSAGE",
+            "message_text": "💰 How much would you like to transfer?\n\nAvailable credit on your {{destination_card.name}}: ${{destination_card.available_credit}}",
+            "input": {
+                "type": "text",
+                "variable": "transfer_amount"
+            },
+            "go_to_screen_id": "show_fees"
+        },
+        "show_fees": {
+            "screen_id": "show_fees",
+            "type": "MENU",
+            "message_text": "📋 Balance Transfer Summary:\n\nTransfer Amount: ${{transfer_amount}}\nTransfer Fee (3%): ${{transfer_amount * 0.03}}\nTotal: ${{transfer_amount * 1.03}}\n\n✨ Special Offer: 0% APR for 12 months\nAfter promotional period: {{destination_card.apr}}% APR",
+            "buttons": [
+                { "label": "▶️ Continue", "go_to_screen_id": "confirm_transfer" },
+                { "label": "📝 Change Amount", "go_to_screen_id": "enter_transfer_amount" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "confirm_transfer": {
+            "screen_id": "confirm_transfer",
+            "type": "MENU",
+            "message_text": "⚠️ Important Information:\n\n• Balance transfers may take 7-14 days to process\n• Continue making payments on your other card until the transfer is complete\n• You'll receive a confirmation email once processed\n\nReady to proceed?",
+            "buttons": [
+                { "label": "✅ Confirm Transfer", "go_to_screen_id": "process_transfer" },
+                { "label": "⬅️ Back", "go_to_screen_id": "show_fees" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "process_transfer": {
+            "screen_id": "process_transfer",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/balance-transfer",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "transfer_id": "BT_9283746510",
+                    "confirmation_number": "CONF847392",
+                    "estimated_completion": "2025-11-25"
+                }
+            },
+            "on_success": "transfer_success",
+            "on_error": "transfer_error"
+        },
+        "transfer_success": {
+            "screen_id": "transfer_success",
+            "type": "MESSAGE",
+            "message_text": "✅ Balance Transfer Initiated!\n\nConfirmation #: CONF847392\n\nYour balance transfer of ${{transfer_amount}} has been submitted. You'll receive an email confirmation shortly.\n\nExpected completion: 7-14 business days",
+            "buttons": [
+                { "label": "📧 Email Confirmation", "go_to_screen_id": "end_flow" },
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "transfer_error": {
+            "screen_id": "transfer_error",
+            "type": "MENU",
+            "message_text": "❌ Unable to Process Transfer\n\nYour balance transfer could not be processed. This may be due to:\n• Insufficient available credit\n• Invalid source card information\n• System error",
+            "buttons": [
+                { "label": "🔄 Try Again", "go_to_screen_id": "enter_source_card" },
+                { "label": "📞 Contact Support", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to retrieve your cards. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for banking with Citi!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

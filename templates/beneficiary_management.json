@@ -1,0 +1,263 @@
+{
+    "start_screen_id": "beneficiary_menu",
+    "screens": {
+        "beneficiary_menu": {
+            "screen_id": "beneficiary_menu",
+            "type": "MENU",
+            "message_text": "👥 Manage Beneficiaries\n\nBeneficiaries are people or companies you frequently send money to.\n\nWhat would you like to do?",
+            "buttons": [
+                { "label": "👁️ View Beneficiaries", "go_to_screen_id": "get_beneficiaries" },
+                { "label": "➕ Add New Beneficiary", "go_to_screen_id": "select_beneficiary_type" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "get_beneficiaries": {
+            "screen_id": "get_beneficiaries",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/beneficiaries",
+                "method": "GET",
+                "mock_file": "mocks/mock_beneficiaries.json",
+                "save_response_to": "beneficiaries"
+            },
+            "on_success": "show_beneficiaries",
+            "on_error": "api_error"
+        },
+        "show_beneficiaries": {
+            "screen_id": "show_beneficiaries",
+            "type": "MENU",
+            "message_text": "👥 Your Beneficiaries:\n\nSelect a beneficiary to view or edit:",
+            "dynamic_buttons": {
+                "source_variable": "beneficiaries.beneficiaries",
+                "label_template": "{{nickname}} - {{name}}",
+                "go_to_screen_id": "view_beneficiary_details",
+                "set_variable": "selected_beneficiary"
+            },
+            "buttons": [
+                { "label": "➕ Add New", "go_to_screen_id": "select_beneficiary_type" },
+                { "label": "⬅️ Back", "go_to_screen_id": "beneficiary_menu" }
+            ]
+        },
+        "view_beneficiary_details": {
+            "screen_id": "view_beneficiary_details",
+            "type": "MENU",
+            "message_text": "📋 Beneficiary Details:\n\nNickname: {{selected_beneficiary.nickname}}\nName: {{selected_beneficiary.name}}\nType: {{selected_beneficiary.type}}\nAccount: {{selected_beneficiary.account_number}}\nLast Payment: ${{selected_beneficiary.last_payment_amount}} on {{selected_beneficiary.last_payment_date}}\nAutoPay: {{selected_beneficiary.autopay_enabled ? 'Enabled' : 'Disabled'}}",
+            "buttons": [
+                { "label": "✏️ Edit Beneficiary", "go_to_screen_id": "edit_beneficiary" },
+                { "label": "🗑️ Delete Beneficiary", "go_to_screen_id": "confirm_delete" },
+                { "label": "💸 Make Payment", "go_to_screen_id": "end_flow" },
+                { "label": "⬅️ Back", "go_to_screen_id": "show_beneficiaries" }
+            ]
+        },
+        "select_beneficiary_type": {
+            "screen_id": "select_beneficiary_type",
+            "type": "MENU",
+            "message_text": "➕ Add New Beneficiary\n\nWhat type of beneficiary are you adding?",
+            "buttons": [
+                { "label": "👤 Person (Friend/Family)", "go_to_screen_id": "enter_person_name", "set_variable": "beneficiary_type", "set_value": "person" },
+                { "label": "💼 Company/Business", "go_to_screen_id": "enter_company_name", "set_variable": "beneficiary_type", "set_value": "company" },
+                { "label": "📄 Bill Payee", "go_to_screen_id": "enter_payee_name", "set_variable": "beneficiary_type", "set_value": "bill_payment" },
+                { "label": "⬅️ Back", "go_to_screen_id": "beneficiary_menu" }
+            ]
+        },
+        "enter_person_name": {
+            "screen_id": "enter_person_name",
+            "type": "MESSAGE",
+            "message_text": "👤 Enter person's full name:\n\n(Exactly as it appears on their account)",
+            "input": {
+                "type": "text",
+                "variable": "beneficiary_name"
+            },
+            "go_to_screen_id": "enter_nickname"
+        },
+        "enter_company_name": {
+            "screen_id": "enter_company_name",
+            "type": "MESSAGE",
+            "message_text": "💼 Enter company name:",
+            "input": {
+                "type": "text",
+                "variable": "beneficiary_name"
+            },
+            "go_to_screen_id": "enter_nickname"
+        },
+        "enter_payee_name": {
+            "screen_id": "enter_payee_name",
+            "type": "MESSAGE",
+            "message_text": "📄 Enter bill payee name:\n\n(e.g., Electric Company, Internet Provider)",
+            "input": {
+                "type": "text",
+                "variable": "beneficiary_name"
+            },
+            "go_to_screen_id": "enter_nickname"
+        },
+        "enter_nickname": {
+            "screen_id": "enter_nickname",
+            "type": "MESSAGE",
+            "message_text": "🏷️ Create a nickname:\n\n(For easy identification, e.g., 'Mom's Account', 'Electric Bill')",
+            "input": {
+                "type": "text",
+                "variable": "beneficiary_nickname"
+            },
+            "go_to_screen_id": "enter_bank_routing"
+        },
+        "enter_bank_routing": {
+            "screen_id": "enter_bank_routing",
+            "type": "MESSAGE",
+            "message_text": "🏦 Enter bank routing number:\n\n(9-digit number)",
+            "input": {
+                "type": "text",
+                "variable": "routing_number"
+            },
+            "go_to_screen_id": "enter_bank_account"
+        },
+        "enter_bank_account": {
+            "screen_id": "enter_bank_account",
+            "type": "MESSAGE",
+            "message_text": "💳 Enter account number:",
+            "input": {
+                "type": "text",
+                "variable": "account_number"
+            },
+            "go_to_screen_id": "select_account_type"
+        },
+        "select_account_type": {
+            "screen_id": "select_account_type",
+            "type": "MENU",
+            "message_text": "What type of account is this?",
+            "buttons": [
+                { "label": "💳 Checking", "go_to_screen_id": "review_new_beneficiary", "set_variable": "account_type", "set_value": "checking" },
+                { "label": "💰 Savings", "go_to_screen_id": "review_new_beneficiary", "set_variable": "account_type", "set_value": "savings" }
+            ]
+        },
+        "review_new_beneficiary": {
+            "screen_id": "review_new_beneficiary",
+            "type": "MENU",
+            "message_text": "Review New Beneficiary:\n\nNickname: {{beneficiary_nickname}}\nName: {{beneficiary_name}}\nType: {{beneficiary_type}}\nRouting: {{routing_number}}\nAccount: {{account_number}}\nAccount Type: {{account_type}}",
+            "buttons": [
+                { "label": "Save Beneficiary", "go_to_screen_id": "save_beneficiary" },
+                { "label": "Edit Info", "go_to_screen_id": "enter_nickname" },
+                { "label": "Cancel", "go_to_screen_id": "beneficiary_menu" }
+            ]
+        },
+        "save_beneficiary": {
+            "screen_id": "save_beneficiary",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/beneficiaries",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "beneficiary_id": "ben_8473920156"
+                }
+            },
+            "on_success": "beneficiary_saved",
+            "on_error": "save_error"
+        },
+        "beneficiary_saved": {
+            "screen_id": "beneficiary_saved",
+            "type": "MESSAGE",
+            "message_text": "✅ Beneficiary Saved!\n\n{{beneficiary_nickname}} has been added to your beneficiaries list.\n\nYou can now send payments to this beneficiary quickly and easily.",
+            "buttons": [
+                { "label": "💸 Make Payment Now", "go_to_screen_id": "end_flow" },
+                { "label": "➕ Add Another", "go_to_screen_id": "select_beneficiary_type" },
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "edit_beneficiary": {
+            "screen_id": "edit_beneficiary",
+            "type": "MENU",
+            "message_text": "✏️ Edit Beneficiary\n\nWhat would you like to update?",
+            "buttons": [
+                { "label": "🏷️ Change Nickname", "go_to_screen_id": "enter_nickname" },
+                { "label": "💳 Update Account Info", "go_to_screen_id": "enter_bank_account" },
+                { "label": "🔄 Toggle AutoPay", "go_to_screen_id": "update_beneficiary" },
+                { "label": "⬅️ Back", "go_to_screen_id": "view_beneficiary_details" }
+            ]
+        },
+        "update_beneficiary": {
+            "screen_id": "update_beneficiary",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/beneficiaries/update",
+                "method": "PUT",
+                "mock_response": {
+                    "status": "success"
+                }
+            },
+            "on_success": "beneficiary_updated",
+            "on_error": "update_error"
+        },
+        "beneficiary_updated": {
+            "screen_id": "beneficiary_updated",
+            "type": "MESSAGE",
+            "message_text": "✅ Beneficiary Updated!\n\nYour changes have been saved successfully.",
+            "buttons": [
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "confirm_delete": {
+            "screen_id": "confirm_delete",
+            "type": "MENU",
+            "message_text": "⚠️ Delete Beneficiary?\n\nAre you sure you want to delete:\n{{selected_beneficiary.nickname}} - {{selected_beneficiary.name}}\n\nThis action cannot be undone.",
+            "buttons": [
+                { "label": "✅ Yes, Delete", "go_to_screen_id": "delete_beneficiary" },
+                { "label": "❌ No, Cancel", "go_to_screen_id": "view_beneficiary_details" }
+            ]
+        },
+        "delete_beneficiary": {
+            "screen_id": "delete_beneficiary",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/beneficiaries/delete",
+                "method": "DELETE",
+                "mock_response": {
+                    "status": "success"
+                }
+            },
+            "on_success": "beneficiary_deleted",
+            "on_error": "delete_error"
+        },
+        "beneficiary_deleted": {
+            "screen_id": "beneficiary_deleted",
+            "type": "MESSAGE",
+            "message_text": "✅ Beneficiary Deleted\n\n{{selected_beneficiary.nickname}} has been removed from your beneficiaries list.",
+            "buttons": [
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "save_error": {
+            "screen_id": "save_error",
+            "type": "MENU",
+            "message_text": "❌ Unable to Save Beneficiary\n\nPlease verify the account information and try again.",
+            "buttons": [
+                { "label": "🔄 Try Again", "go_to_screen_id": "review_new_beneficiary" },
+                { "label": "❌ Cancel", "go_to_screen_id": "beneficiary_menu" }
+            ]
+        },
+        "update_error": {
+            "screen_id": "update_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to update beneficiary. Please try again.",
+            "go_to_screen_id": "view_beneficiary_details"
+        },
+        "delete_error": {
+            "screen_id": "delete_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to delete beneficiary. Please try again.",
+            "go_to_screen_id": "view_beneficiary_details"
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to retrieve beneficiaries. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for banking with Citi!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

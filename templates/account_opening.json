@@ -1,0 +1,186 @@
+{
+    "start_screen_id": "welcome_account_opening",
+    "screens": {
+        "welcome_account_opening": {
+            "screen_id": "welcome_account_opening",
+            "type": "MESSAGE",
+            "message_text": "🏦 Open a New Account\n\nOpen a Citi checking or savings account in minutes!\n\n✅ No monthly fees with qualifying activities\n✅ FDIC insured up to $250,000\n✅ Access to 60,000+ fee-free ATMs",
+            "buttons": [
+                { "label": "▶️ Get Started", "go_to_screen_id": "select_account_type" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "select_account_type": {
+            "screen_id": "select_account_type",
+            "type": "MENU",
+            "message_text": "What type of account would you like to open?",
+            "buttons": [
+                { "label": "💳 Checking Account", "go_to_screen_id": "show_checking_details", "set_variable": "account_type", "set_value": "checking" },
+                { "label": "💰 Savings Account", "go_to_screen_id": "show_savings_details", "set_variable": "account_type", "set_value": "savings" },
+                { "label": "📊 Both Checking & Savings", "go_to_screen_id": "show_combo_details", "set_variable": "account_type", "set_value": "combo" }
+            ]
+        },
+        "show_checking_details": {
+            "screen_id": "show_checking_details",
+            "type": "MENU",
+            "message_text": "💳 Citibank Checking Account\n\n✨ Benefits:\n• $0 monthly fee with $500 balance\n• Free debit card\n• Mobile check deposit\n• Bill pay\n• Overdraft protection\n\nMinimum opening deposit: $100",
+            "buttons": [
+                { "label": "✅ Choose This Account", "go_to_screen_id": "enter_personal_info" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_account_type" }
+            ]
+        },
+        "show_savings_details": {
+            "screen_id": "show_savings_details",
+            "type": "MENU",
+            "message_text": "💰 Citibank Savings Plus\n\n✨ Benefits:\n• 2.50% APY on all balances\n• $0 monthly fee with $500 balance\n• Automatic savings tools\n• 6 free withdrawals per month\n\nMinimum opening deposit: $100",
+            "buttons": [
+                { "label": "✅ Choose This Account", "go_to_screen_id": "enter_personal_info" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_account_type" }
+            ]
+        },
+        "show_combo_details": {
+            "screen_id": "show_combo_details",
+            "type": "MENU",
+            "message_text": "📊 Checking + Savings Combo\n\n✨ Benefits:\n• All checking account features\n• All savings account features\n• Free transfers between accounts\n• Linked overdraft protection\n• $200 welcome bonus\n\nMinimum opening deposit: $200 total",
+            "buttons": [
+                { "label": "✅ Choose This Package", "go_to_screen_id": "enter_personal_info" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_account_type" }
+            ]
+        },
+        "enter_personal_info": {
+            "screen_id": "enter_personal_info",
+            "type": "MESSAGE",
+            "message_text": "📝 Personal Information\n\nPlease provide your full legal name:\n\n(First name, Middle initial, Last name)",
+            "input": {
+                "type": "text",
+                "variable": "full_name"
+            },
+            "go_to_screen_id": "enter_dob"
+        },
+        "enter_dob": {
+            "screen_id": "enter_dob",
+            "type": "MESSAGE",
+            "message_text": "📅 Date of Birth\n\n(MM/DD/YYYY format)\n\n⚠️ You must be 18 or older to open an account.",
+            "input": {
+                "type": "text",
+                "variable": "date_of_birth"
+            },
+            "go_to_screen_id": "enter_ssn"
+        },
+        "enter_ssn": {
+            "screen_id": "enter_ssn",
+            "type": "MESSAGE",
+            "message_text": "🔐 Social Security Number\n\nRequired for identity verification and tax reporting.\n\n(XXX-XX-XXXX format)",
+            "input": {
+                "type": "password",
+                "variable": "ssn"
+            },
+            "go_to_screen_id": "enter_address"
+        },
+        "enter_address": {
+            "screen_id": "enter_address",
+            "type": "MESSAGE",
+            "message_text": "🏠 Residential Address\n\nEnter your current street address:\n\n(Street, City, State, ZIP)",
+            "input": {
+                "type": "text",
+                "variable": "address"
+            },
+            "go_to_screen_id": "enter_contact"
+        },
+        "enter_contact": {
+            "screen_id": "enter_contact",
+            "type": "MESSAGE",
+            "message_text": "📱 Contact Information\n\nEmail address:",
+            "input": {
+                "type": "text",
+                "variable": "email"
+            },
+            "go_to_screen_id": "enter_phone"
+        },
+        "enter_phone": {
+            "screen_id": "enter_phone",
+            "type": "MESSAGE",
+            "message_text": "📞 Mobile Phone Number:\n\n(Used for account alerts and verification)",
+            "input": {
+                "type": "text",
+                "variable": "phone"
+            },
+            "go_to_screen_id": "enter_employment"
+        },
+        "enter_employment": {
+            "screen_id": "enter_employment",
+            "type": "MENU",
+            "message_text": "💼 Employment Status:",
+            "buttons": [
+                { "label": "💼 Employed", "go_to_screen_id": "enter_initial_deposit", "set_variable": "employment", "set_value": "employed" },
+                { "label": "👔 Self-Employed", "go_to_screen_id": "enter_initial_deposit", "set_variable": "employment", "set_value": "self_employed" },
+                { "label": "🎓 Student", "go_to_screen_id": "enter_initial_deposit", "set_variable": "employment", "set_value": "student" },
+                { "label": "🏖️ Retired", "go_to_screen_id": "enter_initial_deposit", "set_variable": "employment", "set_value": "retired" },
+                { "label": "🔍 Unemployed", "go_to_screen_id": "enter_initial_deposit", "set_variable": "employment", "set_value": "unemployed" }
+            ]
+        },
+        "enter_initial_deposit": {
+            "screen_id": "enter_initial_deposit",
+            "type": "MESSAGE",
+            "message_text": "💵 Initial Deposit\n\nMinimum: $100\n\nHow much would you like to deposit to open your account?\n\n(You can fund via transfer from another bank or debit card)",
+            "input": {
+                "type": "text",
+                "variable": "initial_deposit"
+            },
+            "go_to_screen_id": "review_application"
+        },
+        "review_application": {
+            "screen_id": "review_application",
+            "type": "MENU",
+            "message_text": "📋 Review Your Application:\n\nAccount Type: {{account_type}}\nName: {{full_name}}\nInitial Deposit: ${{initial_deposit}}\n\n✅ By submitting, you agree to:\n• Account terms and conditions\n• Electronic communications\n• Privacy policy",
+            "buttons": [
+                { "label": "✅ Submit Application", "go_to_screen_id": "process_application" },
+                { "label": "📝 Edit Information", "go_to_screen_id": "enter_personal_info" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "process_application": {
+            "screen_id": "process_application",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/accounts/open",
+                "method": "POST",
+                "mock_response": {
+                    "status": "approved",
+                    "account_id": "acc_8473920156",
+                    "account_number": "****8834",
+                    "routing_number": "021000089"
+                }
+            },
+            "on_success": "application_approved",
+            "on_error": "application_error"
+        },
+        "application_approved": {
+            "screen_id": "application_approved",
+            "type": "MESSAGE",
+            "message_text": "🎉 Congratulations! Your Account is Open!\n\nAccount Number: ****8834\nRouting Number: 021000089\n\n✅ Next Steps:\n• Debit card arriving in 7-10 days\n• Set up online banking credentials\n• Download mobile app\n• Activate debit card when received\n\n💳 You can start using your account immediately for transfers and bill pay!",
+            "buttons": [
+                { "label": "📱 Set Up Mobile Banking", "go_to_screen_id": "end_flow" },
+                { "label": "📧 Email Account Details", "go_to_screen_id": "end_flow" },
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "application_error": {
+            "screen_id": "application_error",
+            "type": "MENU",
+            "message_text": "❌ Application Could Not Be Processed\n\nWe're unable to approve your application at this time. This may be due to:\n\n• Identity verification issues\n• Incomplete information\n• ChexSystems review needed\n\nA specialist will contact you within 2 business days.",
+            "buttons": [
+                { "label": "📞 Call Now", "go_to_screen_id": "end_flow" },
+                { "label": "📧 Email Support", "go_to_screen_id": "end_flow" },
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for choosing Citi!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

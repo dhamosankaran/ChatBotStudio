@@ -1,0 +1,198 @@
+{
+    "start_screen_id": "select_transfer_type",
+    "screens": {
+        "select_transfer_type": {
+            "screen_id": "select_transfer_type",
+            "type": "MENU",
+            "message_text": "💸 Transfer Funds\n\nWhat type of transfer would you like to make?",
+            "buttons": [
+                { "label": "🔄 Between My Citi Accounts", "go_to_screen_id": "get_accounts" },
+                { "label": "🏦 To Another Bank", "go_to_screen_id": "get_external_beneficiaries" },
+                { "label": "👤 To Someone Else (Zelle)", "go_to_screen_id": "zelle_transfer" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "get_accounts": {
+            "screen_id": "get_accounts",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/accounts",
+                "method": "GET",
+                "mock_file": "mocks/mock_accounts.json",
+                "save_response_to": "accounts"
+            },
+            "on_success": "select_from_account",
+            "on_error": "api_error"
+        },
+        "select_from_account": {
+            "screen_id": "select_from_account",
+            "type": "MENU",
+            "message_text": "Transfer FROM which account?",
+            "dynamic_buttons": {
+                "source_variable": "accounts.accounts",
+                "label_template": "{{name}} (...{{last_four}}) - ${{balance}}",
+                "go_to_screen_id": "select_to_account",
+                "set_variable": "from_account"
+            },
+            "buttons": [
+                { "label": "⬅️ Back", "go_to_screen_id": "select_transfer_type" }
+            ]
+        },
+        "select_to_account": {
+            "screen_id": "select_to_account",
+            "type": "MENU",
+            "message_text": "Transfer TO which account?",
+            "dynamic_buttons": {
+                "source_variable": "accounts.accounts",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "enter_transfer_amount",
+                "set_variable": "to_account"
+            },
+            "buttons": [
+                { "label": "⬅️ Back", "go_to_screen_id": "select_from_account" }
+            ]
+        },
+        "enter_transfer_amount": {
+            "screen_id": "enter_transfer_amount",
+            "type": "MESSAGE",
+            "message_text": "💰 How much would you like to transfer?\n\nFrom: {{from_account.name}} (...{{from_account.last_four}})\nAvailable: ${{from_account.balance}}",
+            "input": {
+                "type": "text",
+                "variable": "transfer_amount"
+            },
+            "go_to_screen_id": "select_transfer_date"
+        },
+        "select_transfer_date": {
+            "screen_id": "select_transfer_date",
+            "type": "MENU",
+            "message_text": "📅 When should this transfer occur?",
+            "buttons": [
+                { "label": "⚡ Right Now", "go_to_screen_id": "review_transfer", "set_variable": "transfer_date", "set_value": "now" },
+                { "label": "📆 Schedule for Later", "go_to_screen_id": "enter_schedule_date", "set_variable": "transfer_date", "set_value": "scheduled" },
+                { "label": "🔄 Recurring Transfer", "go_to_screen_id": "setup_recurring" }
+            ]
+        },
+        "enter_schedule_date": {
+            "screen_id": "enter_schedule_date",
+            "type": "MESSAGE",
+            "message_text": "When would you like to schedule this transfer?\n\n(Enter date in MM/DD/YYYY format)",
+            "input": {
+                "type": "text",
+                "variable": "scheduled_date"
+            },
+            "go_to_screen_id": "review_transfer"
+        },
+        "setup_recurring": {
+            "screen_id": "setup_recurring",
+            "type": "MENU",
+            "message_text": "🔄 How often should this transfer occur?",
+            "buttons": [
+                { "label": "📅 Weekly", "go_to_screen_id": "review_transfer", "set_variable": "recurring_frequency", "set_value": "weekly" },
+                { "label": "📅 Bi-Weekly", "go_to_screen_id": "review_transfer", "set_variable": "recurring_frequency", "set_value": "biweekly" },
+                { "label": "📅 Monthly", "go_to_screen_id": "review_transfer", "set_variable": "recurring_frequency", "set_value": "monthly" }
+            ]
+        },
+        "review_transfer": {
+            "screen_id": "review_transfer",
+            "type": "MENU",
+            "message_text": "📋 Review Transfer:\n\nFrom: {{from_account.name}} (...{{from_account.last_four}})\nTo: {{to_account.name}} (...{{to_account.last_four}})\nAmount: ${{transfer_amount}}\nWhen: {{transfer_date}}\n\n✅ This transfer will complete instantly.",
+            "buttons": [
+                { "label": "✅ Confirm Transfer", "go_to_screen_id": "process_transfer" },
+                { "label": "📝 Edit Amount", "go_to_screen_id": "enter_transfer_amount" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "process_transfer": {
+            "screen_id": "process_transfer",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/transfers",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "transfer_id": "TRF_8473920156",
+                    "confirmation_number": "CONF847392",
+                    "completed_at": "2025-11-11T10:30:00Z"
+                }
+            },
+            "on_success": "transfer_success",
+            "on_error": "transfer_error"
+        },
+        "transfer_success": {
+            "screen_id": "transfer_success",
+            "type": "MESSAGE",
+            "message_text": "✅ Transfer Complete!\n\nConfirmation #: CONF847392\n\n💰 ${{transfer_amount}} transferred\nFrom: {{from_account.name}}\nTo: {{to_account.name}}\n\nNew balance in {{from_account.name}}: ${{from_account.balance - transfer_amount}}",
+            "buttons": [
+                { "label": "🔄 Make Another Transfer", "go_to_screen_id": "select_transfer_type" },
+                { "label": "📧 Email Receipt", "go_to_screen_id": "end_flow" },
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "get_external_beneficiaries": {
+            "screen_id": "get_external_beneficiaries",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/beneficiaries",
+                "method": "GET",
+                "mock_file": "mocks/mock_beneficiaries.json",
+                "save_response_to": "beneficiaries"
+            },
+            "on_success": "select_beneficiary",
+            "on_error": "api_error"
+        },
+        "select_beneficiary": {
+            "screen_id": "select_beneficiary",
+            "type": "MENU",
+            "message_text": "Select a beneficiary:",
+            "dynamic_buttons": {
+                "source_variable": "beneficiaries.beneficiaries",
+                "label_template": "{{name}} - {{nickname}}",
+                "go_to_screen_id": "enter_transfer_amount",
+                "set_variable": "selected_beneficiary"
+            },
+            "buttons": [
+                { "label": "➕ Add New Beneficiary", "go_to_screen_id": "add_beneficiary" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_transfer_type" }
+            ]
+        },
+        "add_beneficiary": {
+            "screen_id": "add_beneficiary",
+            "type": "MESSAGE",
+            "message_text": "To add a new beneficiary, you'll need their:\n• Full name\n• Bank routing number\n• Account number\n\nThis will open in a secure form.",
+            "buttons": [
+                { "label": "✅ Continue", "go_to_screen_id": "select_beneficiary" }
+            ]
+        },
+        "zelle_transfer": {
+            "screen_id": "zelle_transfer",
+            "type": "MESSAGE",
+            "message_text": "💸 Zelle® Transfer\n\nSend money quickly to friends and family using their email or phone number.\n\nThis feature will open the Zelle interface.",
+            "buttons": [
+                { "label": "✅ Open Zelle", "go_to_screen_id": "end_flow" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_transfer_type" }
+            ]
+        },
+        "transfer_error": {
+            "screen_id": "transfer_error",
+            "type": "MENU",
+            "message_text": "❌ Transfer Failed\n\nYour transfer could not be completed. This may be due to:\n• Insufficient funds\n• Daily transfer limit reached\n• System error",
+            "buttons": [
+                { "label": "🔄 Try Again", "go_to_screen_id": "review_transfer" },
+                { "label": "📞 Contact Support", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to retrieve information. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for banking with Citi!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

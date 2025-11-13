@@ -1,0 +1,48 @@
+{
+  "status": "success",
+  "accounts": [
+    {
+      "account_id": "acc_472859301",
+      "name": "Citibank Checking",
+      "account_type": "checking",
+      "last_four": "8834",
+      "balance": 5847.92,
+      "available_balance": 5847.92,
+      "currency": "USD",
+      "status": "active",
+      "routing_number": "021000089",
+      "account_open_date": "2018-05-12",
+      "interest_rate": 0.01,
+      "monthly_fee": 0.00
+    },
+    {
+      "account_id": "acc_583746192",
+      "name": "Citibank Savings Plus",
+      "account_type": "savings",
+      "last_four": "2219",
+      "balance": 18250.45,
+      "available_balance": 18250.45,
+      "currency": "USD",
+      "status": "active",
+      "routing_number": "021000089",
+      "account_open_date": "2018-05-12",
+      "interest_rate": 2.50,
+      "monthly_fee": 0.00
+    },
+    {
+      "account_id": "acc_693827465",
+      "name": "Citibank Money Market",
+      "account_type": "money_market",
+      "last_four": "5567",
+      "balance": 42180.00,
+      "available_balance": 42180.00,
+      "currency": "USD",
+      "status": "active",
+      "routing_number": "021000089",
+      "account_open_date": "2020-09-18",
+      "interest_rate": 3.25,
+      "monthly_fee": 0.00
+    }
+  ]
+}
+

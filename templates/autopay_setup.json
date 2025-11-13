@@ -1,0 +1,156 @@
+{
+    "start_screen_id": "get_cards",
+    "screens": {
+        "get_cards": {
+            "screen_id": "get_cards",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards",
+                "method": "GET",
+                "mock_file": "mocks/mock_credit_cards.json",
+                "save_response_to": "cards"
+            },
+            "on_success": "select_card",
+            "on_error": "api_error"
+        },
+        "select_card": {
+            "screen_id": "select_card",
+            "type": "MENU",
+            "message_text": "🔄 Set Up AutoPay\n\nWhich card would you like to set up automatic payments for?",
+            "dynamic_buttons": {
+                "source_variable": "cards.cards",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "select_payment_type",
+                "set_variable": "selected_card"
+            },
+            "buttons": [
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "select_payment_type": {
+            "screen_id": "select_payment_type",
+            "type": "MENU",
+            "message_text": "💰 AutoPay for {{selected_card.name}}\n\nHow much would you like to pay each month?",
+            "buttons": [
+                { "label": "💵 Minimum Payment (${{selected_card.minimum_payment}})", "go_to_screen_id": "get_bank_accounts", "set_variable": "payment_type", "set_value": "minimum" },
+                { "label": "💳 Statement Balance (Full)", "go_to_screen_id": "get_bank_accounts", "set_variable": "payment_type", "set_value": "full" },
+                { "label": "✏️ Custom Amount", "go_to_screen_id": "enter_custom_amount", "set_variable": "payment_type", "set_value": "custom" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_card" }
+            ]
+        },
+        "enter_custom_amount": {
+            "screen_id": "enter_custom_amount",
+            "type": "MESSAGE",
+            "message_text": "Enter the amount you'd like to pay each month:\n\n(Minimum: ${{selected_card.minimum_payment}})",
+            "input": {
+                "type": "text",
+                "variable": "custom_amount"
+            },
+            "go_to_screen_id": "get_bank_accounts"
+        },
+        "get_bank_accounts": {
+            "screen_id": "get_bank_accounts",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/accounts",
+                "method": "GET",
+                "mock_file": "mocks/mock_accounts.json",
+                "save_response_to": "accounts"
+            },
+            "on_success": "select_payment_account",
+            "on_error": "api_error"
+        },
+        "select_payment_account": {
+            "screen_id": "select_payment_account",
+            "type": "MENU",
+            "message_text": "🏦 Which account would you like to use for AutoPay?",
+            "dynamic_buttons": {
+                "source_variable": "accounts.accounts",
+                "label_template": "{{name}} (...{{last_four}}) - ${{balance}}",
+                "go_to_screen_id": "select_payment_date",
+                "set_variable": "payment_account"
+            },
+            "buttons": [
+                { "label": "➕ Add External Account", "go_to_screen_id": "add_external_account" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_payment_type" }
+            ]
+        },
+        "add_external_account": {
+            "screen_id": "add_external_account",
+            "type": "MESSAGE",
+            "message_text": "To add an external bank account, you'll need:\n\n• Bank routing number\n• Account number\n• Account type\n\nThis feature will open in a new secure window.",
+            "buttons": [
+                { "label": "✅ Continue", "go_to_screen_id": "select_payment_account" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_payment_account" }
+            ]
+        },
+        "select_payment_date": {
+            "screen_id": "select_payment_date",
+            "type": "MENU",
+            "message_text": "📅 When should we make the payment?\n\nCurrent due date: {{selected_card.payment_due_date}}",
+            "buttons": [
+                { "label": "📆 On Due Date", "go_to_screen_id": "review_autopay", "set_variable": "payment_date", "set_value": "due_date" },
+                { "label": "⏰ 3 Days Before Due Date", "go_to_screen_id": "review_autopay", "set_variable": "payment_date", "set_value": "3_days_before" },
+                { "label": "⏰ 5 Days Before Due Date", "go_to_screen_id": "review_autopay", "set_variable": "payment_date", "set_value": "5_days_before" }
+            ]
+        },
+        "review_autopay": {
+            "screen_id": "review_autopay",
+            "type": "MENU",
+            "message_text": "Review AutoPay Setup:\n\nCard: {{selected_card.name}} (...{{selected_card.last_four}})\nPayment Type: {{payment_type}}\nPayment Account: {{payment_account.name}} (...{{payment_account.last_four}})\nPayment Date: {{payment_date}}\n\nImportant:\n• Ensure sufficient funds are available\n• You can modify or cancel AutoPay anytime\n• You'll receive email confirmations",
+            "buttons": [
+                { "label": "Confirm AutoPay", "go_to_screen_id": "setup_autopay" },
+                { "label": "Edit Settings", "go_to_screen_id": "select_payment_type" },
+                { "label": "Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "setup_autopay": {
+            "screen_id": "setup_autopay",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/autopay/setup",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "autopay_id": "AUTO_8473920156",
+                    "confirmation_number": "CONF847392",
+                    "first_payment_date": "2025-11-28"
+                }
+            },
+            "on_success": "autopay_success",
+            "on_error": "autopay_error"
+        },
+        "autopay_success": {
+            "screen_id": "autopay_success",
+            "type": "MESSAGE",
+            "message_text": "AutoPay Successfully Set Up!\n\nConfirmation #: CONF847392\n\nCard: {{selected_card.name}}\nPayment Type: {{payment_type}}\nFirst Payment: November 28, 2025\n\nYou'll receive an email confirmation and reminders before each payment.\n\nTip: You can modify or cancel AutoPay anytime in your account settings.",
+            "buttons": [
+                { "label": "Set Up Another Card", "go_to_screen_id": "get_cards" },
+                { "label": "Email Confirmation", "go_to_screen_id": "end_flow" },
+                { "label": "Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "autopay_error": {
+            "screen_id": "autopay_error",
+            "type": "MENU",
+            "message_text": "❌ Unable to Set Up AutoPay\n\nWe're unable to set up AutoPay at this time. Please verify:\n• Your payment account information is correct\n• You have authorization for automatic withdrawals\n• There are no holds on your account",
+            "buttons": [
+                { "label": "🔄 Try Again", "go_to_screen_id": "review_autopay" },
+                { "label": "📞 Contact Support", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to retrieve information. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for choosing Citi!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

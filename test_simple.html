@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Click Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+        }
+        .test-node {
+            width: 200px;
+            padding: 20px;
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .test-node:hover {
+            background: #bbdefb;
+            transform: scale(1.05);
+        }
+        .test-node.selected {
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
+        }
+        .config-panel {
+            flex: 1;
+            padding: 20px;
+            background: #f5f5f5;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            min-height: 300px;
+        }
+        .log-panel {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h2>Test Nodes (Click to select)</h2>
+        <div class="test-node" data-id="node1" data-type="MESSAGE">
+            <h3>📝 Message Node</h3>
+            <p>Click me to test selection</p>
+        </div>
+        <br>
+        <div class="test-node" data-id="node2" data-type="MENU">
+            <h3>📋 Menu Node</h3>
+            <p>Click me too!</p>
+        </div>
+    </div>
+
+    <div class="config-panel" id="configPanel">
+        <h2>Config Panel</h2>
+        <p>Click a node to see its configuration here</p>
+    </div>
+
+    <div class="log-panel" id="logPanel">
+        <strong>Console Log:</strong><br>
+    </div>
+
+    <script>
+        let selectedNode = null;
+
+        function log(message) {
+            const logPanel = document.getElementById('logPanel');
+            const time = new Date().toLocaleTimeString();
+            logPanel.innerHTML += `[${time}] ${message}<br>`;
+            logPanel.scrollTop = logPanel.scrollHeight;
+            console.log(message);
+        }
+
+        function selectNode(nodeId, nodeType) {
+            log(`✅ Selecting node: ${nodeId} (${nodeType})`);
+            selectedNode = nodeId;
+            
+            // Update visual selection
+            document.querySelectorAll('.test-node').forEach(node => {
+                node.classList.remove('selected');
+            });
+            document.querySelector(`[data-id="${nodeId}"]`).classList.add('selected');
+            
+            // Update config panel
+            renderConfigPanel(nodeId, nodeType);
+        }
+
+        function renderConfigPanel(nodeId, nodeType) {
+            log(`⚙️ Rendering config panel for: ${nodeId}`);
+            const panel = document.getElementById('configPanel');
+            
+            panel.innerHTML = `
+                <h2>Configure ${nodeType}</h2>
+                <div style="margin: 20px 0;">
+                    <label><strong>Node ID:</strong></label><br>
+                    <input type="text" value="${nodeId}" style="width: 100%; padding: 8px; margin-top: 5px;">
+                </div>
+                <div style="margin: 20px 0;">
+                    <label><strong>Screen ID:</strong></label><br>
+                    <input type="text" placeholder="Enter screen ID" style="width: 100%; padding: 8px; margin-top: 5px;">
+                </div>
+                <div style="margin: 20px 0;">
+                    <label><strong>Message Text:</strong></label><br>
+                    <textarea placeholder="Enter message" style="width: 100%; padding: 8px; margin-top: 5px; min-height: 80px;"></textarea>
+                </div>
+                <button style="padding: 10px 20px; background: #2196f3; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Save Changes
+                </button>
+            `;
+            
+            log(`✅ Config panel rendered successfully`);
+        }
+
+        // Attach click handlers to test nodes
+        document.querySelectorAll('.test-node').forEach(node => {
+            node.addEventListener('click', (e) => {
+                const nodeId = node.dataset.id;
+                const nodeType = node.dataset.type;
+                log(`🖱️ Node clicked: ${nodeId}`);
+                selectNode(nodeId, nodeType);
+            });
+        });
+
+        log('🚀 Test app initialized - Click a node to test!');
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,116 @@
+{
+    "start_screen_id": "get_cards",
+    "screens": {
+        "get_cards": {
+            "screen_id": "get_cards",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards",
+                "method": "GET",
+                "mock_file": "mocks/mock_credit_cards.json",
+                "save_response_to": "cards"
+            },
+            "on_success": "select_card",
+            "on_error": "api_error"
+        },
+        "select_card": {
+            "screen_id": "select_card",
+            "type": "MENU",
+            "message_text": "Which card would you like to replace?",
+            "dynamic_buttons": {
+                "source_variable": "cards.cards",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "select_reason",
+                "set_variable": "selected_card"
+            },
+            "buttons": [
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "select_reason": {
+            "screen_id": "select_reason",
+            "type": "MENU",
+            "message_text": "Why do you need to replace your {{selected_card.name}}?",
+            "buttons": [
+                { "label": "Lost", "go_to_screen_id": "confirm_address", "set_variable": "reason", "set_value": "lost" },
+                { "label": "Stolen", "go_to_screen_id": "confirm_address", "set_variable": "reason", "set_value": "stolen" },
+                { "label": "Damaged", "go_to_screen_id": "confirm_address", "set_variable": "reason", "set_value": "damaged" },
+                { "label": "Back", "go_to_screen_id": "select_card" }
+            ]
+        },
+        "confirm_address": {
+            "screen_id": "confirm_address",
+            "type": "MENU",
+            "message_text": "Where should we send your replacement card?",
+            "buttons": [
+                { "label": "Current Address on File", "go_to_screen_id": "confirm_replacement" },
+                { "label": "New Address", "go_to_screen_id": "enter_new_address" },
+                { "label": "Back", "go_to_screen_id": "select_reason" }
+            ]
+        },
+        "enter_new_address": {
+            "screen_id": "enter_new_address",
+            "type": "MESSAGE",
+            "message_text": "Please enter your new shipping address:",
+            "input": {
+                "type": "text",
+                "variable": "new_address"
+            },
+            "go_to_screen_id": "confirm_replacement"
+        },
+        "confirm_replacement": {
+            "screen_id": "confirm_replacement",
+            "type": "MENU",
+            "message_text": "Please confirm card replacement:\n\nCard: {{selected_card.name}} (...{{selected_card.last_four}})\nReason: Card {{reason}}\n\nYour new card will arrive in 5-7 business days.",
+            "buttons": [
+                { "label": "Confirm Replacement", "go_to_screen_id": "process_replacement" },
+                { "label": "Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "process_replacement": {
+            "screen_id": "process_replacement",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards/replace",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "replacement_order_id": "ORD_8473920156",
+                    "estimated_delivery": "2025-11-20"
+                }
+            },
+            "on_success": "success_message",
+            "on_error": "replacement_error"
+        },
+        "success_message": {
+            "screen_id": "success_message",
+            "type": "MESSAGE",
+            "message_text": "Your replacement card has been ordered!\n\nYour new {{selected_card.name}} will arrive within 5-7 business days. Your current card has been deactivated for security.",
+            "buttons": [
+                { "label": "Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "replacement_error": {
+            "screen_id": "replacement_error",
+            "type": "MENU",
+            "message_text": "We're unable to process your card replacement at this time. Please try again or contact customer service.",
+            "buttons": [
+                { "label": "Try Again", "go_to_screen_id": "process_replacement" },
+                { "label": "Call Customer Service", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to retrieve your cards at this time. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for using Citi Mobile Banking!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

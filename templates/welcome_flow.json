@@ -1,0 +1,33 @@
+{
+    "start_screen_id": "welcome_screen",
+    "screens": {
+        "welcome_screen": {
+            "screen_id": "welcome_screen",
+            "type": "MENU",
+            "message_text": "👋 Welcome to Citi Mobile! What would you like to do today?",
+            "buttons": [
+                { "label": "💰 Check Balance", "go_to_screen_id": "check_balance_flow" },
+                { "label": "💳 Pay Bill", "go_to_screen_id": "pay_bill_flow" },
+                { "label": "📞 Contact Support", "go_to_screen_id": "support_screen" }
+            ]
+        },
+        "check_balance_flow": {
+            "screen_id": "check_balance_flow",
+            "type": "MESSAGE",
+            "message_text": "This feature is coming soon. Redirecting to the main menu.",
+            "go_to_screen_id": "welcome_screen"
+        },
+        "pay_bill_flow": {
+            "screen_id": "pay_bill_flow",
+            "type": "MESSAGE",
+            "message_text": "This feature is coming soon. Redirecting to the main menu.",
+            "go_to_screen_id": "welcome_screen"
+        },
+        "support_screen": {
+            "screen_id": "support_screen",
+            "type": "MESSAGE",
+            "message_text": "For support, please call 1-800-CITI-HELP. Redirecting to the main menu.",
+            "go_to_screen_id": "welcome_screen"
+        }
+    }
+}

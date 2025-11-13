@@ -1,0 +1,145 @@
+{
+    "start_screen_id": "welcome_deposit",
+    "screens": {
+        "welcome_deposit": {
+            "screen_id": "welcome_deposit",
+            "type": "MESSAGE",
+            "message_text": "📱 Mobile Check Deposit\n\nDeposit checks anytime, anywhere using your phone's camera.\n\n✅ Deposits typically available within 1 business day\n✅ Daily limit: $5,000\n✅ Monthly limit: $25,000",
+            "buttons": [
+                { "label": "▶️ Start Deposit", "go_to_screen_id": "get_accounts" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "get_accounts": {
+            "screen_id": "get_accounts",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/accounts",
+                "method": "GET",
+                "mock_file": "mocks/mock_accounts.json",
+                "save_response_to": "accounts"
+            },
+            "on_success": "select_deposit_account",
+            "on_error": "api_error"
+        },
+        "select_deposit_account": {
+            "screen_id": "select_deposit_account",
+            "type": "MENU",
+            "message_text": "Which account would you like to deposit to?",
+            "dynamic_buttons": {
+                "source_variable": "accounts.accounts",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "enter_check_amount",
+                "set_variable": "deposit_account"
+            },
+            "buttons": [
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "enter_check_amount": {
+            "screen_id": "enter_check_amount",
+            "type": "MESSAGE",
+            "message_text": "💵 Enter the check amount:\n\n(Enter the exact amount shown on the check)",
+            "input": {
+                "type": "text",
+                "variable": "check_amount"
+            },
+            "go_to_screen_id": "capture_front_instructions"
+        },
+        "capture_front_instructions": {
+            "screen_id": "capture_front_instructions",
+            "type": "MESSAGE",
+            "message_text": "📸 Capture Check - Front Side\n\nTips for best results:\n• Place check on a dark surface\n• Ensure all 4 corners are visible\n• Avoid glare and shadows\n• Hold phone steady\n\nEndorse the back of your check:\n'For Mobile Deposit Only at Citi'\n+ Your signature",
+            "buttons": [
+                { "label": "📷 Capture Front", "go_to_screen_id": "simulate_front_capture" }
+            ]
+        },
+        "simulate_front_capture": {
+            "screen_id": "simulate_front_capture",
+            "type": "MESSAGE",
+            "message_text": "📸 [Camera would open here]\n\nSimulating successful front image capture...",
+            "buttons": [
+                { "label": "✅ Image Captured", "go_to_screen_id": "capture_back_instructions" },
+                { "label": "🔄 Retake", "go_to_screen_id": "capture_front_instructions" }
+            ]
+        },
+        "capture_back_instructions": {
+            "screen_id": "capture_back_instructions",
+            "type": "MESSAGE",
+            "message_text": "📸 Capture Check - Back Side\n\nMake sure:\n• Your endorsement is visible\n• All edges of the check are in frame\n• Image is clear and in focus",
+            "buttons": [
+                { "label": "📷 Capture Back", "go_to_screen_id": "simulate_back_capture" }
+            ]
+        },
+        "simulate_back_capture": {
+            "screen_id": "simulate_back_capture",
+            "type": "MESSAGE",
+            "message_text": "📸 [Camera would open here]\n\nSimulating successful back image capture...",
+            "buttons": [
+                { "label": "✅ Image Captured", "go_to_screen_id": "review_deposit" },
+                { "label": "🔄 Retake", "go_to_screen_id": "capture_back_instructions" }
+            ]
+        },
+        "review_deposit": {
+            "screen_id": "review_deposit",
+            "type": "MENU",
+            "message_text": "📋 Review Your Deposit:\n\nAmount: ${{check_amount}}\nDeposit To: {{deposit_account.name}} (...{{deposit_account.last_four}})\n\n✅ Front image captured\n✅ Back image captured\n\n⚠️ Keep your check for 14 days, then shred it.",
+            "buttons": [
+                { "label": "✅ Submit Deposit", "go_to_screen_id": "process_deposit" },
+                { "label": "📝 Edit Amount", "go_to_screen_id": "enter_check_amount" },
+                { "label": "📷 Retake Photos", "go_to_screen_id": "capture_front_instructions" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "process_deposit": {
+            "screen_id": "process_deposit",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/deposits",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "deposit_id": "DEP_8473920156",
+                    "confirmation_number": "CONF847392",
+                    "available_date": "2025-11-12",
+                    "hold_amount": 0
+                }
+            },
+            "on_success": "deposit_success",
+            "on_error": "deposit_error"
+        },
+        "deposit_success": {
+            "screen_id": "deposit_success",
+            "type": "MESSAGE",
+            "message_text": "✅ Deposit Submitted Successfully!\n\nConfirmation #: CONF847392\n\nAmount: ${{check_amount}}\nDeposit To: {{deposit_account.name}}\nAvailable: Tomorrow, November 12\n\n📧 You'll receive an email confirmation shortly.\n\n⚠️ Remember:\n• Keep your check for 14 days\n• Do not deposit the same check again\n• Shred the check after 14 days",
+            "buttons": [
+                { "label": "📱 Deposit Another Check", "go_to_screen_id": "welcome_deposit" },
+                { "label": "📧 Email Receipt", "go_to_screen_id": "end_flow" },
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "deposit_error": {
+            "screen_id": "deposit_error",
+            "type": "MENU",
+            "message_text": "❌ Deposit Could Not Be Processed\n\nPossible reasons:\n• Image quality too low\n• Check amount exceeds daily limit\n• Duplicate check detected\n• Account restrictions",
+            "buttons": [
+                { "label": "🔄 Try Again", "go_to_screen_id": "capture_front_instructions" },
+                { "label": "📞 Contact Support", "go_to_screen_id": "end_flow" },
+                { "label": "🏠 Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to retrieve your accounts. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for banking with Citi!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

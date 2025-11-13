@@ -1,0 +1,94 @@
+{
+    "start_screen_id": "welcome_screen",
+    "screens": {
+        "welcome_screen": {
+            "screen_id": "welcome_screen",
+            "type": "MENU",
+            "message_text": "Welcome to Bill Pay. What would you like to do?",
+            "buttons": [
+                { "label": "💳 Pay a Bill", "go_to_screen_id": "api_get_payees" },
+                { "label": "🏠 Main Menu", "go_to_screen_id": "main_menu" }
+            ]
+        },
+        "api_get_payees": {
+            "screen_id": "api_get_payees",
+            "type": "API_CALL",
+            "api_call": { "url": "https://api.citi.com/v1/payees" },
+            "on_success": "select_payee",
+            "on_error": "api_error"
+        },
+        "select_payee": {
+            "screen_id": "select_payee",
+            "type": "MENU",
+            "message_text": "Who would you like to pay?",
+            "dynamic_buttons": {
+                "source_variable": "payees",
+                "label_template": "{{name}}",
+                "go_to_screen_id": "api_get_accounts",
+                "set_variable": "selected_payee"
+            }
+        },
+        "api_get_accounts": {
+            "screen_id": "api_get_accounts",
+            "type": "API_CALL",
+            "api_call": { "url": "https://api.citi.com/v1/accounts" },
+            "on_success": "select_account",
+            "on_error": "api_error"
+        },
+        "select_account": {
+            "screen_id": "select_account",
+            "type": "MENU",
+            "message_text": "Which account would you like to pay from?",
+            "dynamic_buttons": {
+                "source_variable": "accounts.accounts",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "enter_amount",
+                "set_variable": "selected_account"
+            }
+        },
+        "enter_amount": {
+            "screen_id": "enter_amount",
+            "type": "MESSAGE",
+            "message_text": "How much would you like to pay {{selected_payee.name}}?",
+            "input": {
+                "type": "text",
+                "variable": "payment_amount"
+            },
+            "go_to_screen_id": "confirm_payment"
+        },
+        "confirm_payment": {
+            "screen_id": "confirm_payment",
+            "type": "MENU",
+            "message_text": "Please confirm your payment of ${{payment_amount}} to {{selected_payee.name}} from your {{selected_account.name}} account.",
+            "buttons": [
+                { "label": "✅ Confirm Payment", "go_to_screen_id": "api_make_payment" },
+                { "label": "❌ Cancel", "go_to_screen_id": "welcome_screen" }
+            ]
+        },
+        "api_make_payment": {
+            "screen_id": "api_make_payment",
+            "type": "API_CALL",
+            "api_call": { "url": "https://api.citi.com/v1/payments", "method": "POST" },
+            "on_success": "payment_success",
+            "on_error": "payment_error"
+        },
+        "payment_success": {
+            "screen_id": "payment_success",
+            "type": "MESSAGE",
+            "message_text": "Your payment of ${{payment_amount}} to {{selected_payee.name}} was successful.",
+            "go_to_screen_id": "welcome_screen"
+        },
+        "payment_error": {
+            "screen_id": "payment_error",
+            "type": "MESSAGE",
+            "message_text": "There was an error processing your payment. Please try again later.",
+            "go_to_screen_id": "welcome_screen"
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "We are unable to retrieve your information at this time.",
+            "go_to_screen_id": "welcome_screen"
+        }
+    }
+}

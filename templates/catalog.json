@@ -1,0 +1,320 @@
+{
+    "version": "1.0.0",
+    "last_updated": "2025-11-11",
+    "total_templates": 19,
+    "categories": {
+        "credit_cards": {
+            "id": "credit_cards",
+            "name": "Credit Card Services",
+            "icon": "💳",
+            "description": "Comprehensive credit card management flows including card operations, payments, rewards, and disputes",
+            "templates": [
+                {
+                    "id": "check_card_balance",
+                    "file": "check_card_balance.json",
+                    "name": "Check Card Balance",
+                    "description": "Check the current balance, available credit, and payment due date for a credit card.",
+                    "complexity": "low",
+                    "estimated_screens": 4,
+                    "estimated_time": "1-2 minutes",
+                    "apis_used": ["get_cards"],
+                    "features": ["Dynamic card selection", "Real-time balance display"],
+                    "icon": "💰"
+                },
+                {
+                    "id": "recent_transactions",
+                    "file": "recent_transactions.json",
+                    "name": "Recent Transactions",
+                    "description": "View a list of recent transactions for a selected credit card.",
+                    "complexity": "medium",
+                    "estimated_screens": 5,
+                    "estimated_time": "2-3 minutes",
+                    "apis_used": ["get_cards", "get_recent_transactions"],
+                    "features": ["Transaction list", "Status indicators (posted/pending)"],
+                    "icon": "🧾"
+                },
+                {
+                    "id": "view_card_statements",
+                    "file": "view_card_statements.json",
+                    "name": "View Statements",
+                    "description": "View and download monthly credit card statements.",
+                    "complexity": "medium",
+                    "estimated_screens": 6,
+                    "estimated_time": "2-3 minutes",
+                    "apis_used": ["get_cards", "get_card_statements"],
+                    "features": ["Statement list", "Download links"],
+                    "icon": "📄"
+                },
+                {
+                    "id": "card_replacement",
+                    "file": "card_replacement.json",
+                    "name": "Card Replacement",
+                    "description": "Replace lost, stolen, or damaged credit card with reason selection and address confirmation",
+                    "complexity": "medium",
+                    "estimated_screens": 11,
+                    "estimated_time": "3-5 minutes",
+                    "apis_used": ["get_cards", "replace_card"],
+                    "features": ["Dynamic card selection", "Reason codes", "Address verification", "Order tracking"],
+                    "icon": "💳"
+                },
+                {
+                    "id": "card_activation",
+                    "file": "card_activation.json",
+                    "name": "Card Activation",
+                    "description": "Activate new credit card with verification steps and PIN setup",
+                    "complexity": "medium",
+                    "estimated_screens": 13,
+                    "estimated_time": "4-6 minutes",
+                    "apis_used": ["verify_card", "activate_card"],
+                    "features": ["Card verification", "PIN setup", "Digital wallet integration"],
+                    "icon": "✅"
+                },
+                {
+                    "id": "balance_transfer",
+                    "file": "balance_transfer.json",
+                    "name": "Balance Transfer",
+                    "description": "Transfer balance from other cards with amount entry and fee disclosure",
+                    "complexity": "high",
+                    "estimated_screens": 12,
+                    "estimated_time": "5-8 minutes",
+                    "apis_used": ["get_cards", "balance_transfer"],
+                    "features": ["Fee calculator", "Promotional APR", "Transfer tracking"],
+                    "icon": "🔄"
+                },
+                {
+                    "id": "credit_limit_increase",
+                    "file": "credit_limit_increase.json",
+                    "name": "Credit Limit Increase",
+                    "description": "Request credit limit increase with income verification and instant decision",
+                    "complexity": "medium",
+                    "estimated_screens": 11,
+                    "estimated_time": "4-6 minutes",
+                    "apis_used": ["get_cards", "request_limit_increase"],
+                    "features": ["Eligibility check", "Income verification", "Instant approval"],
+                    "icon": "📈"
+                },
+                {
+                    "id": "dispute_transaction",
+                    "file": "dispute_transaction.json",
+                    "name": "Dispute Transaction",
+                    "description": "Report and dispute unauthorized or incorrect credit card transactions",
+                    "complexity": "high",
+                    "estimated_screens": 13,
+                    "estimated_time": "5-10 minutes",
+                    "apis_used": ["get_cards", "get_transactions", "submit_dispute"],
+                    "features": ["Transaction selection", "Dispute reasons", "Documentation upload", "Temporary credit"],
+                    "icon": "🚨"
+                },
+                {
+                    "id": "rewards_redemption",
+                    "file": "rewards_redemption.json",
+                    "name": "Rewards Redemption",
+                    "description": "Redeem ThankYou points for cash back, travel, gift cards, and more",
+                    "complexity": "medium",
+                    "estimated_screens": 11,
+                    "estimated_time": "3-5 minutes",
+                    "apis_used": ["get_rewards", "redeem_points"],
+                    "features": ["Points balance", "Multiple redemption options", "Value calculator", "Expiration tracking"],
+                    "icon": "✨"
+                },
+                {
+                    "id": "autopay_setup",
+                    "file": "autopay_setup.json",
+                    "name": "AutoPay Setup",
+                    "description": "Set up automatic credit card payments with flexible options",
+                    "complexity": "medium",
+                    "estimated_screens": 13,
+                    "estimated_time": "4-6 minutes",
+                    "apis_used": ["get_cards", "get_accounts", "setup_autopay"],
+                    "features": ["Multiple payment options", "Account linking", "Payment date selection", "Confirmation"],
+                    "icon": "🔄"
+                }
+            ]
+        },
+        "retail_banking": {
+            "id": "retail_banking",
+            "name": "Retail Banking Services",
+            "description": "Complete banking operations including transfers, deposits, account management, and loan applications",
+            "icon": "🏦",
+            "templates": [
+                {
+                    "id": "fund_transfer",
+                    "file": "fund_transfer.json",
+                    "name": "Fund Transfer",
+                    "description": "Transfer money between own accounts, to external banks, or via Zelle",
+                    "complexity": "high",
+                    "estimated_screens": 16,
+                    "estimated_time": "4-8 minutes",
+                    "apis_used": ["get_accounts", "get_beneficiaries", "transfer_funds"],
+                    "features": ["Multiple transfer types", "Scheduling", "Recurring transfers", "Instant completion"],
+                    "icon": "💸"
+                },
+                {
+                    "id": "check_deposit",
+                    "file": "check_deposit.json",
+                    "name": "Mobile Check Deposit",
+                    "description": "Deposit checks using mobile device camera with image capture",
+                    "complexity": "medium",
+                    "estimated_screens": 12,
+                    "estimated_time": "3-5 minutes",
+                    "apis_used": ["get_accounts", "submit_deposit"],
+                    "features": ["Image capture", "Amount validation", "Deposit limits", "Processing time"],
+                    "icon": "📱"
+                },
+                {
+                    "id": "account_opening",
+                    "file": "account_opening.json",
+                    "name": "Account Opening",
+                    "description": "Open new checking or savings account with complete application process",
+                    "complexity": "high",
+                    "estimated_screens": 14,
+                    "estimated_time": "8-12 minutes",
+                    "apis_used": ["create_account"],
+                    "features": ["Multiple account types", "Identity verification", "Initial funding", "Instant approval"],
+                    "icon": "🏦"
+                },
+                {
+                    "id": "stop_payment",
+                    "file": "stop_payment.json",
+                    "name": "Stop Payment",
+                    "description": "Stop payment on a check with detailed reason tracking",
+                    "complexity": "medium",
+                    "estimated_screens": 12,
+                    "estimated_time": "4-6 minutes",
+                    "apis_used": ["get_accounts", "stop_payment"],
+                    "features": ["Check verification", "Reason codes", "Fee disclosure", "6-month validity"],
+                    "icon": "🛑"
+                },
+                {
+                    "id": "wire_transfer",
+                    "file": "wire_transfer.json",
+                    "name": "Wire Transfer",
+                    "description": "Send domestic or international wire transfers with full beneficiary details",
+                    "complexity": "high",
+                    "estimated_screens": 15,
+                    "estimated_time": "6-10 minutes",
+                    "apis_used": ["get_accounts", "send_wire"],
+                    "features": ["Domestic/International", "Fee calculation", "Purpose tracking", "Confirmation"],
+                    "icon": "💸"
+                },
+                {
+                    "id": "statement_download",
+                    "file": "statement_download.json",
+                    "name": "Statements & Documents",
+                    "description": "View, download, and email account statements and tax documents",
+                    "complexity": "medium",
+                    "estimated_screens": 14,
+                    "estimated_time": "2-4 minutes",
+                    "apis_used": ["get_accounts", "get_statements", "download_statement"],
+                    "features": ["Multiple document types", "Date range selection", "Download/Email", "7-year history"],
+                    "icon": "📄"
+                },
+                {
+                    "id": "beneficiary_management",
+                    "file": "beneficiary_management.json",
+                    "name": "Beneficiary Management",
+                    "description": "Add, edit, and delete payment beneficiaries for quick transfers",
+                    "complexity": "high",
+                    "estimated_screens": 18,
+                    "estimated_time": "5-8 minutes",
+                    "apis_used": ["get_beneficiaries", "create_beneficiary", "update_beneficiary", "delete_beneficiary"],
+                    "features": ["Multiple beneficiary types", "Nickname assignment", "Account validation", "AutoPay toggle"],
+                    "icon": "👥"
+                },
+                {
+                    "id": "loan_application",
+                    "file": "loan_application.json",
+                    "name": "Personal Loan Application",
+                    "description": "Apply for personal loan with income verification and instant approval",
+                    "complexity": "high",
+                    "estimated_screens": 15,
+                    "estimated_time": "10-15 minutes",
+                    "apis_used": ["apply_loan"],
+                    "features": ["Loan calculator", "Eligibility check", "Income verification", "Instant decision"],
+                    "icon": "💰"
+                }
+            ]
+        },
+        "getting_started": {
+            "id": "getting_started",
+            "name": "Getting Started",
+            "description": "Simple template flows to help you learn the Flow Builder",
+            "icon": "🚀",
+            "templates": [
+                {
+                    "id": "welcome_flow",
+                    "file": "welcome_flow.json",
+                    "name": "Welcome Flow",
+                    "description": "Simple greeting flow with menu options to demonstrate basic navigation",
+                    "complexity": "low",
+                    "estimated_screens": 4,
+                    "estimated_time": "1-2 minutes",
+                    "apis_used": [],
+                    "features": ["Basic menu", "Message screens", "Navigation"],
+                    "icon": "👋"
+                },
+                {
+                    "id": "check_balance",
+                    "file": "check_balance.json",
+                    "name": "Check Account Balance",
+                    "description": "Complete retail banking flow with dynamic account selection and API integration",
+                    "complexity": "medium",
+                    "estimated_screens": 4,
+                    "estimated_time": "2-3 minutes",
+                    "apis_used": ["get_accounts"],
+                    "features": ["API integration", "Dynamic buttons", "Error handling"],
+                    "icon": "💰"
+                },
+                {
+                    "id": "bill_payment",
+                    "file": "bill_payment.json",
+                    "name": "Bill Payment",
+                    "description": "Complete bill payment flow with payee selection, amount entry, and confirmation",
+                    "complexity": "high",
+                    "estimated_screens": 11,
+                    "estimated_time": "4-6 minutes",
+                    "apis_used": ["get_payees", "get_accounts", "make_payment"],
+                    "features": ["Multi-step flow", "Dynamic data", "Payment confirmation"],
+                    "icon": "💳"
+                },
+                {
+                    "id": "credit_card_payment",
+                    "file": "credit_card_payment.json",
+                    "name": "Credit Card Payment",
+                    "description": "Make payment to credit card with minimum, full balance, or custom amount options",
+                    "complexity": "medium",
+                    "estimated_screens": 9,
+                    "estimated_time": "3-5 minutes",
+                    "apis_used": ["get_credit_cards", "get_accounts", "process_payment"],
+                    "features": ["Payment options", "Account linking", "Confirmation"],
+                    "icon": "💳"
+                }
+            ]
+        }
+    },
+    "tags": {
+        "popular": ["card_replacement", "fund_transfer", "check_deposit", "bill_payment"],
+        "quick_start": ["welcome_flow", "check_balance"],
+        "advanced": ["loan_application", "wire_transfer", "beneficiary_management", "balance_transfer"],
+        "payments": ["bill_payment", "credit_card_payment", "fund_transfer", "autopay_setup"],
+        "account_services": ["account_opening", "check_balance", "statement_download", "stop_payment"]
+    },
+    "complexity_levels": {
+        "low": {
+            "name": "Beginner",
+            "description": "Simple flows with 2-5 screens, ideal for learning",
+            "icon": "🟢"
+        },
+        "medium": {
+            "name": "Intermediate",
+            "description": "Moderate flows with 6-12 screens, includes API calls",
+            "icon": "🟡"
+        },
+        "high": {
+            "name": "Advanced",
+            "description": "Complex flows with 13+ screens, multiple APIs and branching logic",
+            "icon": "🔴"
+        }
+    }
+}
+

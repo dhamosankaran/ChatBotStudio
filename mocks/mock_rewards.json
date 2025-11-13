@@ -1,0 +1,70 @@
+{
+  "status": "success",
+  "rewards": {
+    "total_points": 45820,
+    "points_expiring_soon": 2500,
+    "expiration_date": "2026-01-31",
+    "points_earned_ytd": 12840,
+    "tier_status": "Gold",
+    "next_tier": "Platinum",
+    "points_to_next_tier": 15000
+  },
+  "redemption_options": [
+    {
+      "option_id": "redeem_cash",
+      "type": "cash_back",
+      "name": "Statement Credit",
+      "description": "Redeem points for statement credit",
+      "conversion_rate": 100,
+      "min_points": 2500,
+      "icon": "💵"
+    },
+    {
+      "option_id": "redeem_travel",
+      "type": "travel",
+      "name": "Travel Booking",
+      "description": "Book flights, hotels, and car rentals",
+      "conversion_rate": 100,
+      "min_points": 5000,
+      "icon": "✈️"
+    },
+    {
+      "option_id": "redeem_giftcard",
+      "type": "gift_card",
+      "name": "Gift Cards",
+      "description": "Choose from hundreds of retailers",
+      "conversion_rate": 100,
+      "min_points": 1000,
+      "icon": "🎁"
+    },
+    {
+      "option_id": "redeem_transfer",
+      "type": "points_transfer",
+      "name": "Transfer to Partners",
+      "description": "Transfer to airline and hotel partners",
+      "conversion_rate": 100,
+      "min_points": 1000,
+      "icon": "🔄"
+    },
+    {
+      "option_id": "redeem_shopping",
+      "type": "shopping",
+      "name": "Shop with Points",
+      "description": "Use points at Amazon and other retailers",
+      "conversion_rate": 80,
+      "min_points": 500,
+      "icon": "🛒"
+    }
+  ],
+  "recent_redemptions": [
+    {
+      "redemption_id": "red_8473920156",
+      "date": "2025-10-15",
+      "type": "cash_back",
+      "points_used": 10000,
+      "value": 100.00,
+      "description": "Statement Credit"
+    }
+  ]
+}
+

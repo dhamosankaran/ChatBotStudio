@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Layout Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+            background: #f0f0f0;
+        }
+        
+        .left-panel {
+            width: 280px;
+            min-width: 280px;
+            background: #e3f2fd;
+            border-right: 2px solid #2196f3;
+            padding: 20px;
+        }
+        
+        .center-panel {
+            flex: 1;
+            background: #fff;
+            padding: 20px;
+            overflow: auto;
+        }
+        
+        .right-panel {
+            width: 360px !important;
+            min-width: 360px !important;
+            max-width: 360px !important;
+            flex-shrink: 0 !important;
+            background: #fffbeb !important;
+            border-left: 5px solid #f59e0b !important;
+            padding: 20px !important;
+            overflow-y: auto !important;
+            display: block !important;
+            box-shadow: -5px 0 15px rgba(245, 158, 11, 0.3) !important;
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left-panel">
+            <div class="panel-title">LEFT PANEL</div>
+            <p>Node Palette (280px)</p>
+            <p>This should be blue</p>
+        </div>
+        
+        <div class="center-panel">
+            <div class="panel-title">CENTER PANEL</div>
+            <p>Canvas Area (Flex: 1)</p>
+            <p>This should be white</p>
+            <div style="margin-top: 20px; padding: 10px; background: #e0e0e0;">
+                <p>Some content here...</p>
+                <p>The right panel should be visible!</p>
+            </div>
+        </div>
+        
+        <div class="right-panel">
+            <div class="panel-title">RIGHT PANEL (CONFIG)</div>
+            <p><strong>Width: 360px</strong></p>
+            <p><strong>Background: Yellow tint (#fffbeb)</strong></p>
+            <p><strong>Border: 5px orange</strong></p>
+            <p style="margin-top: 15px;">If you can see this with yellow background and orange border, the CSS is working!</p>
+            
+            <div style="margin-top: 20px; padding: 10px; background: white; border: 1px solid #ccc; border-radius: 4px;">
+                <p><strong>Test Input:</strong></p>
+                <input type="text" placeholder="Screen ID" style="width: 100%; padding: 8px; margin-top: 5px;">
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        console.log('=== LAYOUT TEST ===');
+        console.log('Right panel element:', document.querySelector('.right-panel'));
+        console.log('Right panel styles:', window.getComputedStyle(document.querySelector('.right-panel')));
+        console.log('Right panel rect:', document.querySelector('.right-panel').getBoundingClientRect());
+    </script>
+</body>
+</html>
+

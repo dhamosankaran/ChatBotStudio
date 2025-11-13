@@ -1,0 +1,193 @@
+{
+    "start_screen_id": "welcome_wire_transfer",
+    "screens": {
+        "welcome_wire_transfer": {
+            "screen_id": "welcome_wire_transfer",
+            "type": "MENU",
+            "message_text": "💸 Wire Transfer\n\nSend money quickly and securely.\n\n⚠️ Fees:\n• Domestic: $25\n• International: $45\n\n⏱️ Processing:\n• Domestic: Same day\n• International: 1-5 days",
+            "buttons": [
+                { "label": "🇺🇸 Domestic Wire", "go_to_screen_id": "get_accounts", "set_variable": "wire_type", "set_value": "domestic" },
+                { "label": "🌍 International Wire", "go_to_screen_id": "get_accounts", "set_variable": "wire_type", "set_value": "international" },
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "get_accounts": {
+            "screen_id": "get_accounts",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/accounts",
+                "method": "GET",
+                "mock_file": "mocks/mock_accounts.json",
+                "save_response_to": "accounts"
+            },
+            "on_success": "select_from_account",
+            "on_error": "api_error"
+        },
+        "select_from_account": {
+            "screen_id": "select_from_account",
+            "type": "MENU",
+            "message_text": "Which account would you like to send FROM?",
+            "dynamic_buttons": {
+                "source_variable": "accounts.accounts",
+                "label_template": "{{name}} (...{{last_four}}) - ${{balance}}",
+                "go_to_screen_id": "enter_beneficiary_name",
+                "set_variable": "from_account"
+            },
+            "buttons": [
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "enter_beneficiary_name": {
+            "screen_id": "enter_beneficiary_name",
+            "type": "MESSAGE",
+            "message_text": "👤 Beneficiary Information\n\nEnter the recipient's full name:\n\n(Exactly as it appears on their account)",
+            "input": {
+                "type": "text",
+                "variable": "beneficiary_name"
+            },
+            "go_to_screen_id": "enter_beneficiary_bank"
+        },
+        "enter_beneficiary_bank": {
+            "screen_id": "enter_beneficiary_bank",
+            "type": "MESSAGE",
+            "message_text": "🏦 Beneficiary's Bank Name:",
+            "input": {
+                "type": "text",
+                "variable": "beneficiary_bank"
+            },
+            "go_to_screen_id": "enter_routing_number"
+        },
+        "enter_routing_number": {
+            "screen_id": "enter_routing_number",
+            "type": "MESSAGE",
+            "message_text": "🔢 Bank Routing Number:\n\n(9-digit routing number for domestic transfers)\n(SWIFT/BIC code for international)",
+            "input": {
+                "type": "text",
+                "variable": "routing_number"
+            },
+            "go_to_screen_id": "enter_account_number"
+        },
+        "enter_account_number": {
+            "screen_id": "enter_account_number",
+            "type": "MESSAGE",
+            "message_text": "💳 Beneficiary's Account Number:\n\n(IBAN for international transfers)",
+            "input": {
+                "type": "text",
+                "variable": "beneficiary_account"
+            },
+            "go_to_screen_id": "enter_wire_amount"
+        },
+        "enter_wire_amount": {
+            "screen_id": "enter_wire_amount",
+            "type": "MESSAGE",
+            "message_text": "💰 Wire Amount:\n\nAvailable balance: ${{from_account.balance}}\n\n(Enter amount in USD)",
+            "input": {
+                "type": "text",
+                "variable": "wire_amount"
+            },
+            "go_to_screen_id": "enter_purpose"
+        },
+        "enter_purpose": {
+            "screen_id": "enter_purpose",
+            "type": "MENU",
+            "message_text": "📝 Purpose of Wire Transfer:",
+            "buttons": [
+                { "label": "🏠 Purchase of Property", "go_to_screen_id": "enter_message", "set_variable": "purpose", "set_value": "property" },
+                { "label": "💼 Business Payment", "go_to_screen_id": "enter_message", "set_variable": "purpose", "set_value": "business" },
+                { "label": "👨‍👩‍👧 Family Support", "go_to_screen_id": "enter_message", "set_variable": "purpose", "set_value": "family" },
+                { "label": "🎓 Education", "go_to_screen_id": "enter_message", "set_variable": "purpose", "set_value": "education" },
+                { "label": "🏥 Medical Expenses", "go_to_screen_id": "enter_message", "set_variable": "purpose", "set_value": "medical" },
+                { "label": "📋 Other", "go_to_screen_id": "enter_other_purpose" }
+            ]
+        },
+        "enter_other_purpose": {
+            "screen_id": "enter_other_purpose",
+            "type": "MESSAGE",
+            "message_text": "Please specify the purpose:",
+            "input": {
+                "type": "text",
+                "variable": "other_purpose"
+            },
+            "go_to_screen_id": "enter_message"
+        },
+        "enter_message": {
+            "screen_id": "enter_message",
+            "type": "MESSAGE",
+            "message_text": "💬 Message to Beneficiary (Optional):\n\n(Up to 140 characters)",
+            "input": {
+                "type": "text",
+                "variable": "wire_message"
+            },
+            "go_to_screen_id": "review_wire"
+        },
+        "review_wire": {
+            "screen_id": "review_wire",
+            "type": "MENU",
+            "message_text": "Review Wire Transfer:\n\nType: {{wire_type}}\nFrom: {{from_account.name}}\nTo: {{beneficiary_name}}\nBank: {{beneficiary_bank}}\nAmount: ${{wire_amount}}\nFee: ${{wire_type == 'domestic' ? 25 : 45}}\nTotal: ${{parseFloat(wire_amount) + (wire_type == 'domestic' ? 25 : 45)}}\n\nWire transfers cannot be cancelled once sent!",
+            "buttons": [
+                { "label": "Send Wire", "go_to_screen_id": "confirm_wire" },
+                { "label": "Edit Details", "go_to_screen_id": "enter_beneficiary_name" },
+                { "label": "Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "confirm_wire": {
+            "screen_id": "confirm_wire",
+            "type": "MENU",
+            "message_text": "⚠️ FINAL CONFIRMATION\n\nYou are about to send ${{wire_amount}} to:\n{{beneficiary_name}}\n{{beneficiary_bank}}\n\nThis action CANNOT be reversed.\n\nAre you absolutely sure?",
+            "buttons": [
+                { "label": "✅ YES, Send Wire", "go_to_screen_id": "process_wire" },
+                { "label": "❌ NO, Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "process_wire": {
+            "screen_id": "process_wire",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/wire-transfer",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "wire_id": "WIRE_8473920156",
+                    "confirmation_number": "CONF847392",
+                    "reference_number": "REF8473920156",
+                    "estimated_arrival": "2025-11-11"
+                }
+            },
+            "on_success": "wire_success",
+            "on_error": "wire_error"
+        },
+        "wire_success": {
+            "screen_id": "wire_success",
+            "type": "MESSAGE",
+            "message_text": "✅ Wire Transfer Sent!\n\nConfirmation #: CONF847392\nReference #: REF8473920156\n\nAmount: ${{wire_amount}}\nTo: {{beneficiary_name}}\nEstimated Arrival: {{wire_type == 'domestic' ? 'Today' : '1-5 business days'}}\n\n📧 Confirmation email sent to both you and the beneficiary.\n\n⚠️ Keep your confirmation number for your records.",
+            "buttons": [
+                { "label": "📧 Email Receipt", "go_to_screen_id": "end_flow" },
+                { "label": "💾 Save Beneficiary", "go_to_screen_id": "end_flow" },
+                { "label": "🏠 Done", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "wire_error": {
+            "screen_id": "wire_error",
+            "type": "MENU",
+            "message_text": "❌ Wire Transfer Failed\n\nYour wire could not be processed. Possible reasons:\n\n• Insufficient funds\n• Invalid account information\n• Daily limit exceeded\n• Account restrictions",
+            "buttons": [
+                { "label": "🔄 Try Again", "go_to_screen_id": "review_wire" },
+                { "label": "📞 Call Wire Transfer Dept", "go_to_screen_id": "end_flow" },
+                { "label": "🏠 Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "❌ Unable to retrieve your accounts. Please try again later.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for banking with Citi!",
+            "go_to_screen_id": null
+        }
+    }
+}
+

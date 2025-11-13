@@ -1,0 +1,410 @@
+{
+    "start_screen_id": "welcome_dispute",
+    "screens": {
+        "welcome_dispute": {
+            "screen_id": "welcome_dispute",
+            "type": "MENU",
+            "message_text": "Hi! I'm here to help you dispute a transaction.\n\nI understand this can be concerning, and I'll guide you through the process step by step. We take fraud and billing disputes very seriously.\n\nTo get started, I'll need to look up your credit cards. Is that okay?",
+            "buttons": [
+                { "label": "✅ Yes, let's start", "go_to_screen_id": "get_cards" },
+                { "label": "❓ What types of disputes can I file?", "go_to_screen_id": "dispute_types_info" },
+                { "label": "❌ Not right now", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "dispute_types_info": {
+            "screen_id": "dispute_types_info",
+            "type": "MENU",
+            "message_text": "You can dispute transactions for several reasons:\n\n**Unauthorized charges** - Someone used your card without permission\n**Incorrect amounts** - You were charged the wrong amount\n**Items not received** - You paid but never got what you ordered\n**Duplicate charges** - You were charged twice for the same thing\n**Cancelled services** - Charges for services you cancelled\n\nWe'll help you determine the right category as we go through the process.",
+            "buttons": [
+                { "label": "▶️ Continue with dispute", "go_to_screen_id": "get_cards" },
+                { "label": "🏠 Exit", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "get_cards": {
+            "screen_id": "get_cards",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards",
+                "method": "GET",
+                "mock_file": "mocks/mock_credit_cards.json",
+                "save_response_to": "cards"
+            },
+            "on_success": "select_card",
+            "on_error": "api_error"
+        },
+        "select_card": {
+            "screen_id": "select_card",
+            "type": "MENU",
+            "message_text": "Great! I found your credit cards. Which card has the transaction you'd like to dispute?",
+            "dynamic_buttons": {
+                "source_variable": "cards.cards",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "ask_transaction_method",
+                "set_variable": "selected_card"
+            },
+            "buttons": [
+                { "label": "❌ Cancel", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "ask_transaction_method": {
+            "screen_id": "ask_transaction_method",
+            "type": "MENU",
+            "message_text": "Perfect! Now I need to find the specific transaction on your {{selected_card.name}}.\n\nHow would you like to identify the transaction?",
+            "buttons": [
+                { "label": "📋 Show me recent transactions", "go_to_screen_id": "get_transactions" },
+                { "label": "💬 I'll describe the transaction", "go_to_screen_id": "describe_transaction" },
+                { "label": "⬅️ Choose different card", "go_to_screen_id": "select_card" }
+            ]
+        },
+        "describe_transaction": {
+            "screen_id": "describe_transaction",
+            "type": "MESSAGE",
+            "message_text": "I'd be happy to help you find the transaction. Please describe it to me:\n\n• What was the merchant name?\n• Approximately what amount?\n• When did it occur?\n\nFor example: \"Starbucks charge for $8.50 on November 10th\"",
+            "input": {
+                "type": "text",
+                "variable": "transaction_description"
+            },
+            "go_to_screen_id": "confirm_described_transaction"
+        },
+        "confirm_described_transaction": {
+            "screen_id": "confirm_described_transaction",
+            "type": "MENU",
+            "message_text": "Thank you for that information. You described:\n\n\"{{transaction_description}}\"\n\nI'll use this information for your dispute. Now, let's determine why you're disputing this charge.",
+            "buttons": [
+                { "label": "✅ That's correct", "go_to_screen_id": "select_reason_conversational" },
+                { "label": "📝 Let me re-describe it", "go_to_screen_id": "describe_transaction" },
+                { "label": "📋 Show me transactions instead", "go_to_screen_id": "get_transactions" }
+            ]
+        },
+        "get_transactions": {
+            "screen_id": "get_transactions",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/transactions",
+                "method": "GET",
+                "mock_file": "mocks/mock_transactions.json",
+                "save_response_to": "transactions"
+            },
+            "on_success": "select_transaction",
+            "on_error": "api_error"
+        },
+        "select_transaction": {
+            "screen_id": "select_transaction",
+            "type": "MENU",
+            "message_text": "Select the transaction you'd like to dispute:",
+            "dynamic_buttons": {
+                "source_variable": "transactions.transactions",
+                "label_template": "{{date}} - {{description}} - ${{amount}}",
+                "go_to_screen_id": "select_reason",
+                "set_variable": "disputed_transaction"
+            },
+            "buttons": [
+                { "label": "⬅️ Back", "go_to_screen_id": "select_card" }
+            ]
+        },
+        "select_reason": {
+            "screen_id": "select_reason",
+            "type": "MENU",
+            "message_text": "I understand you want to dispute this transaction:\n\n**{{disputed_transaction.description}}**\n💰 Amount: ${{disputed_transaction.amount}}\n📅 Date: {{disputed_transaction.date}}\n\nCould you tell me what happened? What's the main reason you're disputing this charge?",
+            "buttons": [
+                { "label": "I didn't make this purchase", "go_to_screen_id": "unauthorized_flow", "set_variable": "dispute_reason", "set_value": "unauthorized" },
+                { "label": "The amount is wrong", "go_to_screen_id": "wrong_amount_flow", "set_variable": "dispute_reason", "set_value": "wrong_amount" },
+                { "label": "I never received what I paid for", "go_to_screen_id": "not_received_flow", "set_variable": "dispute_reason", "set_value": "not_received" },
+                { "label": "I was charged twice", "go_to_screen_id": "duplicate_flow", "set_variable": "dispute_reason", "set_value": "duplicate" },
+                { "label": "I cancelled but was still charged", "go_to_screen_id": "cancelled_flow", "set_variable": "dispute_reason", "set_value": "cancelled" },
+                { "label": "⬅️ Back", "go_to_screen_id": "select_transaction" }
+            ]
+        },
+        "select_reason_conversational": {
+            "screen_id": "select_reason_conversational",
+            "type": "MENU",
+            "message_text": "I understand you want to dispute the transaction you described:\n\n\"{{transaction_description}}\"\n\nCould you tell me what happened? What's the main reason you're disputing this charge?",
+            "buttons": [
+                { "label": "I didn't make this purchase", "go_to_screen_id": "unauthorized_flow", "set_variable": "dispute_reason", "set_value": "unauthorized" },
+                { "label": "The amount is wrong", "go_to_screen_id": "wrong_amount_flow", "set_variable": "dispute_reason", "set_value": "wrong_amount" },
+                { "label": "I never received what I paid for", "go_to_screen_id": "not_received_flow", "set_variable": "dispute_reason", "set_value": "not_received" },
+                { "label": "I was charged twice", "go_to_screen_id": "duplicate_flow", "set_variable": "dispute_reason", "set_value": "duplicate" },
+                { "label": "I cancelled but was still charged", "go_to_screen_id": "cancelled_flow", "set_variable": "dispute_reason", "set_value": "cancelled" }
+            ]
+        },
+        "unauthorized_flow": {
+            "screen_id": "unauthorized_flow",
+            "type": "MESSAGE",
+            "message_text": "I'm sorry this happened to you. Unauthorized charges are serious, and we'll help you resolve this immediately.\n\nTo help with the investigation, could you tell me:\n\n• Do you recognize the merchant at all?\n• Do you still have your physical card?\n• Have you shared your card details with anyone recently?\n\nPlease provide any details that might help us understand how this charge occurred.",
+            "input": {
+                "type": "text",
+                "variable": "dispute_details"
+            },
+            "go_to_screen_id": "unauthorized_next_steps"
+        },
+        "unauthorized_next_steps": {
+            "screen_id": "unauthorized_next_steps",
+            "type": "MENU",
+            "message_text": "Thank you for that information. For unauthorized charges, I recommend we:\n\n1. **Immediately block your current card** to prevent further unauthorized use\n2. **Issue you a new card** with a new number\n3. **Process your dispute** for the unauthorized charge\n\nWould you like me to proceed with blocking your card and ordering a replacement?",
+            "buttons": [
+                { "label": "✅ Yes, block my card now", "go_to_screen_id": "block_card_process" },
+                { "label": "⏳ Just file the dispute for now", "go_to_screen_id": "ask_documentation" },
+                { "label": "❓ Tell me more about blocking", "go_to_screen_id": "block_card_info" }
+            ]
+        },
+        "block_card_info": {
+            "screen_id": "block_card_info",
+            "type": "MENU",
+            "message_text": "Here's what happens when we block your card:\n\n✅ **Immediate protection** - No new charges can be made\n✅ **New card shipped** - Usually arrives in 1-2 business days\n✅ **Same account** - Your account number and payment history stay the same\n✅ **Automatic updates** - Many merchants will automatically get your new card number\n\n⚠️ **Important**: Any legitimate recurring payments (Netflix, gym, etc.) will need your new card number.",
+            "buttons": [
+                { "label": "✅ Block my card", "go_to_screen_id": "block_card_process" },
+                { "label": "⏳ Just dispute for now", "go_to_screen_id": "ask_documentation" }
+            ]
+        },
+        "block_card_process": {
+            "screen_id": "block_card_process",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/cards/block",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "card_blocked": true,
+                    "new_card_ordered": true,
+                    "delivery_date": "2025-11-14"
+                }
+            },
+            "on_success": "card_blocked_success",
+            "on_error": "card_block_error"
+        },
+        "card_blocked_success": {
+            "screen_id": "card_blocked_success",
+            "type": "MENU",
+            "message_text": "✅ **Your card has been blocked successfully!**\n\n🚫 Your current card ending in {{selected_card.last_four}} is now deactivated\n📬 A new card will arrive by November 14th\n🔒 No additional unauthorized charges can be made\n\nNow let's continue with your dispute. Do you have any supporting documents?",
+            "buttons": [
+                { "label": "📎 Yes, I have documents", "go_to_screen_id": "ask_documentation" },
+                { "label": "❌ No documents", "go_to_screen_id": "review_dispute" }
+            ]
+        },
+        "card_block_error": {
+            "screen_id": "card_block_error",
+            "type": "MENU",
+            "message_text": "I'm having trouble blocking your card right now. Don't worry - we can still process your dispute, and I'll make sure to flag this as urgent for our fraud team.\n\nLet's continue with the dispute process.",
+            "buttons": [
+                { "label": "▶️ Continue with dispute", "go_to_screen_id": "ask_documentation" },
+                { "label": "📞 Call fraud hotline now", "go_to_screen_id": "fraud_hotline_info" }
+            ]
+        },
+        "fraud_hotline_info": {
+            "screen_id": "fraud_hotline_info",
+            "type": "MESSAGE",
+            "message_text": "For immediate fraud assistance, please call:\n\n📞 **1-800-950-5114**\n\nThis line is available 24/7 and can immediately block your card and start a fraud investigation.\n\nI'll also continue processing your dispute here.",
+            "go_to_screen_id": "ask_documentation"
+        },
+        "wrong_amount_flow": {
+            "screen_id": "wrong_amount_flow",
+            "type": "MESSAGE",
+            "message_text": "I understand the charge amount doesn't match what you expected to pay.\n\nCould you help me understand:\n\n• What amount did you expect to be charged?\n• Do you have a receipt or confirmation showing the correct amount?\n• Was this a tip adjustment, tax difference, or completely wrong amount?\n\nPlease provide as much detail as possible.",
+            "input": {
+                "type": "text",
+                "variable": "dispute_details"
+            },
+            "go_to_screen_id": "ask_documentation"
+        },
+        "not_received_flow": {
+            "screen_id": "not_received_flow",
+            "type": "MESSAGE",
+            "message_text": "I'm sorry you didn't receive what you paid for. This is frustrating, and we'll help you get this resolved.\n\nTo strengthen your case, please tell me:\n\n• What did you purchase?\n• When was it supposed to be delivered/provided?\n• Have you contacted the merchant about this?\n• Do you have tracking information or confirmation emails?\n\nThe more details you provide, the better we can help.",
+            "input": {
+                "type": "text",
+                "variable": "dispute_details"
+            },
+            "go_to_screen_id": "ask_documentation"
+        },
+        "duplicate_flow": {
+            "screen_id": "duplicate_flow",
+            "type": "MESSAGE",
+            "message_text": "Being charged twice for the same purchase is definitely not right. Let's get this sorted out.\n\nPlease help me understand:\n\n• When did you make the original purchase?\n• Are both charges for exactly the same amount?\n• Do you have a receipt or confirmation for the original purchase?\n• Have you contacted the merchant about the duplicate charge?\n\nThis information will help us resolve this quickly.",
+            "input": {
+                "type": "text",
+                "variable": "dispute_details"
+            },
+            "go_to_screen_id": "ask_documentation"
+        },
+        "cancelled_flow": {
+            "screen_id": "cancelled_flow",
+            "type": "MESSAGE",
+            "message_text": "It's frustrating when you cancel something but still get charged. We'll help you get your money back.\n\nTo build a strong case, please tell me:\n\n• When did you cancel the service/subscription?\n• How did you cancel (phone, email, website)?\n• Do you have confirmation of the cancellation?\n• What was the merchant's cancellation policy?\n\nAny documentation you have will really help your case.",
+            "input": {
+                "type": "text",
+                "variable": "dispute_details"
+            },
+            "go_to_screen_id": "ask_documentation"
+        },
+        "ask_documentation": {
+            "screen_id": "ask_documentation",
+            "type": "MENU",
+            "message_text": "Great! Now, do you have any supporting documents that could help your case?\n\nDocuments that strengthen disputes:\n📧 **Emails** with the merchant\n🧾 **Receipts** or order confirmations\n📦 **Tracking information**\n💬 **Screenshots** of conversations\n📋 **Cancellation confirmations**\n\nDon't worry if you don't have anything - we can still process your dispute.",
+            "buttons": [
+                { "label": "📎 Yes, I have documents", "go_to_screen_id": "documentation_instructions" },
+                { "label": "❌ No documents available", "go_to_screen_id": "review_dispute" },
+                { "label": "❓ What documents help most?", "go_to_screen_id": "documentation_help" }
+            ]
+        },
+        "documentation_help": {
+            "screen_id": "documentation_help",
+            "type": "MENU",
+            "message_text": "Here's what helps most for each type of dispute:\n\n🚫 **Unauthorized**: Police report, affidavit\n💰 **Wrong amount**: Original receipt, price quote\n📦 **Not received**: Tracking info, delivery confirmation\n🔄 **Duplicate**: Both transaction receipts\n❌ **Cancelled**: Cancellation email, policy terms\n\nEven without perfect documentation, we can still help you!",
+            "buttons": [
+                { "label": "📎 I have some documents", "go_to_screen_id": "documentation_instructions" },
+                { "label": "▶️ Continue without documents", "go_to_screen_id": "review_dispute" }
+            ]
+        },
+        "documentation_instructions": {
+            "screen_id": "documentation_instructions",
+            "type": "MENU",
+            "message_text": "Perfect! Here's how to submit your documents:\n\n1. **After this chat**: You'll receive an email with your case number\n2. **Reply to that email** with your documents attached\n3. **Or upload online**: Log into your account and go to \"Dispute Center\"\n4. **Or by phone**: Call the number on your confirmation email\n\nYour case will be stronger with documentation, but we'll start the investigation now.",
+            "buttons": [
+                { "label": "✅ Got it, let's continue", "go_to_screen_id": "review_dispute" },
+                { "label": "📧 How do I get the email?", "go_to_screen_id": "email_info" }
+            ]
+        },
+        "email_info": {
+            "screen_id": "email_info",
+            "type": "MENU",
+            "message_text": "You'll automatically receive a confirmation email within 15 minutes of submitting your dispute. It will include:\n\n📧 **Your case number**\n📋 **Summary of your dispute**\n📎 **Instructions for uploading documents**\n📞 **Direct phone number for your case**\n\nIf you don't see it, check your spam folder or call customer service.",
+            "buttons": [
+                { "label": "✅ Perfect, let's continue", "go_to_screen_id": "review_dispute" }
+            ]
+        },
+        "review_dispute": {
+            "screen_id": "review_dispute",
+            "type": "MENU",
+            "message_text": "Let's review everything before I submit your dispute:\n\nCard: {{selected_card.name}} (...{{selected_card.last_four}})\nDispute Reason: {{dispute_reason}}\nYour Details: {{dispute_details}}\n\nWhat happens next:\n• Temporary credit within 1-2 business days\n• Investigation begins immediately\n• Email confirmation with case number\n• Resolution typically within 30-90 days\n\nEverything look correct?",
+            "buttons": [
+                { "label": "✅ Yes, submit my dispute", "go_to_screen_id": "submit_dispute" },
+                { "label": "📝 Let me add more details", "go_to_screen_id": "add_more_details" },
+                { "label": "❌ Cancel dispute", "go_to_screen_id": "cancel_confirmation" }
+            ]
+        },
+        "add_more_details": {
+            "screen_id": "add_more_details",
+            "type": "MESSAGE",
+            "message_text": "Of course! Please add any additional information that might help your case:\n\n(You can include new details or clarify anything from before)",
+            "input": {
+                "type": "text",
+                "variable": "additional_details"
+            },
+            "go_to_screen_id": "review_dispute_updated"
+        },
+        "review_dispute_updated": {
+            "screen_id": "review_dispute_updated",
+            "type": "MENU",
+            "message_text": "Updated dispute summary:\n\nCard: {{selected_card.name}} (...{{selected_card.last_four}})\nDispute Reason: {{dispute_reason}}\nOriginal Details: {{dispute_details}}\nAdditional Details: {{additional_details}}\n\nReady to submit?",
+            "buttons": [
+                { "label": "✅ Submit dispute", "go_to_screen_id": "submit_dispute" },
+                { "label": "📝 Add even more details", "go_to_screen_id": "add_more_details" }
+            ]
+        },
+        "cancel_confirmation": {
+            "screen_id": "cancel_confirmation",
+            "type": "MENU",
+            "message_text": "I understand you want to cancel. Just to confirm:\n\n• Your dispute will **not** be filed\n• No temporary credit will be issued\n• The charge will remain on your account\n\nYou can always come back and file a dispute later if you change your mind.",
+            "buttons": [
+                { "label": "✅ Yes, cancel the dispute", "go_to_screen_id": "end_flow" },
+                { "label": "⬅️ Go back to review", "go_to_screen_id": "review_dispute" }
+            ]
+        },
+        "submit_dispute": {
+            "screen_id": "submit_dispute",
+            "type": "API_CALL",
+            "api_call": {
+                "url": "https://api.citi.com/v1/disputes",
+                "method": "POST",
+                "mock_response": {
+                    "status": "success",
+                    "dispute_id": "DISP_8473920156",
+                    "case_number": "CASE847392",
+                    "temporary_credit": true,
+                    "credit_date": "2025-11-13"
+                }
+            },
+            "on_success": "dispute_success",
+            "on_error": "dispute_error"
+        },
+        "dispute_success": {
+            "screen_id": "dispute_success",
+            "type": "MENU",
+            "message_text": "Great news! Your dispute has been successfully submitted.\n\n**Your Case Number: CASE847392**\n*Please save this number for your records*\n\n**What's happening now:**\n**Temporary credit** of ${{disputed_transaction.amount}} will appear within 1-2 business days\n**Investigation starts immediately** - We'll contact the merchant\n**Email confirmation** is being sent to you now\n**Track progress** anytime in your Citi app\n\n**Timeline:** Most disputes resolve within 30-90 days, but many are resolved much faster.\n\nIs there anything else I can help you with today?",
+            "buttons": [
+                { "label": "📧 Resend confirmation email", "go_to_screen_id": "resend_confirmation" },
+                { "label": "❓ What if I have more questions?", "go_to_screen_id": "dispute_followup_help" },
+                { "label": "🏠 All done, thank you!", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "resend_confirmation": {
+            "screen_id": "resend_confirmation",
+            "type": "MENU",
+            "message_text": "Confirmation email sent!\n\nI've sent another copy of your dispute confirmation to your email on file. It should arrive within a few minutes.\n\n**Case Number:** CASE847392\n\nIf you still don't receive it, please check your spam folder or update your email address in your account settings.",
+            "buttons": [
+                { "label": "✅ Perfect, thanks!", "go_to_screen_id": "end_flow" },
+                { "label": "📞 I need to update my email", "go_to_screen_id": "email_update_help" }
+            ]
+        },
+        "email_update_help": {
+            "screen_id": "email_update_help",
+            "type": "MESSAGE",
+            "message_text": "To update your email address:\n\n**Online:** Log into citi.com → Profile → Contact Information\n**Phone:** Call 1-800-950-5114\n**Mobile App:** Settings → Profile → Edit Contact Info\n\nOnce updated, you can request a new confirmation email for case CASE847392.",
+            "go_to_screen_id": "end_flow"
+        },
+        "dispute_followup_help": {
+            "screen_id": "dispute_followup_help",
+            "type": "MENU",
+            "message_text": "**If you have questions about your dispute:**\n\n📱 **Check status:** Citi Mobile App → Account Services → Dispute Center\n💬 **Chat with us:** Available 24/7 in the app\n📞 **Call directly:** 1-800-950-5114 (mention case CASE847392)\n📧 **Email updates:** You'll get automatic notifications\n\n**Need to add documents?** Reply to your confirmation email with attachments.",
+            "buttons": [
+                { "label": "✅ Got it, thanks!", "go_to_screen_id": "end_flow" },
+                { "label": "📞 Call now", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "dispute_error": {
+            "screen_id": "dispute_error",
+            "type": "MENU",
+            "message_text": "I'm sorry, I'm having trouble submitting your dispute right now.\n\nThis could be due to:\n• Temporary system maintenance\n• Network connectivity issues\n• High volume of requests\n\n**Don't worry - your information is saved.** You can:",
+            "buttons": [
+                { "label": "🔄 Try submitting again", "go_to_screen_id": "submit_dispute" },
+                { "label": "📞 Call to file by phone", "go_to_screen_id": "phone_dispute_help" },
+                { "label": "⏰ Try again later", "go_to_screen_id": "save_dispute_info" }
+            ]
+        },
+        "phone_dispute_help": {
+            "screen_id": "phone_dispute_help",
+            "type": "MESSAGE",
+            "message_text": "**File your dispute by phone:**\n\n📞 **Call: 1-800-950-5114**\n⏰ **Available:** 24/7\n🗣️ **Say:** \"I want to dispute a transaction\"\n\n**Have ready:**\n• Your card ending in {{selected_card.last_four}}\n• Transaction details you provided\n• Any supporting documents\n\nThe phone team can complete your dispute immediately.",
+            "go_to_screen_id": "end_flow"
+        },
+        "save_dispute_info": {
+            "screen_id": "save_dispute_info",
+            "type": "MESSAGE",
+            "message_text": "Your dispute information has been saved.\n\nSummary:\n• Card: {{selected_card.name}} (...{{selected_card.last_four}})\n• Reason: {{dispute_reason}}\n• Details: {{dispute_details}}\n\nTo complete later:\n• Return to this chat anytime\n• Call 1-800-950-5114 with this information\n• Use the Citi Mobile App dispute center\n\nRemember: The sooner you file, the better!",
+            "go_to_screen_id": "end_flow"
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MENU",
+            "message_text": "I'm having trouble accessing your account information right now.\n\nThis might be temporary. You can:",
+            "buttons": [
+                { "label": "🔄 Try again", "go_to_screen_id": "get_cards" },
+                { "label": "📞 Call customer service", "go_to_screen_id": "phone_support_info" },
+                { "label": "⏰ Come back later", "go_to_screen_id": "end_flow" }
+            ]
+        },
+        "phone_support_info": {
+            "screen_id": "phone_support_info",
+            "type": "MESSAGE",
+            "message_text": "**For immediate assistance:**\n\n📞 **Customer Service:** 1-800-950-5114\n📞 **Fraud Hotline:** 1-800-950-5114\n⏰ **Available:** 24 hours a day, 7 days a week\n\n**For disputes:** Mention you want to \"dispute a transaction\"\n**For fraud:** Say \"unauthorized charges\" or \"fraud\"\n\nThey can help you immediately over the phone.",
+            "go_to_screen_id": "end_flow"
+        },
+        "end_flow": {
+            "screen_id": "end_flow",
+            "type": "MESSAGE",
+            "message_text": "Thank you for using Citi's dispute assistance!\n\nWe're here to protect you 24/7. If you need help with anything else, just start a new chat or call us anytime.\n\n**Remember:** Your financial security is our top priority.",
+            "go_to_screen_id": null
+        }
+    }
+}
+

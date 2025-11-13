@@ -1,0 +1,66 @@
+{
+  "status": "success",
+  "transactions": [
+    {
+      "transaction_id": "txn_9287463510",
+      "date": "2025-11-10",
+      "description": "Amazon.com Purchase",
+      "amount": -87.45,
+      "category": "shopping",
+      "merchant": "Amazon.com",
+      "status": "posted",
+      "type": "debit"
+    },
+    {
+      "transaction_id": "txn_8374652901",
+      "date": "2025-11-09",
+      "description": "Whole Foods Market",
+      "amount": -124.67,
+      "category": "groceries",
+      "merchant": "Whole Foods",
+      "status": "posted",
+      "type": "debit"
+    },
+    {
+      "transaction_id": "txn_7465839201",
+      "date": "2025-11-08",
+      "description": "Direct Deposit - Salary",
+      "amount": 3500.00,
+      "category": "income",
+      "merchant": "Acme Corp",
+      "status": "posted",
+      "type": "credit"
+    },
+    {
+      "transaction_id": "txn_6574839201",
+      "date": "2025-11-07",
+      "description": "Shell Gas Station",
+      "amount": -52.30,
+      "category": "gas",
+      "merchant": "Shell",
+      "status": "posted",
+      "type": "debit"
+    },
+    {
+      "transaction_id": "txn_5483920164",
+      "date": "2025-11-06",
+      "description": "Netflix Subscription",
+      "amount": -15.99,
+      "category": "entertainment",
+      "merchant": "Netflix",
+      "status": "posted",
+      "type": "debit"
+    },
+    {
+      "transaction_id": "txn_4392016574",
+      "date": "2025-11-05",
+      "description": "Starbucks Coffee",
+      "amount": -8.45,
+      "category": "dining",
+      "merchant": "Starbucks",
+      "status": "pending",
+      "type": "debit"
+    }
+  ]
+}
+

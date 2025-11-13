@@ -1,0 +1,77 @@
+{
+    "start_screen_id": "api_get_credit_cards",
+    "screens": {
+        "api_get_credit_cards": {
+            "screen_id": "api_get_credit_cards",
+            "type": "API_CALL",
+            "api_call": { "url": "https://api.citi.com/v1/credit_cards" },
+            "on_success": "select_card",
+            "on_error": "api_error"
+        },
+        "select_card": {
+            "screen_id": "select_card",
+            "type": "MENU",
+            "message_text": "Which credit card would you like to pay?",
+            "dynamic_buttons": {
+                "source_variable": "credit_cards",
+                "label_template": "{{name}} (...{{last_four}})",
+                "go_to_screen_id": "select_payment_source",
+                "set_variable": "selected_card"
+            }
+        },
+        "select_payment_source": {
+            "screen_id": "select_payment_source",
+            "type": "API_CALL",
+            "api_call": { "url": "https://api.citi.com/v1/accounts" },
+            "on_success": "choose_payment_amount",
+            "on_error": "api_error"
+        },
+        "choose_payment_amount": {
+            "screen_id": "choose_payment_amount",
+            "type": "MENU",
+            "message_text": "How much would you like to pay for {{selected_card.name}}?",
+            "buttons": [
+                { "label": "Minimum Payment: ${{selected_card.min_payment}}", "go_to_screen_id": "confirm_min_payment" },
+                { "label": "Full Balance: ${{selected_card.balance}}", "go_to_screen_id": "confirm_full_payment" },
+                { "label": "Custom Amount", "go_to_screen_id": "enter_custom_amount" }
+            ]
+        },
+        "confirm_min_payment": {
+            "screen_id": "confirm_min_payment",
+            "type": "MENU",
+            "message_text": "Confirm payment of ${{selected_card.min_payment}}?",
+            "buttons": [
+                { "label": "✅ Confirm", "go_to_screen_id": "api_process_payment" },
+                { "label": "❌ Cancel", "go_to_screen_id": "welcome_screen" }
+            ]
+        },
+        "confirm_full_payment": {
+            "screen_id": "confirm_full_payment",
+            "type": "MENU",
+            "message_text": "Confirm payment of ${{selected_card.balance}}?",
+            "buttons": [
+                { "label": "✅ Confirm", "go_to_screen_id": "api_process_payment" },
+                { "label": "❌ Cancel", "go_to_screen_id": "welcome_screen" }
+            ]
+        },
+        "api_process_payment": {
+            "screen_id": "api_process_payment",
+            "type": "API_CALL",
+            "api_call": { "url": "https://api.citi.com/v1/payments", "method": "POST" },
+            "on_success": "payment_success",
+            "on_error": "api_error"
+        },
+        "payment_success": {
+            "screen_id": "payment_success",
+            "type": "MESSAGE",
+            "message_text": "Your payment was successful.",
+            "go_to_screen_id": "welcome_screen"
+        },
+        "api_error": {
+            "screen_id": "api_error",
+            "type": "MESSAGE",
+            "message_text": "An error occurred. Please try again.",
+            "go_to_screen_id": "welcome_screen"
+        }
+    }
+}

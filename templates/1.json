@@ -1,0 +1,178 @@
+{
+  "start_screen_id": "main_menu",
+  "screens": {
+    "start": {
+      "screen_id": "start",
+      "type": "START",
+      "go_to_screen_id": "main_menu"
+    },
+    "main_menu": {
+      "screen_id": "main_menu",
+      "type": "MENU",
+      "message_text": "🏦 Welcome to Citi Mobile Banking!\n\nI can help you with:",
+      "buttons": [
+        {
+          "label": "💳 Credit Cards",
+          "go_to_screen_id": "credit_card_menu"
+        },
+        {
+          "label": "💰 Banking Services",
+          "go_to_screen_id": "banking_menu"
+        },
+        {
+          "label": "❓ Help & Support",
+          "go_to_screen_id": "help_menu"
+        }
+      ]
+    },
+    "credit_card_menu": {
+      "screen_id": "credit_card_menu",
+      "type": "MENU",
+      "message_text": "💳 Credit Card Services",
+      "buttons": [
+        {
+          "label": "🔄 Replace Card",
+          "go_to_screen_id": "card_replacement_start"
+        },
+        {
+          "label": "✅ Activate Card",
+          "go_to_screen_id": "card_activation_start"
+        },
+        {
+          "label": "📊 Check Balance",
+          "go_to_screen_id": "balance_check_start"
+        },
+        {
+          "label": "✍️ Ask a Question",
+          "go_to_screen_id": "free_text_input"
+        },
+        {
+          "label": "⬅️ Back to Main Menu",
+          "go_to_screen_id": "main_menu"
+        }
+      ]
+    },
+    "banking_menu": {
+      "screen_id": "banking_menu",
+      "type": "MENU",
+      "message_text": "💰 Banking Services",
+      "buttons": [
+        {
+          "label": "💸 Transfer Funds",
+          "go_to_screen_id": "transfer_start"
+        },
+        {
+          "label": "📱 Deposit Check",
+          "go_to_screen_id": "deposit_start"
+        },
+        {
+          "label": "📄 View Statements",
+          "go_to_screen_id": "statements_start"
+        },
+        {
+          "label": "✍️ Ask a Question",
+          "go_to_screen_id": "free_text_input"
+        },
+        {
+          "label": "⬅️ Back to Main Menu",
+          "go_to_screen_id": "main_menu"
+        }
+      ]
+    },
+    "help_menu": {
+      "screen_id": "help_menu",
+      "type": "MENU",
+      "message_text": "❓ How can we help you?",
+      "buttons": [
+        {
+          "label": "📞 Contact Us",
+          "go_to_screen_id": "contact_info"
+        },
+        {
+          "label": "🕐 Business Hours",
+          "go_to_screen_id": "hours_info"
+        },
+        {
+          "label": "🔒 Security Tips",
+          "go_to_screen_id": "security_info"
+        },
+        {
+          "label": "✍️ Ask a Question",
+          "go_to_screen_id": "free_text_input"
+        },
+        {
+          "label": "⬅️ Back to Main Menu",
+          "go_to_screen_id": "main_menu"
+        }
+      ]
+    },
+    "free_text_input": {
+      "screen_id": "free_text_input",
+      "type": "MESSAGE",
+      "message_text": "💬 Please type your question below:\n\n(I'll do my best to help or connect you with a specialist)",
+      "input": {
+        "type": "text",
+        "variable": "user_question"
+      },
+      "go_to_screen_id": "acknowledge_question"
+    },
+    "acknowledge_question": {
+      "screen_id": "acknowledge_question",
+      "type": "MENU",
+      "message_text": "Thank you for your question:\n\n\"{{user_question}}\"\n\nWhat would you like to do next?",
+      "buttons": [
+        {
+          "label": "📞 Connect to Agent",
+          "go_to_screen_id": "agent_handoff"
+        },
+        {
+          "label": "🏠 Main Menu",
+          "go_to_screen_id": "main_menu"
+        },
+        {
+          "label": "✍️ Ask Another Question",
+          "go_to_screen_id": "free_text_input"
+        }
+      ]
+    },
+    "agent_handoff": {
+      "screen_id": "agent_handoff",
+      "type": "MESSAGE",
+      "message_text": "📞 Connecting you to a specialist...\n\nYour question: {{user_question}}\n\nPlease wait while we find an available agent.",
+      "go_to_screen_id": null
+    },
+    "contact_info": {
+      "screen_id": "contact_info",
+      "type": "MESSAGE",
+      "message_text": "📞 Contact Information:\n\nPhone: 1-800-CITI-BANK\nEmail: support@citi.com\n24/7 Support Available",
+      "buttons": [
+        {
+          "label": "⬅️ Back",
+          "go_to_screen_id": "help_menu"
+        }
+      ]
+    },
+    "hours_info": {
+      "screen_id": "hours_info",
+      "type": "MESSAGE",
+      "message_text": "🕐 Business Hours:\n\nMon-Fri: 8 AM - 8 PM EST\nSat: 9 AM - 5 PM EST\nSun: Closed\n\n24/7 Online Banking Available",
+      "buttons": [
+        {
+          "label": "⬅️ Back",
+          "go_to_screen_id": "help_menu"
+        }
+      ]
+    },
+    "security_info": {
+      "screen_id": "security_info",
+      "type": "MESSAGE",
+      "message_text": "🔒 Security Tips:\n\n• Never share your PIN\n• Use strong passwords\n• Enable 2-factor authentication\n• Monitor your accounts regularly",
+      "buttons": [
+        {
+          "label": "⬅️ Back",
+          "go_to_screen_id": "help_menu"
+        }
+      ]
+    }
+  }
+}
